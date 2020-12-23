@@ -2,7 +2,6 @@
 ![R-CMD](https://github.com/JGCRI/rdataviz/workflows/R-CMD/badge.svg)
 ![pkgdown](https://github.com/JGCRI/rdataviz/workflows/pkgdown/badge.svg)
 ![test_coverage](https://github.com/JGCRI/rdataviz/workflows/test_coverage/badge.svg)
-![test_coverage](https://github.com/JGCRI/rdataviz/workflows/test_coverage/badge.svg)
 <!-- badges: end -->
 
 <!-- ------------------------>
