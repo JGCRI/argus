@@ -184,6 +184,46 @@ server <- function(input, output) {
 
   })
 
+  # Filter Data after Reactive Choices -------------------
+  dataSumx <- reactive({
+    dataSum() %>%
+      dplyr::filter(scenario %in% input$scenariosSelected,
+                    param %in% paramsSelectedx())
+  })
+
+  #---------------------------
+  # Data Map
+  #---------------------------
+  dataMap <- reactive({
+    # Aggregate across classes
+    tblAggsums <- data() %>%
+      dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+      dplyr::mutate(scenario = as.character(scenario)) %>%
+      dplyr::filter(aggregate == "sum") %>%
+      dplyr::select(scenario, param, subRegion, x, value) %>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ sum(.)))
+    tblAggmeans <- data() %>%
+      dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+      dplyr::select(-class) %>%
+      dplyr::mutate(scenario = as.character(scenario)) %>%
+      dplyr::filter(aggregate == "mean") %>%
+      dplyr::select(scenario, param, subRegion, x, value) %>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+    dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+
+  })
+
+  # Filter Data after Reactive Choices -------------------
+  dataMapx <- reactive({
+    dataMap() %>%
+      dplyr::filter(scenario %in% input$scenariosSelected,
+                    param %in% paramsSelectedx())
+  })
+
+
   #---------------------------
   # Data Chart
   #---------------------------
@@ -283,15 +323,6 @@ server <- function(input, output) {
 
 
   #---------------------------
-  # Filter Data after Reactive Choices
-  #---------------------------
-  dataSumx <- reactive({
-    dataSum() %>%
-      dplyr::filter(scenario %in% input$scenariosSelected,
-                    param %in% paramsSelectedx())
-  })
-
-  #---------------------------
   # Summary Plot
   #---------------------------
   summaryPlot <- function(){
@@ -305,13 +336,14 @@ server <- function(input, output) {
       facet_wrap(.~param, scales="free_y",
                  labeller = labeller(param = label_wrap_gen(15)))+
       theme(legend.position="top",
-            plot.margin=margin(0,20,0,0,"pt"))
+            plot.margin=margin(0,20,0,0,"pt"),
+            aspect.ratio=1)
   }
 
   output$summary <- renderPlot({
     summaryPlot()
   },
-  height=function(){min(700,max(500,50*length(unique(dataSumx()$param))))}
+  height=function(){min(1000,max(500,50*length(unique(dataSumx()$param))))}
   )
 
   output$downloadPlotSum <- downloadHandler(
@@ -353,8 +385,9 @@ server <- function(input, output) {
         facet_grid(param~scenario, scales="free",switch="y")+
         theme(legend.position="right",
               legend.title = element_blank(),
-              plot.margin=margin(20,20,0,0,"pt"))}
-    cowplot::plot_grid(plotlist=plist,ncol=1)
+              plot.margin=margin(20,20,0,0,"pt"),
+              aspect.ratio=1)}
+    cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
   }
 
 
@@ -373,46 +406,28 @@ server <- function(input, output) {
   #---------------------------
   # Maps
   #---------------------------
-  output$map <- renderLeaflet({
 
-    if (is.null(data()) | is.null(map())) {
-      return(NULL)
-    }
+    output$map <- renderUI({
 
-    # Point to reactive values
-    data <- data()
-    map <- map()
+      dataMapxi = dataMapx() %>%
+        filter(param %in% paramsSelectedx()[1])
 
-    # Add data to map
-    datafiltered <- data[which(data$year == input$yearselected), ]
-    ordercounties <- match(map@data$NAME, datafiltered$county)
-    map@data <- datafiltered[ordercounties, ]
+      mapx <- (rmap::mapFind(dataMapxi))$subRegShapeFound;
+      mapx@data <- mapx@data %>%
+        dplyr::left_join(data)%>%
+        dplyr::select("subRegion","value"); mapx@data
+      mapx_1 <- tm_shape(mapx) +
+        tm_polygons(col = "value",
+                    style = "fixed",
+                    breaks = c(0, 25, 50, 75, 100),
+                    legend.hist = TRUE) +
+        tm_layout(legend.outside = T,
+                  legend.show = F)
 
-    # ADD this to create variableplot
-    map$variableplot <- as.numeric(
-      map@data[, input$variableselected]
-    )
-
-    # Create leaflet
-    pal <- colorBin("YlOrRd", domain = map$variableplot, bins = 7)
-
-    labels <- sprintf("%s: %g", map$county, map$variableplot) %>%
-      lapply(htmltools::HTML)
-
-    l <- leaflet(map) %>%
-      addTiles() %>%
-      addPolygons(
-        fillColor = ~ pal(variableplot),
-        color = "white",
-        dashArray = "3",
-        fillOpacity = 0.7,
-        label = labels
-      ) %>%
-      leaflet::addLegend(
-        pal = pal, values = ~variableplot,
-        opacity = 0.7, title = NULL
-      )
-  })
+      m1<-tmap_leaflet(mapx_1)
+      m2<-tmap_leaflet(mapx_1) %>% clearControls()
+      sync(m1,m2,ncol=2)
+    })
 
   #---------------------------
   # Data Table
