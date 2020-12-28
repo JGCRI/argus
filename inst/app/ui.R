@@ -33,6 +33,8 @@ ui <- fluidPage(
   #---------------------------
   # CSS/html
   #---------------------------
+
+  # Hide Shiny Errors
   # tags$style(type="text/css",
   #            ".shiny-output-error { visibility: hidden; }",
   #            ".shiny-output-error:before { visibility: hidden; }"
@@ -63,14 +65,6 @@ ui <- fluidPage(
         accept = c(".csv")
       ),
 
-      # ShapeFile Data
-      fileInput(
-        inputId = "filemap",
-        label = "Upload map. Choose shapefile",
-        multiple = TRUE,
-        accept = c('.shp', '.dbf', '.sbn', '.sbx', '.shx', '.prj')
-      ),
-
       # Reactive Input Choices Based on Input File-------------------------
 
       # Scenarios
@@ -80,7 +74,16 @@ ui <- fluidPage(
       # Params
       uiOutput('selectParams'),
       # Regions
-      uiOutput('selectRegions')
+      uiOutput('selectRegions'),
+
+      # ShapeFile Data
+      fileInput(
+        inputId = "filemap",
+        label = "Custom shapefile (Optional)",
+        multiple = TRUE,
+        accept = c('.shp', '.dbf', '.sbn', '.sbx', '.shx', '.prj')
+      )
+
     ),
 
     #---------------------------
@@ -104,7 +107,7 @@ ui <- fluidPage(
           )),
           br(),
           plotOutput(outputId = "summary"),
-          height = "100%"
+          width = "100%"
         ),
         #---------------------------
         # Main Panel: Charts
@@ -120,12 +123,12 @@ ui <- fluidPage(
             6, div(downloadButton('downloadPlotChart', 'Download Plot'), style = "float: right")
           )),
           br(),
-          plotOutput(outputId = "plot", height = "100%")
+          plotOutput(outputId = "plot", width = "100%")
         ),
         #---------------------------
         # Main Panel: Maps Tab
         #---------------------------
-        tabPanel("Maps", leafletOutput(outputId = "map")),
+        tabPanel("Maps", uiOutput(outputId = "map")),
         #---------------------------
         # Main Panel: Table Tab
         #---------------------------
