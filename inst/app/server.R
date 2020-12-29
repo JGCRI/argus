@@ -446,10 +446,10 @@ server <- function(input, output) {
       print(class(data()))
       write.csv(data() , file)
     })
+
   #---------------------------
   # Download All
   #---------------------------
-
   output$downloadAll <- downloadHandler(
     file = "all.zip",
     content = function(file) {

@@ -45,9 +45,10 @@ ui <- fluidPage(
   # Initial Settings/Theme
   #---------------------------
   #shinythemes::themeSelector(),
+
   theme = shinythemes::shinytheme("spacelab"),
 
-  div(downloadButton('downloadAll', NULL, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px;"), style="float: right"),
+  div(downloadButton('downloadAll', "All", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px;"), style="padding:10px;float: right"),
 
   titlePanel(
     p("RDataViz", style = "color:#3474A7"),
@@ -134,9 +135,8 @@ ui <- fluidPage(
           fluidRow(column(6, p(
             'Sum of Regions Selected'
           ), style = "display: inline-block;"),
-          #height:40px !important;width:90px !important;
           column(
-            6, div(downloadButton('downloadSummary',NULL, download = "summaryChart.png", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
+            6, div(downloadButton('downloadPlotSum',NULL, download = "summaryChart.png", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
           )),
           br(),
           plotOutput(outputId = "summary"),
@@ -148,10 +148,9 @@ ui <- fluidPage(
         tabPanel(
           "Charts",
           br(),
-          #fluidRow(column(12,  div(downloadButton('downloadPlot', 'Download Plot'), style = "float: right"))),
           fluidRow(column(6, p(
             'Sum of Regions Selected'
-          )),#, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"
+          )),
           column(
             6, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
           )),
@@ -170,7 +169,7 @@ ui <- fluidPage(
           br(),
           fluidRow(column(6, p(
             'Sum of Regions Selected'
-          )),#, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"
+          )),
           column(
             6, div(downloadButton('downloadTable', NULL, download = "table.csv", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
           )),
