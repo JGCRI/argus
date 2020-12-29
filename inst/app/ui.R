@@ -45,7 +45,7 @@ ui <- fluidPage(
   # Initial Settings/Theme
   #---------------------------
   #shinythemes::themeSelector(),
-  theme = shinythemes::shinytheme("spacelab"),
+  #theme = shinythemes::shinytheme("default"),
   titlePanel(p("RDataViz", style = "color:#3474A7")),
 
   #---------------------------
