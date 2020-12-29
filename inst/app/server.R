@@ -43,6 +43,14 @@ server <- function(input, output) {
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
 
+  parsefile <- function(file){
+    if (file_ext(input$urlfiledata) == "csv"){
+      return(file)
+    }else{
+
+    }
+  }
+
   #---------------------------
   # Data File (CSV)
   #---------------------------
