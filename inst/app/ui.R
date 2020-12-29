@@ -94,6 +94,26 @@ ui <- fluidPage(
         type = "tabs",
 
         #---------------------------
+        # Main Panel: Home Tab
+        #---------------------------
+        tabPanel(
+          "Home",
+          h2("Welcome!"),
+          p("This is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."),
+          br(),
+          p("GCAM and url input are still under development."),
+          br(),
+          p("For more information, please visit these links: "),
+          a(href = "https://github.com/JGCRI/rmap/blob/master/rdataviz.pdf", "- Cheatsheet"),
+          br(),
+          a(href = "https://github.com/JGCRI/rdataviz", "- Github"),
+          br(),
+          a(href = "https://jgcri.github.io/rdataviz/", "- Webpage"),
+          br(),
+          width = "100%"
+        ),
+
+        #---------------------------
         # Main Panel: Summary Tab
         #---------------------------
         tabPanel(
