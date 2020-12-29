@@ -45,10 +45,16 @@ ui <- fluidPage(
   # Initial Settings/Theme
   #---------------------------
   #shinythemes::themeSelector(),
-  #theme = shinythemes::shinytheme("default"),
-  titlePanel(p("RDataViz", style = "color:#3474A7")),
+  theme = shinythemes::shinytheme("spacelab"),
 
-  #---------------------------
+  div(downloadButton('downloadAll', "All", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px;"), style="padding:10px;float: right"),
+
+  titlePanel(
+    p("RDataViz", style = "color:#3474A7"),
+    windowTitle = "RDataViz"
+    ),
+
+   #---------------------------
   # Side Bar
   #---------------------------
   sidebarLayout(
@@ -99,11 +105,17 @@ ui <- fluidPage(
         tabPanel(
           "Home",
           h2("Welcome!"),
-          p("This is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."),
+          p(
+            "This is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."
+          ),
           br(),
-          p("GCAM and url input are still under development."),
+          p(
+            "GCAM and url input are still under development."
+          ),
           br(),
-          p("For more information, please visit these links: "),
+          p(
+            "For more information, please visit these links: "
+          ),
           a(href = "https://github.com/JGCRI/rmap/blob/master/rdataviz.pdf", "- Cheatsheet"),
           br(),
           a(href = "https://github.com/JGCRI/rdataviz", "- Github"),
@@ -121,9 +133,9 @@ ui <- fluidPage(
           br(),
           fluidRow(column(6, p(
             'Sum of Regions Selected'
-          )),
+          ), style = "display: inline-block;"),
           column(
-            6,  div(downloadButton('downloadPlotSum', 'Download Plot'), style = "float: right")
+            6, div(downloadButton('downloadPlotSum',NULL, download = "summaryChart.png", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
           )),
           br(),
           plotOutput(outputId = "summary"),
@@ -135,12 +147,11 @@ ui <- fluidPage(
         tabPanel(
           "Charts",
           br(),
-          #fluidRow(column(12,  div(downloadButton('downloadPlot', 'Download Plot'), style = "float: right"))),
           fluidRow(column(6, p(
             'Sum of Regions Selected'
           )),
           column(
-            6, div(downloadButton('downloadPlotChart', 'Download Plot'), style = "float: right")
+            6, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
           )),
           br(),
           plotOutput(outputId = "plot", width = "100%")
@@ -152,7 +163,18 @@ ui <- fluidPage(
         #---------------------------
         # Main Panel: Table Tab
         #---------------------------
-        tabPanel("Table", DTOutput(outputId = "table"))
+        tabPanel(
+          "Table",
+          br(),
+          fluidRow(column(6, p(
+            'Sum of Regions Selected'
+          )),
+          column(
+            6, div(downloadButton('downloadTable', NULL, download = "table.csv", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
+          )),
+          br(),
+          DTOutput(outputId = "table")
+        )
       )
     )
   )
