@@ -10,6 +10,8 @@ library(cowplot)
 library(rdataviz)
 library(rmap)
 library(shinyWidgets)
+library(tools)
+library(RCurl)
 
 #---------------------------
 # Overall Strtucture
@@ -45,12 +47,19 @@ server <- function(input, output) {
   # Data File (CSV)
   #---------------------------
   data <- reactive({
-    if (is.null(input$filedata)) {
+    if ((is.null(input$filedata))|(is.null(input$urlfiledata))) {
       rdataviz::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
-    } else {
+    } else if (url.exists(input$urlfiledata)&((file_ext(input$urlfiledata) == "csv")|(file_ext(input$urlfiledata) == "zip"))) {
+        rdataviz::addMissing(
+          read.csv(input$urlfiledata) %>%
+            as.data.frame() %>%
+            dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+        )
+    }
+    else {
       rdataviz::addMissing(
         read.csv(input$filedata$datapath) %>%
           as.data.frame() %>%

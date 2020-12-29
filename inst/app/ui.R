@@ -68,9 +68,12 @@ ui <- fluidPage(
 
       fileInput(
         inputId = "filedata",
-        label = "Upload csv",
-        accept = c(".csv")
+        label = "Upload csv or zip",
+        accept = c(".csv", ".zip")
       ),
+
+      textInput(
+        inputId = "urlfiledata", label = "Enter url of file", value = "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
 
       # Reactive Input Choices Based on Input File-------------------------
 
