@@ -347,7 +347,7 @@ server <- function(input, output) {
   )
 
   output$downloadPlotSum <- downloadHandler(
-    filename = "Shinyplot.png",
+    filename = "summaryPlot.png",
     content = function(file) {
       ggsave(file,plot=summaryPlot())
     })
@@ -398,7 +398,7 @@ server <- function(input, output) {
   )
 
   output$downloadPlotChart <- downloadHandler(
-    filename = "Shinyplot.png",
+    filename = "barChart.png",
     content = function(file) {
       ggsave(file,plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
     })
@@ -441,10 +441,29 @@ server <- function(input, output) {
   )
 
   output$downloadTable <- downloadHandler(
-    filename = "table.csv",
+    file = "table.csv",
     content = function(file) {
-      write.csv(data() , filename)
+      print(class(data()))
+      write.csv(data() , file)
     })
+  #---------------------------
+  # Download All
+  #---------------------------
+
+  output$downloadAll <- downloadHandler(
+    file = "all.zip",
+    content = function(file) {
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      print(tempdir())
+      fs <- c("table.csv", "summaryCharts.png", "barCharts.png")
+      write.csv(data(), "table.csv")
+      ggsave("summaryCharts.png",plot=summaryPlot())
+      ggsave("barCharts.png",plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
+      print(fs)
+      zip(zipfile=file, files=fs)
+    }
+  )
 
 
 }
