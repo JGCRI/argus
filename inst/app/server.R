@@ -366,10 +366,13 @@ server <- function(input, output) {
       palAdd <- rmap::colors()$pal_Basic
       missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
                                                      names(rmap::colors()$pal_rmap)]
-      palAdd <- palAdd[1:length(missNames)]
-      names(palAdd) <- missNames
-      palCharts <- c(rmap::colors()$pal_rmap,palAdd)
-
+      if (length(missNames) > 0) {
+        palAdd <- palAdd[1:length(missNames)]
+        names(palAdd) <- missNames
+        palCharts <- c(rmap::colors()$pal_rmap, palAdd)
+      } else{
+        palCharts <- rmap::colors()$pal_rmap
+      }
 
       plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
                                        filter(param==unique(dataChartPlot$param)[i])%>%
