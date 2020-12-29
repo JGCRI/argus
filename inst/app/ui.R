@@ -123,7 +123,7 @@ ui <- fluidPage(
           ), style = "display: inline-block;"),
           #height:40px !important;width:90px !important;
           column(
-          6,  div(downloadButton('downloadPlotSum', NULL, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right;"),
+          6,  div(downloadButton('downloadPlotSum', NULL, download = "summaryChart.png", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right;"),
           )),
           br(),
           plotOutput(outputId = "summary"),
@@ -140,7 +140,7 @@ ui <- fluidPage(
             'Sum of Regions Selected'
           )),#, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"
           column(
-            6, div(downloadButton('downloadPlotChart', NULL, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
+            6, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
           )),
           br(),
           plotOutput(outputId = "plot", width = "100%")
@@ -152,7 +152,17 @@ ui <- fluidPage(
         #---------------------------
         # Main Panel: Table Tab
         #---------------------------
-        tabPanel("Table", DTOutput(outputId = "table"))
+        tabPanel(
+          "Table",
+          fluidRow(column(6, p(
+            'Sum of Regions Selected'
+          )),#, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"
+          column(
+            6, div(downloadButton('downloadTable', NULL, download = "table.csv", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
+          )),
+          br(),
+          DTOutput(outputId = "table")
+        )
       )
     )
   )

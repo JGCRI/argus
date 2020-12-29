@@ -403,6 +403,8 @@ server <- function(input, output) {
       ggsave(file,plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
     })
 
+
+
   #---------------------------
   # Maps
   #---------------------------
@@ -437,5 +439,12 @@ server <- function(input, output) {
     data(),
     filter = "top"
   )
+
+  output$downloadTable <- downloadHandler(
+    filename = "table.csv",
+    content = function(file) {
+      write.csv(data() , filename)
+    })
+
 
 }
