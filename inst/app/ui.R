@@ -47,7 +47,6 @@ ui <- fluidPage(
   #shinythemes::themeSelector(),
   theme = shinythemes::shinytheme("spacelab"),
   titlePanel(p("RDataViz", style = "color:#3474A7")),
-  # includeCSS("./www/styles.css"),
   #---------------------------
   # Side Bar
   #---------------------------
@@ -124,7 +123,7 @@ ui <- fluidPage(
           ), style = "display: inline-block;"),
           #height:40px !important;width:90px !important;
           column(
-          6,  div(downloadButton('downloadPlotSum', '', style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right;"),
+          6,  div(downloadButton('downloadPlotSum', NULL, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right;"),
           )),
           br(),
           plotOutput(outputId = "summary"),
@@ -141,7 +140,7 @@ ui <- fluidPage(
             'Sum of Regions Selected'
           )),#, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"
           column(
-            6, div(downloadButton('downloadPlotChart', 'Download Plot', style = "font-size:12px !important"), style = "float: right")
+            6, div(downloadButton('downloadPlotChart', NULL, style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
           )),
           br(),
           plotOutput(outputId = "plot", width = "100%")
