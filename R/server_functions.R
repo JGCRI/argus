@@ -10,7 +10,6 @@
 #' @export
 #'
 addMissing<-function(data){
-  print("test")
   NULL -> year -> aggregate -> scenario -> subRegion -> param -> x -> value
 
   if(!any(grepl("\\<scenario\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(scenario="scenario")}else{

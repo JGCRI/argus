@@ -48,23 +48,25 @@ server <- function(input, output) {
   # Data File (CSV)
   #---------------------------
   data <- reactive({
-    if ((is.null(input$filedata))|(is.null(input$urlfiledata))) {
+    print("reacting")
+    print(input$filedata)
+    print(input$urlfiledata)
+    if ((is.null(input$filedata))&("" == input$urlfiledata)) {
       rdataviz::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
       #check if input is on file
-    } else if(input$tabs == "File"){
+    } else if((input$tabs == "File")){
       return(rdataviz::addMissing(
         rdataviz::parse_local(input)
       ))
-    } else if(input$tabs == "URL input"){
+      #check if input is on url
+    } else if((input$tabs == "URL input")){
       rdataviz::addMissing(
         rdataviz::parse_remote(input)
       )
     }
-    #check if both input are null
-    #check if input is on file
   })
 
   #---------------------------
