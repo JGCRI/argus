@@ -45,9 +45,8 @@ ui <- fluidPage(
   # Initial Settings/Theme
   #---------------------------
   #shinythemes::themeSelector(),
-
-  theme = shinythemes::shinytheme("spacelab"),
-
+  #theme = shinythemes::shinytheme("spacelab"),
+  
   div(downloadButton('downloadAll', "All", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px;"), style="padding:10px;float: right"),
 
   titlePanel(
@@ -83,6 +82,9 @@ ui <- fluidPage(
             width = "100%"
         ))
       ),
+
+      textInput(
+        inputId = "urlfiledata", label = "Enter url of file", value = "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
 
       # Reactive Input Choices Based on Input File-------------------------
 
@@ -153,7 +155,6 @@ ui <- fluidPage(
           column(
             6, div(downloadButton('downloadPlotSum',NULL, download = "summaryChart.png", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px"), style = "float: right")
           )),
-          br(),
           plotOutput(outputId = "summary"),
           width = "100%"
         ),
