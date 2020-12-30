@@ -43,13 +43,6 @@ server <- function(input, output) {
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
 
-  parsefile <- function(file){
-    if (file_ext(input$urlfiledata) == "csv"){
-      return(file)
-    }else{
-
-    }
-  }
 
   #---------------------------
   # Data File (CSV)
@@ -60,20 +53,18 @@ server <- function(input, output) {
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
-    } else if (url.exists(input$urlfiledata)&((file_ext(input$urlfiledata) == "csv")|(file_ext(input$urlfiledata) == "zip"))) {
-        rdataviz::addMissing(
-          read.csv(input$urlfiledata) %>%
-            as.data.frame() %>%
-            dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-        )
-    }
-    else {
+      #check if input is on file
+    } else if(input$tabs == "File"){
+      return(rdataviz::addMissing(
+        rdataviz::parse_local(input)
+      ))
+    } else if(input$tabs == "URL input"){
       rdataviz::addMissing(
-        read.csv(input$filedata$datapath) %>%
-          as.data.frame() %>%
-          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+        rdataviz::parse_remote(input)
       )
     }
+    #check if both input are null
+    #check if input is on file
   })
 
   #---------------------------
