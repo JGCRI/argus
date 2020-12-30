@@ -115,7 +115,10 @@ parse_remote <- function(input){
     return(read.csv(input$urlfiledata) %>%
              as.data.frame() %>%
              dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
+  }else{
+    return(dataDefault)
   }
+
 }
 #' @export
 parse_local <- function(input){
@@ -131,6 +134,8 @@ parse_local <- function(input){
     return(read.csv(input$filedata$datapath) %>%
              as.data.frame() %>%
              dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
+  }else{
+    return(dataDefault)
   }
 }
 
