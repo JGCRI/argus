@@ -10,6 +10,7 @@ library(cowplot)
 library(rdataviz)
 library(rmap)
 library(shinyWidgets)
+library(zip)
 
 #---------------------------
 # Overall Strtucture
@@ -464,7 +465,7 @@ server <- function(input, output) {
       ggsave("summaryCharts.png",plot=summaryPlot())
       ggsave("barCharts.png",plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
       print(fs)
-      zip(zipfile=file, files=fs)
+      zip::zip(zipfile=file, files=fs)
     }
   )
 
