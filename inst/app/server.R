@@ -10,6 +10,7 @@ library(cowplot)
 library(rdataviz)
 library(rmap)
 library(shinyWidgets)
+library(zip)
 
 #---------------------------
 # Overall Strtucture
@@ -333,25 +334,60 @@ server <- function(input, output) {
       ggplottheme +
       geom_line() +
       ylab(NULL) +  xlab(NULL) +
-      facet_wrap(.~param, scales="free_y",
+      facet_wrap(.~param, scales="free", ncol = 3,
                  labeller = labeller(param = label_wrap_gen(15)))+
       theme(legend.position="top",
-            plot.margin=margin(0,20,0,0,"pt"),
-            aspect.ratio=1)
+            plot.margin=margin(0,10,0,0,"pt"),
+            aspect.ratio=0.5)
   }
 
   output$summary <- renderPlot({
     summaryPlot()
   },
-  height=function(){min(1000,max(500,50*length(unique(dataSumx()$param))))}
+  height=function(){
+    if (length(unique(dataChartx()$param))%%3==0){
+      return(((length(unique(dataChartx()$param))%/%3))*250)
+    }else{
+      return(((length(unique(dataChartx()$param))%/%3)+1)*250)
+    }
+  }
   )
-
   output$downloadPlotSum <- downloadHandler(
-    filename = "Shinyplot.png",
+    filename = "summaryPlot.png",
     content = function(file) {
-      ggsave(file,plot=summaryPlot())
+      ggsave(
+        file,
+        plot=summaryPlot(),
+        #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
+        height = sum_hi(),
+        width=sum_wi(),
+        units="in"
+      )
     })
-
+    sum_hi<-function(){
+    if (length(unique(dataChartx()$param))%%3==0){
+      return(((length(unique(dataChartx()$param))%/%3))*5)
+    }else{
+      return(((length(unique(dataChartx()$param))%/%3)+1)*5)
+    }
+    }
+    sum_wi<-function(){
+      if (length(unique(dataChartx()$param))<3){
+        return(((length(unique(dataChartx()$param))))*5)
+      }else{
+        return(30)
+      }
+    }
+#  sum_width <- function(){
+#    width <- 0
+#    if (length(unique(dataChartx()$param)) <= 3){
+#      return(length(unique(dataChartx()$param)) * 5)
+#    }
+#    else if (length(unique(dataChartx()$param)) <= 9) {
+#      return(10)
+#    }
+#      return(16)
+#  }
   #---------------------------
   # Chart Plot
   #---------------------------
@@ -366,10 +402,13 @@ server <- function(input, output) {
       palAdd <- rmap::colors()$pal_Basic
       missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
                                                      names(rmap::colors()$pal_rmap)]
-      palAdd <- palAdd[1:length(missNames)]
-      names(palAdd) <- missNames
-      palCharts <- c(rmap::colors()$pal_rmap,palAdd)
-
+      if (length(missNames) > 0) {
+        palAdd <- palAdd[1:length(missNames)]
+        names(palAdd) <- missNames
+        palCharts <- c(rmap::colors()$pal_rmap, palAdd)
+      } else{
+        palCharts <- rmap::colors()$pal_rmap
+      }
 
       plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
                                        filter(param==unique(dataChartPlot$param)[i])%>%
@@ -398,10 +437,12 @@ server <- function(input, output) {
   )
 
   output$downloadPlotChart <- downloadHandler(
-    filename = "Shinyplot.png",
+    filename = "barChart.png",
     content = function(file) {
       ggsave(file,plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
     })
+
+
 
   #---------------------------
   # Maps
@@ -437,5 +478,31 @@ server <- function(input, output) {
     data(),
     filter = "top"
   )
+
+  output$downloadTable <- downloadHandler(
+    file = "table.csv",
+    content = function(file) {
+      print(class(data()))
+      write.csv(data() , file)
+    })
+
+  #---------------------------
+  # Download All
+  #---------------------------
+  output$downloadAll <- downloadHandler(
+    file = "all.zip",
+    content = function(file) {
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      print(tempdir())
+      fs <- c("table.csv", "summaryCharts.png", "barCharts.png")
+      write.csv(data(), "table.csv")
+      ggsave("summaryCharts.png",plot=summaryPlot())
+      ggsave("barCharts.png",plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
+      print(fs)
+      zip::zip(zipfile=file, files=fs)
+    }
+  )
+
 
 }
