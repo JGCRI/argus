@@ -358,16 +358,16 @@ server <- function(input, output) {
         file,
         plot=summaryPlot(),
         #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-        height = sum_hi(5),
+        height = sum_hi(),
         width=sum_wi(),
         units="in"
       )
     })
-    sum_hi<-function(factor){
+    sum_hi<-function(){
     if (length(unique(dataChartx()$param))%%3==0){
-      return(((length(unique(dataChartx()$param))%/%3))*factor)
+      return(((length(unique(dataChartx()$param))%/%3))*5)
     }else{
-      return(((length(unique(dataChartx()$param))%/%3)+1)*factor)
+      return(((length(unique(dataChartx()$param))%/%3)+1)*5)
     }
     }
     sum_wi<-function(){
