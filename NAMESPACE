@@ -2,9 +2,6 @@
 
 export(addMissing)
 export(constants)
-export(parse_local)
-export(parse_remote)
-export(parse_zip)
 export(run)
 import(shiny)
 importFrom(data.table,":=")

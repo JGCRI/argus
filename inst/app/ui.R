@@ -118,6 +118,7 @@ ui <- fluidPage(
         #---------------------------
         tabPanel(
           "Home",
+<<<<<<< HEAD
           style = "margin-bottom: 30px; margin-top: 30px; margin-right: 50px; margin-left: 50px; border-color: #A9A9A9; border-width: thin;border-style: solid;padding: 20px",
           h1("Welcome!",style="font-weight: bold; color = #A9A9A9"),
           h3("Introduction",style="font-weight: bold; color = #A9A9A9"),
@@ -125,6 +126,20 @@ ui <- fluidPage(
           p("This is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."),
           h3( "Key Links ",style="font-weight: bold; color = #A9A9A9"),
           hr(style="border-top: 1px solid #bbb;"),
+=======
+          h2("Welcome!"),
+          p(
+            "This is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."
+          ),
+          br(),
+          p(
+            "GCAM and url input are still under development."
+          ),
+          br(),
+          p(
+            "For more information, please visit these links: "
+          ),
+>>>>>>> parent of d58bec0... Merge branch 'add-multi-input' of https://github.com/JGCRI/rdataviz into add-home
           a(href = "https://github.com/JGCRI/rmap/blob/master/rdataviz.pdf", "- Cheatsheet"),
           br(),
           a(href = "https://github.com/JGCRI/rdataviz", "- Github"),
