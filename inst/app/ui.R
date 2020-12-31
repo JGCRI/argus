@@ -59,30 +59,16 @@ ui <- fluidPage(
   #---------------------------
   sidebarLayout(
     sidebarPanel(
-      tabsetPanel(
-        type = "tabs",
-        id="tabs",
-        # Reactive Input Choices Based on Input File-------------------------
-        tabPanel(
-          "URL input",
-          br(),
-          #URL Data --------------------------------------
-          textInput(
-            inputId = "urlfiledata", label = "Enter url to csv, zip, or GCAM folder", placeholder =  "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
-          br(),
-          width = "100%"
-        ),
-        tabPanel(
-          "File",
-          br(),
-          # CSV Data -------------------------------------
-          fileInput(
-            inputId = "filedata",
-            label = "Upload csv, zip, or GCAM folder",
-            accept = c(".csv", ".zip"),
-            multiple = TRUE,
-            width = "100%"
-        ))
+      # CSV Data -------------------------------------
+      p(
+        "Upload a csv file with columns: 'subRegion', 'scenario', 'year', 'param', 'class', 'value'."
+      ),
+
+
+      fileInput(
+        inputId = "filedata",
+        label = "Upload csv or zip",
+        accept = c(".csv", ".zip")
       ),
 
 
