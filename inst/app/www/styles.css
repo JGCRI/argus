@@ -9,15 +9,35 @@
   font-size:90% !important;
 }
 
-.dropdown-toggle{
+#selectRegions .dropdown-toggle{
   font-size: 90%;
   height:25px !important;
 }
-.form-control{
+#selectScenarios  div  div  button{
+  font-size: 90%;
+  height:25px !important;
+}
+#selectRefScenarios .dropdown-toggle{
+  font-size: 90%;
+  height:25px !important;
+}
+#selectParams .dropdown-toggle{
+  font-size: 90%;
+  height:25px !important;
+}
+body > div > div.row > div.col-sm-4 > form > div:nth-child(2) > div > div.input-group > input{
   font-size:90%;
   height:25px !important;
 }
-.btn-file{
+body > div > div.row > div.col-sm-4 > form > div:nth-child(2) > div > div.input-group > label > span{
+  font-size:10px;
+  height:25px !important;
+}
+body > div > div.row > div.col-sm-4 > form > div:nth-child(8) > div.input-group > input{
+  font-size:10px;
+  height:25px !important;
+}
+body > div > div.row > div.col-sm-4 > form > div:nth-child(8) > div.input-group > label > span{
   font-size:10px;
   height:25px !important;
 }
@@ -29,24 +49,8 @@
   font-size:90%;
   height:25px !important;
 }
-#selectScenarioss{
-  font-size:90%;
-}
-#selectRefScenarios{
-  font-size:90%;
-}
-#selectParams{
-  font-size:90%;
-}
-#selectRegions{
-  font-size:90%;
-}
 #filedata_progress{
   height:17.5px;
   font-size:80%;
   margin-bottom: -4px
-}
-input{
-  font-size:90%;
-  height:25px;
 }
