@@ -59,16 +59,17 @@ ui <- fluidPage(
   #---------------------------
   sidebarLayout(
     sidebarPanel(
+      class = "sidebar",
       # CSV Data -------------------------------------
       p(
         "Upload a csv file with columns: 'subRegion', 'scenario', 'year', 'param', 'class', 'value'."
       ),
-
-
-      fileInput(
-        inputId = "filedata",
-        label = "Upload csv or zip",
-        accept = c(".csv", ".zip")
+      div(
+        fileInput(
+          inputId = "filedata",
+          label = "Upload csv or zip",
+          accept = c(".csv", ".zip")
+        )
       ),
 
       textInput(

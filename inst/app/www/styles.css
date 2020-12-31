@@ -5,4 +5,48 @@
   border:0px;
 }
 
-*{font-size:90%}
+.sidebar{
+  font-size:90% !important;
+}
+
+.dropdown-toggle{
+  font-size: 90%;
+  height:25px !important;
+}
+.form-control{
+  font-size:90%;
+  height:25px !important;
+}
+.btn-file{
+  font-size:10px;
+  height:25px !important;
+}
+#filedata{
+  font-size:90%;
+  height:25px !important;
+}
+#urlfiledata{
+  font-size:90%;
+  height:25px !important;
+}
+#selectScenarioss{
+  font-size:90%;
+}
+#selectRefScenarios{
+  font-size:90%;
+}
+#selectParams{
+  font-size:90%;
+}
+#selectRegions{
+  font-size:90%;
+}
+#filedata_progress{
+  height:17.5px;
+  font-size:80%;
+  margin-bottom: -4px
+}
+input{
+  font-size:90%;
+  height:25px;
+}
