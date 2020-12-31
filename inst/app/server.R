@@ -10,12 +10,9 @@ library(cowplot)
 library(rdataviz)
 library(rmap)
 library(shinyWidgets)
-<<<<<<< HEAD
 library(tools)
 library(RCurl)
-=======
 library(zip)
->>>>>>> deb239f4ef42eb4e4dd79cb99b6344675f0993c2
 
 #---------------------------
 # Overall Strtucture
