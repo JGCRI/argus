@@ -63,14 +63,6 @@ ui <- fluidPage(
         type = "tabs",
         id="tabs",
         tabPanel(
-          "URL input",
-          br(),
-          textInput(
-            inputId = "urlfiledata", label = "Enter url to csv, zip, or GCAM folder", placeholder =  "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
-          br(),
-          width = "100%"
-        ),
-        tabPanel(
           "File",
           br(),
           # CSV Data -------------------------------------
@@ -80,7 +72,15 @@ ui <- fluidPage(
             accept = c(".csv", ".zip"),
             multiple = TRUE,
             width = "100%"
-        ))
+        )),
+        tabPanel(
+          "URL input",
+          br(),
+          textInput(
+            inputId = "urlfiledata", label = "Enter url to csv, zip, or GCAM folder", placeholder =  "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
+          br(),
+          width = "100%"
+        )
       ),
 
       # Reactive Input Choices Based on Input File-------------------------
