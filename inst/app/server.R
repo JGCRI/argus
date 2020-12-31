@@ -44,28 +44,20 @@ server <- function(input, output) {
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
 
-
   #---------------------------
   # Data File (CSV)
   #---------------------------
   data <- reactive({
-    print("reacting")
-    print(input$filedata)
-    print(input$urlfiledata)
-    if ((is.null(input$filedata))&("" == input$urlfiledata)) {
+    if (is.null(input$filedata)) {
       rdataviz::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
-      #check if input is on file
-    } else if((input$tabs == "File")){
-      return(rdataviz::addMissing(
-        rdataviz::parse_local(input)
-      ))
-      #check if input is on url
-    } else if((input$tabs == "URL input")){
+    } else {
       rdataviz::addMissing(
-        rdataviz::parse_remote(input)
+        read.csv(input$filedata$datapath) %>%
+          as.data.frame() %>%
+          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
     }
   })
