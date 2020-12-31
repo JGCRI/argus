@@ -62,9 +62,11 @@ ui <- fluidPage(
       tabsetPanel(
         type = "tabs",
         id="tabs",
+        # Reactive Input Choices Based on Input File-------------------------
         tabPanel(
           "URL input",
           br(),
+          #URL Data --------------------------------------
           textInput(
             inputId = "urlfiledata", label = "Enter url to csv, zip, or GCAM folder", placeholder =  "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
           br(),
@@ -82,7 +84,7 @@ ui <- fluidPage(
             width = "100%"
         ))
       ),
-      # Reactive Input Choices Based on Input File-------------------------
+
 
       # Scenarios
       uiOutput('selectScenarios'),
@@ -103,6 +105,7 @@ ui <- fluidPage(
 
     ),
 
+
     #---------------------------
     # Main Panel
     #---------------------------
@@ -115,27 +118,37 @@ ui <- fluidPage(
         #---------------------------
         tabPanel(
           "Home",
-          h2("Welcome!"),
-          p(
-            "This is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."
-          ),
-          p(
-            "Upload a csv file with columns: 'subRegion', 'scenario', 'year', 'param', 'class', 'value'."
-          ),
-          br(),
-          p(
-            "GCAM and url input are still under development."
-          ),
-          br(),
-          p(
-            "For more information, please visit these links: "
-          ),
+          style = "margin-bottom: 30px; margin-top: 30px; margin-right: 50px; margin-left: 50px; border-color: #A9A9A9; border-width: thin;border-style: solid;padding: 20px",
+          h1("Welcome!",style="font-weight: bold; color = #A9A9A9"),
+          h3("Introduction",style="font-weight: bold; color = #A9A9A9"),
+          hr(style="border-top: 1px solid #bbb;"),
+          p("This is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."),
+          h3( "Key Links ",style="font-weight: bold; color = #A9A9A9"),
+          hr(style="border-top: 1px solid #bbb;"),
           a(href = "https://github.com/JGCRI/rmap/blob/master/rdataviz.pdf", "- Cheatsheet"),
           br(),
           a(href = "https://github.com/JGCRI/rdataviz", "- Github"),
           br(),
           a(href = "https://jgcri.github.io/rdataviz/", "- Webpage"),
-          br(),
+          h3("Citation",style="font-weight: bold; color = #A9A9A9"),
+          hr(style="border-top: 1px solid #bbb;"),
+          h3("How-to",style="font-weight: bold; color = #A9A9A9"),
+          hr(style="border-top: 1px solid #bbb;"),
+          p("Step 1: Choose Project Folder (For saving all project files)"),
+          p("Step 2: Load/Save Settings (This will be a file to save all current options on the app, which can be loaded in the future to return to a certain state)"),
+          p("Step 3: Choose Data"),
+          p("Choose a csv, zip, or GCAM output directory containing columns: 'subRegion', 'scenario', 'year', 'param', 'class', 'value'."),
+          p("GCAM and url input are still under development."),
+          p("Step 4: Select scenarios, regions and parameters"),
+          p("Step 5: Save settings"),
+          p("Step 6: Download all / Explore output"),
+          h3("Output Tabs", style="font-weight: bold; color = #A9A9A9"),
+          hr(style="border-top: 1px solid #bbb;"),
+          p("Home: Basic instructions on how to run and cite the app."),
+          p("Summary: Summary visualization of the input data in the form of a line graph displaying the difference across scenarios."),
+          p("Charts: Detailed visualization of the input data in the form of bar graphs displaying the absolute difference across scenarios"),
+          p("Maps: Under Development"),
+          p("Table: Table displaying the input data, including search and sort functions"),
           width = "100%"
         ),
 
