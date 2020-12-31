@@ -46,7 +46,7 @@ ui <- fluidPage(
   #---------------------------
   #shinythemes::themeSelector(),
   #theme = shinythemes::shinytheme("spacelab"),
-  
+
   div(downloadButton('downloadAll', "All", style = "font-size:12px !important;color:#FFFFFF;background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);border:0px;"), style="padding:10px;float: right"),
 
   titlePanel(
@@ -59,20 +59,29 @@ ui <- fluidPage(
   #---------------------------
   sidebarLayout(
     sidebarPanel(
-      # CSV Data -------------------------------------
-      p(
-        "Upload a csv file with columns: 'subRegion', 'scenario', 'year', 'param', 'class', 'value'."
+      tabsetPanel(
+        type = "tabs",
+        id="tabs",
+        tabPanel(
+          "File",
+          br(),
+          # CSV Data -------------------------------------
+          fileInput(
+            inputId = "filedata",
+            label = "Upload csv, zip, or GCAM folder",
+            accept = c(".csv", ".zip"),
+            multiple = TRUE,
+            width = "100%"
+        )),
+        tabPanel(
+          "URL input",
+          br(),
+          textInput(
+            inputId = "urlfiledata", label = "Enter url to csv, zip, or GCAM folder", placeholder =  "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
+          br(),
+          width = "100%"
+        )
       ),
-
-
-      fileInput(
-        inputId = "filedata",
-        label = "Upload csv or zip",
-        accept = c(".csv", ".zip")
-      ),
-
-      textInput(
-        inputId = "urlfiledata", label = "Enter url of file", value = "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
 
       # Reactive Input Choices Based on Input File-------------------------
 
@@ -110,6 +119,9 @@ ui <- fluidPage(
           h2("Welcome!"),
           p(
             "This is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."
+          ),
+          p(
+            "Upload a csv file with columns: 'subRegion', 'scenario', 'year', 'param', 'class', 'value'."
           ),
           br(),
           p(
