@@ -10,6 +10,8 @@ library(cowplot)
 library(rdataviz)
 library(rmap)
 library(shinyWidgets)
+library(tools)
+library(RCurl)
 library(zip)
 
 #---------------------------
@@ -338,7 +340,7 @@ server <- function(input, output) {
                  labeller = labeller(param = label_wrap_gen(15)))+
       theme(legend.position="top",
             plot.margin=margin(0,10,0,0,"pt"),
-            aspect.ratio=0.5)
+            aspect.ratio=0.75)
   }
 
   output$summary <- renderPlot({
@@ -366,16 +368,16 @@ server <- function(input, output) {
     })
     sum_hi<-function(){
     if (length(unique(dataChartx()$param))%%3==0){
-      return(((length(unique(dataChartx()$param))%/%3))*5)
+      return(((length(unique(dataChartx()$param))%/%3))*3)
     }else{
-      return(((length(unique(dataChartx()$param))%/%3)+1)*5)
+      return(((length(unique(dataChartx()$param))%/%3)+1)*3)
     }
     }
     sum_wi<-function(){
       if (length(unique(dataChartx()$param))<3){
-        return(((length(unique(dataChartx()$param))))*5)
+        return(((length(unique(dataChartx()$param))))*2)
       }else{
-        return(30)
+        return(10)
       }
     }
 #  sum_width <- function(){
@@ -497,7 +499,10 @@ server <- function(input, output) {
       print(tempdir())
       fs <- c("table.csv", "summaryCharts.png", "barCharts.png")
       write.csv(data(), "table.csv")
-      ggsave("summaryCharts.png",plot=summaryPlot())
+      ggsave("summaryCharts.png",plot=summaryPlot(),
+             height = sum_hi(),
+             width=sum_wi(),
+             units="in")
       ggsave("barCharts.png",plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
       print(fs)
       zip::zip(zipfile=file, files=fs)
