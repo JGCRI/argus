@@ -1,0 +1,8 @@
+.download_button{
+  font-size:12px !important;
+  color:#FFFFFF;
+  background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);
+  border:0px;
+}
+
+*{font-size:90%}
