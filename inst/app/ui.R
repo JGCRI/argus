@@ -59,16 +59,28 @@ ui <- fluidPage(
   #---------------------------
   sidebarLayout(
     sidebarPanel(
-      # CSV Data -------------------------------------
-      p(
-        "Upload a csv file with columns: 'subRegion', 'scenario', 'year', 'param', 'class', 'value'."
-      ),
-
-
-      fileInput(
-        inputId = "filedata",
-        label = "Upload csv or zip",
-        accept = c(".csv", ".zip")
+      tabsetPanel(
+        type = "tabs",
+        id="tabs",
+        tabPanel(
+          "URL input",
+          br(),
+          textInput(
+            inputId = "urlfiledata", label = "Enter url to csv, zip, or GCAM folder", placeholder =  "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
+          br(),
+          width = "100%"
+        ),
+        tabPanel(
+          "File",
+          br(),
+          # CSV Data -------------------------------------
+          fileInput(
+            inputId = "filedata",
+            label = "Upload csv, zip, or GCAM folder",
+            accept = c(".csv", ".zip"),
+            multiple = TRUE,
+            width = "100%"
+        ))
       ),
 
       textInput(
@@ -110,6 +122,9 @@ ui <- fluidPage(
           h2("Welcome!"),
           p(
             "This is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."
+          ),
+          p(
+            "Upload a csv file with columns: 'subRegion', 'scenario', 'year', 'param', 'class', 'value'."
           ),
           br(),
           p(

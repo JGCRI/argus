@@ -10,7 +10,12 @@ library(cowplot)
 library(rdataviz)
 library(rmap)
 library(shinyWidgets)
+<<<<<<< HEAD
+library(tools)
+library(RCurl)
+=======
 library(zip)
+>>>>>>> deb239f4ef42eb4e4dd79cb99b6344675f0993c2
 
 #---------------------------
 # Overall Strtucture
@@ -42,20 +47,28 @@ server <- function(input, output) {
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
 
+
   #---------------------------
   # Data File (CSV)
   #---------------------------
   data <- reactive({
-    if (is.null(input$filedata)) {
+    print("reacting")
+    print(input$filedata)
+    print(input$urlfiledata)
+    if ((is.null(input$filedata))&("" == input$urlfiledata)) {
       rdataviz::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
-    } else {
+      #check if input is on file
+    } else if((input$tabs == "File")){
+      return(rdataviz::addMissing(
+        rdataviz::parse_local(input)
+      ))
+      #check if input is on url
+    } else if((input$tabs == "URL input")){
       rdataviz::addMissing(
-        read.csv(input$filedata$datapath) %>%
-          as.data.frame() %>%
-          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+        rdataviz::parse_remote(input)
       )
     }
   })
