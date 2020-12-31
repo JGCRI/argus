@@ -1,0 +1,56 @@
+.download_button{
+  font-size:12px !important;
+  color:#FFFFFF;
+  background-image: linear-gradient(#3399f3, #3399f3 50%, #3399f3);
+  border:0px;
+}
+
+.sidebar{
+  font-size:90% !important;
+}
+
+#selectRegions .dropdown-toggle{
+  font-size: 90%;
+  height:25px !important;
+}
+#selectScenarios  div  div  button{
+  font-size: 90%;
+  height:25px !important;
+}
+#selectRefScenarios .dropdown-toggle{
+  font-size: 90%;
+  height:25px !important;
+}
+#selectParams .dropdown-toggle{
+  font-size: 90%;
+  height:25px !important;
+}
+body > div > div.row > div.col-sm-4 > form > div:nth-child(2) > div > div.input-group > input{
+  font-size:90%;
+  height:25px !important;
+}
+body > div > div.row > div.col-sm-4 > form > div:nth-child(2) > div > div.input-group > label > span{
+  font-size:10px;
+  height:25px !important;
+}
+body > div > div.row > div.col-sm-4 > form > div:nth-child(8) > div.input-group > input{
+  font-size:10px;
+  height:25px !important;
+}
+body > div > div.row > div.col-sm-4 > form > div:nth-child(8) > div.input-group > label > span{
+  font-size:10px;
+  height:25px !important;
+}
+#filedata{
+  font-size:90%;
+  height:25px !important;
+}
+#urlfiledata{
+  font-size:90%;
+  height:25px !important;
+}
+#filedata_progress{
+  height:17.5px;
+  font-size:80%;
+  margin-bottom: -4px
+}
