@@ -13,6 +13,7 @@ library(shinyWidgets)
 library(tools)
 library(RCurl)
 library(zip)
+library(tmap)
 library(leaflet)
 library(leafsync)
 
