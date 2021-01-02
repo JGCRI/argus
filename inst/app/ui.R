@@ -52,6 +52,17 @@ ui <- fluidPage(
                  onclick ="window.open('https://github.com/JGCRI/rdataviz', '_blank')"),style="padding:15px 5px;float: right"),
   div(actionLink(inputId='help', label='', icon = icon("question","fa-1x"),
                  onclick ="window.open('https://jgcri.github.io/rdataviz/', '_blank')"),style="padding:15px 5px;float: right"),
+  div(downloadButton('downloadSettings', "Save Settings",  class = "download_button", icon = icon("cog", "fa-1x")), style="padding:5px; float: left"),
+  div(style = "padding:5px", tags$label(class="btn btn-default shiny-download-link download_button shiny-bound-output", tags$span(class="btn download_button", "Upload Settings", style = "padding:0px", tags$i(class="fa fa-download", style="float:left"), tags$input(type="file", id="settings_file", name="settings_file", class="shiny-bound-input", style = "display:none")))),
+
+
+
+  # <div style="display: block; width: 100px; height: 20px; overflow: hidden;"
+  #   <button style="width: 110px; height: 30px; position: relative; top: -5px; left: -5px;"><a href="javascript: void(0)">Upload File</a></button>
+  #   <input type="file" id="upload_input" name="upload" style="font-size: 50px; width: 120px; opacity: 0; filter:alpha(opacity=0);  position: relative; top: -40px;; left: -20px" />
+  #   </div>
+
+  # <input id="filedata" name="filedata" type="file" style="display: none;" multiple="multiple" accept=".csv,.zip" class="shiny-bound-input">
 
   titlePanel(
     p("RDataViz", style = "color:#3474A7"),
@@ -105,7 +116,6 @@ ui <- fluidPage(
         multiple = TRUE,
         accept = c('.shp', '.dbf', '.sbn', '.sbx', '.shx', '.prj')
       )
-
     ),
 
 
