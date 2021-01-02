@@ -114,7 +114,7 @@ ui <- fluidPage(
     #---------------------------
     mainPanel(
       tabsetPanel(
-        type = "tabs",
+        type = "pills",
 
         #---------------------------
         # Main Panel: Home Tab
@@ -154,23 +154,36 @@ ui <- fluidPage(
         #---------------------------
         # Main Panel: Summary Tab
         #---------------------------
-        tabPanel(
-          "Summary",
-          br(),
-          fluidRow(column(6, p(
-            'Sum of Regions Selected'
-          )),
-          column(
-            6, div(downloadButton('downloadPlotSum',NULL, download = "summaryChart.png", class = "download_button"), style = "float: right")
-          )),
-          plotOutput(outputId = "summary"),
-          width = "100%"
-        ),
+        tabPanel("Summary",
+                 tabsetPanel(
+                   tabPanel(
+                     "All",
+                     br(),
+                     fluidRow(column(6, p(
+                       'Sum of Regions Selected'
+                     )),
+                     column(
+                       6, div(
+                         downloadButton(
+                           'downloadPlotSum',
+                           NULL,
+                           download = "summaryChart.png",
+                           class = "download_button"
+                         ),
+                         style = "float: right"
+                       )
+                     )),
+                     plotOutput(outputId = "summary"),
+                     width = "100%"
+                   ),
+                   tabPanel("Compare Regions")
+                 )),
         #---------------------------
         # Main Panel: Charts
         #---------------------------
-        tabPanel(
-          "Charts",
+        tabPanel("Charts",
+                 tabsetPanel(
+                   tabPanel("All",
           br(),
           fluidRow(column(6, p(
             'Sum of Regions Selected'
@@ -180,11 +193,23 @@ ui <- fluidPage(
           )),
           br(),
           plotOutput(outputId = "plot", width = "100%")
+                 ),
+          tabPanel("Compare Regions")
+          )
         ),
         #---------------------------
         # Main Panel: Maps Tab
         #---------------------------
-        tabPanel("Maps", uiOutput(outputId = "map")),
+        tabPanel("Maps",
+                 tabsetPanel(
+                   tabPanel("Summary",
+                 uiOutput(outputId = "map")
+                 ),
+                 tabPanel("Compare Years"),
+                 tabPanel("Class"),
+                 tabPanel("Class Compare years")
+        )
+      ),
         #---------------------------
         # Main Panel: Table Tab
         #---------------------------
