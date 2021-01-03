@@ -342,8 +342,7 @@ server <- function(input, output) {
       facet_wrap(.~param, scales="free", ncol = 3,
                  labeller = labeller(param = label_wrap_gen(15)))+
       theme(legend.position="top",
-            plot.margin=margin(0,10,0,0,"pt"),
-            aspect.ratio=0.75)
+            plot.margin=margin(10,10,0,0,"pt"))
   }
 
   output$summary <- renderPlot({
@@ -383,16 +382,85 @@ server <- function(input, output) {
         return(10)
       }
     }
-#  sum_width <- function(){
-#    width <- 0
-#    if (length(unique(dataChartx()$param)) <= 3){
-#      return(length(unique(dataChartx()$param)) * 5)
-#    }
-#    else if (length(unique(dataChartx()$param)) <= 9) {
-#      return(10)
-#    }
-#      return(16)
-#  }
+
+    #---------------------------
+    # Subset Regions Selected
+    #---------------------------
+    output$subsetRegions = renderUI({
+      pickerInput(
+        inputId = "subsetRegions",
+        label = "Select Regions to Compare",
+        choices = unique(dataMap()$subRegion),
+        selected = unique(dataMap()$subRegion)[1:4],
+        multiple = TRUE,
+        options = list(
+          `actions-box` = TRUE,
+          `deselect-all-text` = "None",
+          `select-all-text` = "All",
+          `none-selected-text` = "None Selected"
+      ))
+    })
+
+    #---------------------------
+    # Reactive Regions Select based on inputs
+    #---------------------------
+    subsetRegionsx <- reactive({
+      if (input$subsetRegions == "All" &
+          length(input$subsetRegions) == 1) {
+        unique(dataMapx()$subRegion)
+      } else{
+        input$subsetRegions
+      }
+    })
+
+    #---------------------------
+    # Summary Plot Compare Regions
+    #---------------------------
+    summaryPlotReg <- function(){
+
+      dataChartPlot <- # All regions
+        dataMapx() %>% tidyr::complete(scenario,param,subRegion,x) %>%
+        dplyr::mutate(value=case_when(is.na(value)~0,
+                                      TRUE~value))%>%
+        dplyr::filter(subRegion %in% subsetRegionsx())
+
+      plist <- list()
+      for(i in 1:length(unique(dataChartPlot$param))){
+
+        plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                         filter(param==unique(dataChartPlot$param)[i]),
+                                       aes(x=x,y=value,
+                                           group=scenario,
+                                           color=scenario)) +
+          ggplottheme +
+          ylab(NULL) + xlab(NULL) +
+          geom_line() +
+          scale_y_continuous(position = "right")+
+          facet_grid(param~subRegion, scales="free",switch="y",
+                     labeller = labeller(param = label_wrap_gen(15)))+
+          theme(legend.position="top",
+                legend.title = element_blank(),
+                plot.margin=margin(10,10,0,0,"pt"))}
+      cowplot::plot_grid(plotlist=plist,ncol=1,align = "v", axis="l")
+    }
+
+
+    output$summaryReg <- renderPlot({
+      summaryPlotReg()
+    },
+    height=function(){200*length(unique(dataMapx()$param))},
+    width=function(){200*length(subsetRegionsx())}
+    )
+
+    output$downloadPlotSumReg <- downloadHandler(
+      filename = "summaryChartReg.png",
+      content = function(file) {
+        ggsave(file,plot=summaryPlotReg(),
+               width=min(49,max(15,1*length(unique(dataMapx()$subRegion)))),
+               height=min(49,max(12,1*length(unique(dataMapx()$param)))),units="in")
+      })
+
+
   #---------------------------
   # Chart Plot
   #---------------------------
@@ -446,8 +514,6 @@ server <- function(input, output) {
     content = function(file) {
       ggsave(file,plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
     })
-
-
 
   #---------------------------
   # Maps

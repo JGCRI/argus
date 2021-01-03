@@ -123,8 +123,7 @@ ui <- fluidPage(
     # Main Panel
     #---------------------------
     mainPanel(
-      tabsetPanel(
-        type = "pills",
+      tabsetPanel(type = "tabs",
 
         #---------------------------
         # Main Panel: Home Tab
@@ -165,7 +164,7 @@ ui <- fluidPage(
         # Main Panel: Summary Tab
         #---------------------------
         tabPanel("Summary",
-                 tabsetPanel(
+                 tabsetPanel(type = "pills",
                    tabPanel(
                      "All",
                      br(),
@@ -186,13 +185,31 @@ ui <- fluidPage(
                      plotOutput(outputId = "summary"),
                      width = "100%"
                    ),
-                   tabPanel("Compare Regions")
+                   tabPanel("Compare Regions",
+                            br(),
+                            fluidRow(column(12, div(
+                                downloadButton(
+                                  'downloadPlotSumReg',
+                                  NULL,
+                                  download = "summaryChartReg.png",
+                                  class = "download_button"
+                                ),
+                                style = "float: right"
+                              )
+                            )),
+                            fluidRow(column(12,div(
+                              # Regions
+                              uiOutput('subsetRegions'),
+
+                            ))),
+                            plotOutput(outputId = "summaryReg"),
+                            width = "100%")
                  )),
         #---------------------------
         # Main Panel: Charts
         #---------------------------
         tabPanel("Charts",
-                 tabsetPanel(
+                 tabsetPanel(type = "pills",
                    tabPanel("All",
           br(),
           fluidRow(column(6, p(
@@ -211,7 +228,7 @@ ui <- fluidPage(
         # Main Panel: Maps Tab
         #---------------------------
         tabPanel("Maps",
-                 tabsetPanel(
+                 tabsetPanel(type = "pills",
                    tabPanel("Summary",
                  uiOutput(outputId = "map")
                  ),
