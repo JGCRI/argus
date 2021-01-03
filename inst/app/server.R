@@ -13,6 +13,9 @@ library(shinyWidgets)
 library(tools)
 library(RCurl)
 library(zip)
+library(tmap)
+library(leaflet)
+library(leafsync)
 
 #---------------------------
 # Overall Strtucture
@@ -453,23 +456,23 @@ server <- function(input, output) {
     output$map <- renderUI({
 
       dataMapxi = dataMapx() %>%
-        filter(param %in% paramsSelectedx()[1])
+        filter(param %in% paramsSelectedx()[1],
+               scenario %in% input$scenariosSelected[1],
+               x %in% c("2010"))
 
       mapx <- (rmap::mapFind(dataMapxi))$subRegShapeFound;
       mapx@data <- mapx@data %>%
-        dplyr::left_join(data)%>%
-        dplyr::select("subRegion","value"); mapx@data
+        dplyr::left_join(dataMapxi)%>%
+        dplyr::select("subRegion","value")%>%
+        unique(); mapx@data
       mapx_1 <- tm_shape(mapx) +
-        tm_polygons(col = "value",
-                    style = "fixed",
-                    breaks = c(0, 25, 50, 75, 100),
-                    legend.hist = TRUE) +
+        tm_polygons(col = "value") +
         tm_layout(legend.outside = T,
                   legend.show = F)
 
-      m1<-tmap_leaflet(mapx_1)
-      m2<-tmap_leaflet(mapx_1) %>% clearControls()
-      sync(m1,m2,ncol=2)
+      m1<-tmap_leaflet(mapx_1) %>% clearControls()
+      m2<-tmap_leaflet(mapx_1)
+      sync(m1,m2,ncol=1)
     })
 
   #---------------------------
