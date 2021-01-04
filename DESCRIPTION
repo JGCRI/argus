@@ -18,7 +18,12 @@ Imports:
     dplyr,
     magrittr,
     data.table,
-    zip
+    zip,
+    XML,
+    rgcam,
+    stringr,
+    tibble,
+    tidyr
 VignetteBuilder: 
     knitr
 Depends: 

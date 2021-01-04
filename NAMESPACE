@@ -2,6 +2,10 @@
 
 export(addMissing)
 export(constants)
+export(elecInvest)
+export(hydroInvest)
+export(mappings)
+export(readgcam)
 export(run)
 import(shiny)
 importFrom(data.table,":=")

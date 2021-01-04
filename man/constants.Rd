@@ -4,7 +4,10 @@
 \alias{constants}
 \title{constants}
 \usage{
-constants()
+constants(name = NULL)
+}
+\arguments{
+\item{name}{Default=NULL. Name of constant to call.}
 }
 \value{
 A list of constants
