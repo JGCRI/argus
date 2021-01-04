@@ -13,6 +13,11 @@ library(shinyWidgets)
 library(tools)
 library(RCurl)
 library(zip)
+library(tmap)
+library(leaflet)
+library(leafsync)
+library(rgcam)
+
 
 #---------------------------
 # Overall Strtucture
@@ -44,30 +49,144 @@ server <- function(input, output) {
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
 
+  #---------------------------
+  # Data File (GCAM)
+  #---------------------------
+
+  gcamdatabasepathx <- reactive({
+    if (dir.exists(input$gcamdatabasepath)) {
+      input$gcamdatabasepath
+    } else {
+      "GCAM database entered does not exist."
+    }
+  })
+
+  #output$text <- renderText({print(dataGCAMx())})
+
+
+  # Get names of scenarios in GCAM database.....................
+  gcamScenariosx <- reactive({
+
+  if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
+  gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",gcamdatabasepathx())); gcamdatabasePath_dir
+  gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', gcamdatabasepathx()); gcamdatabasePath_file
+  # Save Message from rgcam::localDBConn to a text file and then extract names
+  zz <- file(paste(getwd(),"/test.txt",sep=""), open = "wt")
+  sink(zz,type="message")
+  rgcam::localDBConn(gcamdatabasePath_dir,gcamdatabasePath_file)
+  sink()
+  closeAllConnections()
+  # Read temp file
+  con <- file(paste(getwd(),"/test.txt",sep=""),open = "r")
+  first_line <- readLines(con,n=1); first_line
+  closeAllConnections()
+  if(grepl("error",first_line,ignore.case = T)){stop(paste(first_line))}
+  print(first_line)
+  if(file.exists(paste(getwd(),"/test.txt",sep=""))){unlink(paste(getwd(),"/test.txt",sep=""))}
+  # Extract scenario names from saved line
+  s1 <- gsub(".*:","",first_line);s1
+  s2 <- gsub(" ","",s1);s2
+  as.vector(unlist(strsplit(s2,",")))
+  }else{
+    gcamdatabasepathx()
+  }
+  })
+
+  output$gcamScenarios = renderUI({
+    if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
+    pickerInput(
+      inputId = "gcamScenariosSelected",
+      label = "Select Available GCAM Scenarios",
+      choices = unique(gcamScenariosx()),
+      selected = unique(gcamScenariosx()),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `deselect-all-text` = "None",
+        `select-all-text` = "All",
+        `none-selected-text` = "None Selected"
+      )
+    )}else{
+      NULL
+    }
+  })
+
+  #...................................
+  # Create data table from database
+  dataGCAMx <- reactive({
+
+    if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
+    tempdir <- paste(getwd(),"/tempdir",sep="")
+    dir.create(tempdir)
+    gcamdatabasepath_i <- gcamdatabasepathx()
+    scenOrigNames_i <- input$gcamScenariosSelected
+    scenNewNames_i <- paste(input$gcamScenariosSelected,"NEW",sep="")
+    regionsSelect_i <- "Southeast Asia"
+    paramsSelect_i <- c("gdp","pop","agProdByCrop")
+
+    dataGCAMraw <- rdataviz::readgcam(reReadData = T,
+                                      dirOutputs = tempdir,
+                                      gcamdatabase = gcamdatabasepath_i,
+                                      scenOrigNames = scenOrigNames_i,
+                                      scenNewNames = scenNewNames_i,
+                                      dataProj = "projFile",
+                                      #dataProjPath = dataProjPath_i,
+                                      regionsSelect = regionsSelect_i,
+                                      paramsSelect= paramsSelect_i)
+
+    unlink(tempdir, recursive = T)
+
+    dataGCAMraw$data %>% as_tibble() %>%
+      dplyr::select(scenario, region, subRegion, param,
+                    class1, class2, x, vintage, aggregate, units,
+                    value) %>%
+      dplyr::rename(class=class1)-> dataGCAM
+
+    dataGCAM
+    } else {
+      NULL
+    }
+  })
+
 
   #---------------------------
   # Data File (CSV)
   #---------------------------
-  data <- reactive({
-    print("reacting")
-    print(input$filedata)
-    print(input$urlfiledata)
-    if ((is.null(input$filedata))&("" == input$urlfiledata)) {
+  data_raw <- reactive({
+    if (is.null(input$filedata) & is.null(dataGCAMx())) {
       rdataviz::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
-      #check if input is on file
-    } else if((input$tabs == "File")){
-      return(rdataviz::addMissing(
-        rdataviz::parse_local(input)
-      ))
-      #check if input is on url
-    } else if((input$tabs == "URL input")){
+
+
+    } else if(!is.null(input$filedata) & is.null(dataGCAMx())) {
       rdataviz::addMissing(
-        rdataviz::parse_remote(input)
+        read.csv(input$filedata$datapath) %>%
+          as.data.frame() %>%
+          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
+    } else {
+      dataGCAMx() %>%
+        dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
     }
+  })
+
+  data <- reactive({
+
+    # Aggregate across classes
+    tblAggsums <- data_raw() %>%
+      dplyr::filter(aggregate == "sum") %>%
+      dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ sum(.)))
+    tblAggmeans <- data_raw() %>%
+      dplyr::filter(aggregate == "mean") %>%
+      dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+    dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
   })
 
   #---------------------------
@@ -347,8 +466,7 @@ server <- function(input, output) {
       facet_wrap(.~param, scales="free", ncol = 3,
                  labeller = labeller(param = label_wrap_gen(15)))+
       theme(legend.position="top",
-            plot.margin=margin(0,10,0,0,"pt"),
-            aspect.ratio=0.5)
+            plot.margin=margin(10,10,0,0,"pt"))
   }
 
   output$summary <- renderPlot({
@@ -376,28 +494,97 @@ server <- function(input, output) {
     })
     sum_hi<-function(){
     if (length(unique(dataChartx()$param))%%3==0){
-      return(((length(unique(dataChartx()$param))%/%3))*5)
+      return(((length(unique(dataChartx()$param))%/%3))*3)
     }else{
-      return(((length(unique(dataChartx()$param))%/%3)+1)*5)
+      return(((length(unique(dataChartx()$param))%/%3)+1)*3)
     }
     }
     sum_wi<-function(){
       if (length(unique(dataChartx()$param))<3){
-        return(((length(unique(dataChartx()$param))))*5)
+        return(((length(unique(dataChartx()$param))))*2)
       }else{
-        return(30)
+        return(10)
       }
     }
-#  sum_width <- function(){
-#    width <- 0
-#    if (length(unique(dataChartx()$param)) <= 3){
-#      return(length(unique(dataChartx()$param)) * 5)
-#    }
-#    else if (length(unique(dataChartx()$param)) <= 9) {
-#      return(10)
-#    }
-#      return(16)
-#  }
+
+    #---------------------------
+    # Subset Regions Selected
+    #---------------------------
+    output$subsetRegions = renderUI({
+      pickerInput(
+        inputId = "subsetRegions",
+        label = "Select Regions to Compare",
+        choices = unique(dataMap()$subRegion),
+        selected = unique(dataMap()$subRegion)[1:4],
+        multiple = TRUE,
+        options = list(
+          `actions-box` = TRUE,
+          `deselect-all-text` = "None",
+          `select-all-text` = "All",
+          `none-selected-text` = "None Selected"
+      ))
+    })
+
+    #---------------------------
+    # Reactive Regions Select based on inputs
+    #---------------------------
+    subsetRegionsx <- reactive({
+      if (input$subsetRegions == "All" &
+          length(input$subsetRegions) == 1) {
+        unique(dataMapx()$subRegion)
+      } else{
+        input$subsetRegions
+      }
+    })
+
+    #---------------------------
+    # Summary Plot Compare Regions
+    #---------------------------
+    summaryPlotReg <- function(){
+
+      dataChartPlot <- # All regions
+        dataMapx() %>% tidyr::complete(scenario,param,subRegion,x) %>%
+        dplyr::mutate(value=case_when(is.na(value)~0,
+                                      TRUE~value))%>%
+        dplyr::filter(subRegion %in% subsetRegionsx())
+
+      plist <- list()
+      for(i in 1:length(unique(dataChartPlot$param))){
+
+        plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                         filter(param==unique(dataChartPlot$param)[i]),
+                                       aes(x=x,y=value,
+                                           group=scenario,
+                                           color=scenario)) +
+          ggplottheme +
+          ylab(NULL) + xlab(NULL) +
+          geom_line() +
+          scale_y_continuous(position = "right")+
+          facet_grid(param~subRegion, scales="free",switch="y",
+                     labeller = labeller(param = label_wrap_gen(15)))+
+          theme(legend.position="top",
+                legend.title = element_blank(),
+                plot.margin=margin(10,10,0,0,"pt"))}
+      cowplot::plot_grid(plotlist=plist,ncol=1,align = "v", axis="l")
+    }
+
+
+    output$summaryReg <- renderPlot({
+      summaryPlotReg()
+    },
+    height=function(){200*length(unique(dataMapx()$param))},
+    width=function(){200*length(subsetRegionsx())}
+    )
+
+    output$downloadPlotSumReg <- downloadHandler(
+      filename = "summaryChartReg.png",
+      content = function(file) {
+        ggsave(file,plot=summaryPlotReg(),
+               width=min(49,max(15,1*length(unique(dataMapx()$subRegion)))),
+               height=min(49,max(12,1*length(unique(dataMapx()$param)))),units="in")
+      })
+
+
   #---------------------------
   # Chart Plot
   #---------------------------
@@ -452,8 +639,6 @@ server <- function(input, output) {
       ggsave(file,plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
     })
 
-
-
   #---------------------------
   # Maps
   #---------------------------
@@ -461,23 +646,23 @@ server <- function(input, output) {
     output$map <- renderUI({
 
       dataMapxi = dataMapx() %>%
-        filter(param %in% paramsSelectedx()[1])
+        filter(param %in% paramsSelectedx()[1],
+               scenario %in% input$scenariosSelected[1],
+               x %in% c("2010"))
 
       mapx <- (rmap::mapFind(dataMapxi))$subRegShapeFound;
       mapx@data <- mapx@data %>%
-        dplyr::left_join(data)%>%
-        dplyr::select("subRegion","value"); mapx@data
+        dplyr::left_join(dataMapxi)%>%
+        dplyr::select("subRegion","value")%>%
+        unique(); mapx@data
       mapx_1 <- tm_shape(mapx) +
-        tm_polygons(col = "value",
-                    style = "fixed",
-                    breaks = c(0, 25, 50, 75, 100),
-                    legend.hist = TRUE) +
+        tm_polygons(col = "value") +
         tm_layout(legend.outside = T,
                   legend.show = F)
 
-      m1<-tmap_leaflet(mapx_1)
-      m2<-tmap_leaflet(mapx_1) %>% clearControls()
-      sync(m1,m2,ncol=2)
+      m1<-tmap_leaflet(mapx_1) %>% clearControls()
+      m2<-tmap_leaflet(mapx_1)
+      sync(m1,m2,ncol=1)
     })
 
   #---------------------------
@@ -507,7 +692,10 @@ server <- function(input, output) {
       print(tempdir())
       fs <- c("table.csv", "summaryCharts.png", "barCharts.png")
       write.csv(data(), "table.csv")
-      ggsave("summaryCharts.png",plot=summaryPlot())
+      ggsave("summaryCharts.png",plot=summaryPlot(),
+             height = sum_hi(),
+             width=sum_wi(),
+             units="in")
       ggsave("barCharts.png",plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
       print(fs)
       zip::zip(zipfile=file, files=fs)
