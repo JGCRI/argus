@@ -1,0 +1,13 @@
+name: rdataviz
+title:
+username:
+account: zarrar
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3427463
+bundleId: 4054825
+url: https://zarrar.shinyapps.io/rdataviz/
+when: 1609725053.69839
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: modules.R|dataFiles/mapping/template_mapping.csv

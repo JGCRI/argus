@@ -67,27 +67,42 @@ ui <- fluidPage(
         type = "tabs",
         id="tabs",
         tabPanel(
-          "File",
+          "csv",
           br(),
           # CSV Data -------------------------------------
           fileInput(
             inputId = "filedata",
-            label = "Upload csv, zip, or GCAM folder",
+            label = "Upload csv or zip file",
             accept = c(".csv", ".zip"),
             multiple = TRUE,
             width = "100%"
         )),
         tabPanel(
-          "URL input",
+          "url",
           br(),
           textInput(
-            inputId = "urlfiledata", label = "Enter url to csv, zip, or GCAM folder", placeholder =  "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
+            inputId = "urlfiledata",
+            label = "Enter url to csv or zip file",
+            placeholder =  "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
+          br(),
+          width = "100%"
+        ),
+        tabPanel(
+          "GCAM",
+          br(),
+          textInput(
+            inputId = "gcamdatabasepath",
+            label = "Enter full path to GCAM database",
+            placeholder =  "C://example_local_folder/example_database_basexdb"),
           br(),
           width = "100%"
         )
       ),
 
       # Reactive Input Choices Based on Input File-------------------------
+      # GCAM Scenarios
+      textOutput("text"),
+      uiOutput('gcamScenarios'),
 
       # Scenarios
       uiOutput('selectScenarios'),
