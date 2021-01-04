@@ -63,3 +63,88 @@ addMissing<-function(data){
     dplyr::select(scenario,subRegion,param,class,x,aggregate,value)
     return(data)
 }
+
+
+#' parse_zip
+#'
+#' parse zip files
+#' @param file file to unzip
+#' @importFrom magrittr %>%
+#' @export
+parse_zip <- function(file){
+  print("zip found 2.0")
+  tmpdir <- tempdir()
+  setwd(tmpdir)
+  zip::unzip(
+    file, exdir = tmpdir
+  )
+  print(dir())
+  for(i in dir()){
+    print(i)
+    if (endsWith(i, ".csv")){
+      return(utils::read.csv(i) %>% as.data.frame())
+    }
+  }
+}
+
+#' parse_remote
+#'
+#' parse remote files
+#' @param input reactive remote file link to parse
+#' @importFrom magrittr %>%
+#' @export
+parse_remote <- function(input){
+  print(input$urlfiledata)
+  print("----")
+  if (tools::file_ext(input$urlfiledata) == ""){
+    if (grepl("./$",input$urlfiledata)){
+      #GCAM
+      utils::read.csv(input$urlfiledata) %>%
+        as.data.frame()
+    } else if((!grepl("./$",input$urlfiledata, "/") || !grepl(".zip$",input$urlfiledata) || !grepl(".csv$",input$urlfiledata))){
+      print("+++++")
+      if (grepl(".zip", input$urlfiledata, fixed=TRUE)){
+        temp <- tempfile()
+        utils::download.file(input$urlfiledata, temp)
+        return(parse_zip(temp))
+      }else if (grepl(".csv", input$urlfiledata, fixed=TRUE)){
+        return(utils::read.csv(input$urlfiledata) %>%
+                 as.data.frame())
+      }
+    }
+  }else if ((tools::file_ext(input$urlfiledata) == "zip")){
+    temp <- tempfile()
+    utils::download.file(input$urlfiledata, temp)
+    return(parse_zip(temp))
+  }else if (tools::file_ext(input$urlfiledata) == "csv"){
+    temp <- tempfile()
+    utils::download.file(input$urlfiledata, temp)
+    return(utils::read.csv(input$urlfiledata) %>%
+             as.data.frame())
+  }else{
+    return(NULL)
+  }
+}
+
+
+#' parse_local
+#'
+#' parse local files
+#' @param input reactive local file to parse
+#' @importFrom magrittr %>%
+#' @export
+parse_local <- function(input){
+  if (tools::file_ext(input$filedata$datapath) == ""){
+    if (grepl("./$",input$urlfiledata$datapath)){
+      utils::read.csv(input$filedata$datapath) %>%
+        as.data.frame()
+    }
+  }else if (tools::file_ext(input$filedata$datapath) == "zip"){
+    return(parse_zip(input$filedata$datapath))
+  }else if (tools::file_ext(input$filedata$datapath) == "csv"){
+    return(utils::read.csv(input$filedata$datapath) %>%
+             as.data.frame())
+  }else{
+    return(NULL)
+  }
+}

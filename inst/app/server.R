@@ -152,22 +152,24 @@ server <- function(input, output) {
   # Data File (CSV)
   #---------------------------
   data_raw <- reactive({
-    if (is.null(input$filedata) & is.null(dataGCAMx())) {
+    if (is.null(input$filedata) & is.null(dataGCAMx()) & ("" == input$urlfiledata)) {
       rdataviz::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
-
-
-    } else if(!is.null(input$filedata) & is.null(dataGCAMx())) {
+    } else if(!is.null(input$filedata) & is.null(dataGCAMx()) & ("" == input$urlfiledata)) {
       rdataviz::addMissing(
-        read.csv(input$filedata$datapath) %>%
-          as.data.frame() %>%
+        rdataviz::parse_local(input)%>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
-    } else {
+    } else if(is.null(input$filedata) & !is.null(dataGCAMx()) & ("" == input$urlfiledata)){
       dataGCAMx() %>%
         dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+    }else{
+      rdataviz::addMissing(
+       rdataviz::parse_remote(input)%>%
+         dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+      )
     }
   })
 

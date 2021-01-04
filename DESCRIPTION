@@ -13,6 +13,8 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Imports: 
+    rgcam,
+    tools,
     shiny,
     knitr (>= 1.20),
     dplyr,
@@ -20,10 +22,10 @@ Imports:
     data.table,
     zip,
     XML,
-    rgcam,
     stringr,
     tibble,
     tidyr
+Remotes: github::JGCRI/rgcam
 VignetteBuilder: 
     knitr
 Depends: 
