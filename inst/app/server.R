@@ -18,7 +18,6 @@ library(leaflet)
 library(leafsync)
 library(rgcam)
 
-
 #---------------------------
 # Overall Strtucture
 #---------------------------
