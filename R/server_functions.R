@@ -8,6 +8,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom data.table :=
 #' @export
+#'
 addMissing<-function(data){
   NULL -> year -> aggregate -> scenario -> subRegion -> param -> x -> value
 
@@ -63,3 +64,78 @@ addMissing<-function(data){
     dplyr::select(scenario,subRegion,param,class,x,aggregate,value)
     return(data)
 }
+#' @export
+parse_zip <- function(file){
+  print("zip found 2.0")
+  tmpdir <- tempdir()
+  setwd(tmpdir)
+  unzip(
+    file, exdir = tmpdir
+  )
+  print(dir())
+  for(i in dir()){
+    print(i)
+    if (endsWith(i, ".csv")){
+      return(read.csv(i) %>%
+               as.data.frame() %>%
+               dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
+    }
+  }
+}
+
+#' @export
+parse_remote <- function(input){
+  print(input$urlfiledata)
+  print("----")
+  if (file_ext(input$urlfiledata) == ""){
+    if (endsWith(input$urlfiledata, "/")){
+      #GCAM
+      read.csv(input$urlfiledata) %>%
+        as.data.frame() %>%
+        dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+    } else if((!endsWith(input$urlfiledata, "/") || !endsWith(input$urlfiledata, "zip") || !endsWith(input$urlfiledata, "csv"))){
+      print("+++++")
+      if (grepl(".zip", input$urlfiledata, fixed=TRUE)){
+        temp <- tempfile()
+        download.file(input$urlfiledata, temp)
+        return(parse_zip(temp))
+      }else if (grepl(".csv", input$urlfiledata, fixed=TRUE)){
+        return(read.csv(input$urlfiledata) %>%
+                 as.data.frame() %>%
+                 dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
+      }
+    }
+  }else if ((file_ext(input$urlfiledata) == "zip")){
+    temp <- tempfile()
+    download.file(input$urlfiledata, temp)
+    return(parse_zip(temp))
+  }else if (file_ext(input$urlfiledata) == "csv"){
+    temp <- tempfile()
+    download.file(input$urlfiledata, temp)
+    return(read.csv(input$urlfiledata) %>%
+             as.data.frame() %>%
+             dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
+  }else{
+    return(dataDefault)
+  }
+
+}
+#' @export
+parse_local <- function(input){
+  if (file_ext(input$filedata$datapath) == ""){
+    if (endswith(input$urlfiledata$datapath, "/")){
+      read.csv(input$filedata$datapath) %>%
+        as.data.frame() %>%
+        dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+    }
+  }else if (file_ext(input$filedata$datapath) == "zip"){
+    return(parse_zip(input$filedata$datapath))
+  }else if (file_ext(input$filedata$datapath) == "csv"){
+    return(read.csv(input$filedata$datapath) %>%
+             as.data.frame() %>%
+             dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
+  }else{
+    return(dataDefault)
+  }
+}
+
