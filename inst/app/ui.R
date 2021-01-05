@@ -46,12 +46,41 @@ ui <- fluidPage(
   #---------------------------
   #shinythemes::themeSelector(),
   #theme = shinythemes::shinytheme("spacelab"),
+  # script="script.js",
+  tags$script("
+    Shiny.addCustomMessageHandler('setsetting', function(value) {
+    console.log(value);
+    Shiny.setInputValue(value[0], value.slice(1,value.length));
+    });
+
+    $(document).on('shiny:inputchanged', function(event) {
+        console.log(event);
+        //console.log('[input] ' + event.name + ': ' + event.value);
+        //Shiny.setInputValue('urlfiledata', 'boohoo');
+        //Shiny.setInputValue('paramsSelected', ['Electricity Generation by Fuel (TWh)', 'Final Energy by Fuel (EJ)']);
+      });
+  "),
+
+
+
 
   div(downloadButton('downloadAll', "All",  class = "download_button"), style="padding:10px; float: right"),
   div(actionLink(inputId='github', label='', icon = icon("github","fa-1x"),
                  onclick ="window.open('https://github.com/JGCRI/rdataviz', '_blank')"),style="padding:15px 5px;float: right"),
   div(actionLink(inputId='help', label='', icon = icon("question","fa-1x"),
                  onclick ="window.open('https://jgcri.github.io/rdataviz/', '_blank')"),style="padding:15px 5px;float: right"),
+  # div(style = "float:left;",fas fa-cog"
+    div(tags$a(id = "downloadSettings", class = "btn btn-default shiny-download-link download_button", href = "", target = "_blank", download = NA, icon("cog"), "Save Settings"), style="padding:5px; float:left;margin-top:5px"),
+    div(style = "padding:5px;margin-top:5px", tags$label(class="btn btn-default shiny-download-link download_button shiny-bound-output", tags$span(class="btn download_button", "Upload Settings", style = "padding:0px", tags$i(class="fas fa-cog", style="float:left;margin-right:5px"), tags$input(type="file", id="settingdata", name="settingdata", class="shiny-bound-input", style = "display:none")))),
+    # ),
+
+
+  # <div style="display: block; width: 100px; height: 20px; overflow: hidden;"
+  #   <button style="width: 110px; height: 30px; position: relative; top: -5px; left: -5px;"><a href="javascript: void(0)">Upload File</a></button>
+  #   <input type="file" id="upload_input" name="upload" style="font-size: 50px; width: 120px; opacity: 0; filter:alpha(opacity=0);  position: relative; top: -40px;; left: -20px" />
+  #   </div>
+
+  # <input id="filedata" name="filedata" type="file" style="display: none;" multiple="multiple" accept=".csv,.zip" class="shiny-bound-input">
 
   titlePanel(
     p("RDataViz", style = "color:#3474A7"),
@@ -120,7 +149,6 @@ ui <- fluidPage(
         multiple = TRUE,
         accept = c('.shp', '.dbf', '.sbn', '.sbx', '.shx', '.prj')
       )
-
     ),
 
 

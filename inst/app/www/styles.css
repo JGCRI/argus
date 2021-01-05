@@ -54,3 +54,14 @@ body > div > div.row > div.col-sm-4 > form > div:nth-child(8) > div.input-group 
   font-size:80%;
   margin-bottom: -4px
 }
+
+#downloadSettings > i {
+   visibility: hidden; !important
+}
+
+#downloadSettings > i.fa {
+   visibility: hidden; !important
+}
+
+
+
