@@ -69,7 +69,7 @@ ui <- fluidPage(
   div(actionLink(inputId='help', label='', icon = icon("question","fa-1x"),
                  onclick ="window.open('https://jgcri.github.io/rdataviz/', '_blank')"),style="padding:15px 5px;float: right"),
   # div(style = "float:left;",
-    div(downloadButton('downloadSettings', "Save Settings",  class = "download_button", icon = icon("cog", "fa-1x")), style="padding:5px"),
+    div(downloadButton('downloadSettings', "Save Settings",  class = "download_button", icon = icon("cog", "fa-1x")), style="padding:5px; float:left"),
     div(style = "padding:5px", tags$label(class="btn btn-default shiny-download-link download_button shiny-bound-output", tags$span(class="btn download_button", "Upload Settings", style = "padding:0px", tags$i(class="fa fa-download", style="float:left;margin-right:5px"), tags$input(type="file", id="settingdata", name="settingdata", class="shiny-bound-input", style = "display:none")))),
     # ),
 
