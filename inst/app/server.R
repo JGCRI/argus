@@ -17,6 +17,8 @@ library(tmap)
 library(leaflet)
 library(leafsync)
 library(rgcam)
+library(yaml)
+library(plyr)
 
 #---------------------------
 # Overall Strtucture
@@ -40,13 +42,58 @@ library(rgcam)
 # Server object
 #---------------------------
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   #---------------------------
   # Load Default Datasets from rdataviz
   #---------------------------
   dataDefault <- rdataviz::exampleData
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
+
+  #---------------------------
+  # Settings
+  #---------------------------
+
+  output$downloadSettings <- downloadHandler(
+    filename = "settings.yaml",
+    content = function(filename) {
+      # input.df = ldply(reactiveValuesToList(input), function(t) t[toDataFrame]())
+      # input.df = as.data.frame(matrix(unlist(reactiveValuesToList(input)),nrow=length(reactiveValuesToList(input)),byrow=TRUE))
+      # write.csv(input.df, filename)
+      write_yaml(reactiveValuesToList(input), filename)
+      # lapply(input, write, filename, append=TRUE, ncolumns=1000)
+  })
+
+
+  settings <- reactive({
+    if (is.null(input$settingdata)){
+      return(reactiveValuesToList(input))
+    }else{
+      return(read_yaml(input$settingdata$datapath))
+    }
+  })
+
+  #gcamdatapath: file filemap: file paramsSelected:  scenarioSelected filedata settingdata github urlfiledata regionsselected  help tabs do
+
+   observeEvent(input$settingdata,{
+    setting <- settings()
+    # updateTextInput(session, "urlfiledata", value = "boo")
+    # updatePickerInput(session, "scenariosSelected", selected = c("Scenario 1", "Scenario 2"))
+    # updatePickerInput(session, "regionsSelected", selected = c("BengalBay", "IrrawaddyR"))
+    for (x in names(setting)){
+      # session$sendCustomMessage("setsetting", c(x, setting[[x]]))
+      if ((x == "regionsSelected")||(x == "scenariosSelected")||(x=="paramsSelected")||(x=="scenarioRefSelected")||(x == "subsetRegions")){
+        updatePickerInput(session, x, selected = setting[[x]])
+      }
+    }
+    print("=====================================================")
+    for (i in names(reactiveValuesToList(input))){
+      print(paste("[+]", i))
+      print(reactiveValuesToList(input)[[i]])
+      print("------------------------------")
+    }
+  })
+
 
   #---------------------------
   # Data File (GCAM)
@@ -152,13 +199,13 @@ server <- function(input, output) {
   # Data File (CSV)
   #---------------------------
   data_raw <- reactive({
+    print(input$filedata)
+    print(input$dataGCAMx)
     if (is.null(input$filedata) & is.null(dataGCAMx())) {
       rdataviz::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       )
-
-
     } else if(!is.null(input$filedata) & is.null(dataGCAMx())) {
       rdataviz::addMissing(
         read.csv(input$filedata$datapath) %>%
@@ -216,7 +263,7 @@ server <- function(input, output) {
       label = "Select Ref Scenario",
       choices = unique(dataSum()$scenario),
       selected = unique(dataSum()$scenario)[1],
-      multiple = F,
+      multiple = F
     )
   })
 
