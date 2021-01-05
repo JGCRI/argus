@@ -514,7 +514,8 @@ server <- function(input, output, session) {
       facet_wrap(.~param, scales="free", ncol = 3,
                  labeller = labeller(param = label_wrap_gen(15)))+
       theme(legend.position="top",
-            plot.margin=margin(10,10,0,0,"pt"))
+            plot.margin=margin(10,10,0,0,"pt"),
+            aspect.ratio=0.75)
   }
 
   output$summary <- renderPlot({
@@ -609,11 +610,13 @@ server <- function(input, output, session) {
           geom_line() +
           scale_y_continuous(position = "right")+
           facet_grid(param~subRegion, scales="free",switch="y",
-                     labeller = labeller(param = label_wrap_gen(15)))+
-          theme(legend.position="top",
+                     labeller = labeller(param = label_wrap_gen(15))
+                     )+
+          theme(legend.position="right",
                 legend.title = element_blank(),
-                plot.margin=margin(10,10,0,0,"pt"))}
-      cowplot::plot_grid(plotlist=plist,ncol=1,align = "v", axis="l")
+                plot.margin=margin(20,20,0,0,"pt"),
+                aspect.ratio=0.75)}
+      cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
     }
 
 
