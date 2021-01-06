@@ -514,8 +514,9 @@ server <- function(input, output, session) {
       facet_wrap(.~param, scales="free", ncol = 3,
                  labeller = labeller(param = label_wrap_gen(15)))+
       theme(legend.position="top",
-            plot.margin=margin(10,10,0,0,"pt"),
-            aspect.ratio=0.75)
+            plot.margin=margin(20,20,0,0,"pt")
+            )
+            # aspect.ratio=0.75)
   }
 
   output$summary <- renderPlot({

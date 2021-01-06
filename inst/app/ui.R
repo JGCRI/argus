@@ -211,7 +211,10 @@ ui <- fluidPage(
                          style = "float: right"
                        )
                      )),
-                     plotOutput(outputId = "summary"),
+                     div(
+                       style = "margin-top:-30px",
+                       plotOutput(outputId = "summary")
+                       ),
                      width = "100%"
                    ),
                    tabPanel("Compare Regions",
