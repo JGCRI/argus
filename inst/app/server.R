@@ -503,24 +503,28 @@ server <- function(input, output, session) {
   #---------------------------
   # Summary Plot
   #---------------------------
-  summaryPlot <- function(){
+  summaryPlot <- function(aspectratio, textsize, titletext){
     ggplot2::ggplot(dataSumx(),
                     aes(x=x,y=value,
                         group=scenario,
-                        color=scenario)) +
+                        color=scenario))+
+      geom_line(size=1.25) +
       ggplottheme +
       geom_line() +
       ylab(NULL) +  xlab(NULL) +
       facet_wrap(.~param, scales="free", ncol = 3,
                  labeller = labeller(param = label_wrap_gen(15)))+
       theme(legend.position="top",
-            plot.margin=margin(20,20,0,0,"pt")
+            legend.text=element_text(size=titletext),
+            legend.title = element_blank(),
+            plot.margin=margin(20,20,0,0,"pt"),
+            text=element_text(size=textsize),
+            aspect.ratio = aspectratio
             )
-            # aspect.ratio=0.75)
   }
 
   output$summary <- renderPlot({
-    summaryPlot()
+    summaryPlot(NULL, 17.5, 20)
   },
   height=function(){
     if (length(unique(dataChartx()$param))%%3==0){
@@ -535,26 +539,23 @@ server <- function(input, output, session) {
     content = function(file) {
       ggsave(
         file,
-        plot=summaryPlot(),
+        plot=summaryPlot(0.75, 10, 10),
         #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-        height = sum_hi(),
-        width=sum_wi(),
+        height = exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
+        width=exportWidth(10, length(unique(dataChartx()$param)), 3),
         units="in"
       )
     })
-    sum_hi<-function(){
-    if (length(unique(dataChartx()$param))%%3==0){
-      return(((length(unique(dataChartx()$param))%/%3))*3)
-    }else{
-      return(((length(unique(dataChartx()$param))%/%3)+1)*3)
-    }
-    }
-    sum_wi<-function(){
-      if (length(unique(dataChartx()$param))<3){
-        return(((length(unique(dataChartx()$param))))*2)
+    exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
+      if (numelement%%chartsperrow==0){
+        return(min(max_height_in, ((numelement%/%chartsperrow))*lenperchart))
       }else{
-        return(10)
+        return(min(max_height_in, ((numelement%/%chartsperrow)+1)*lenperchart))
       }
+    }
+    exportWidth<-function(max_width_in, numelement, lenperchart){
+      print(numelement)
+      return(min(max_width_in, (numelement)*lenperchart))
     }
 
     #---------------------------
@@ -590,7 +591,7 @@ server <- function(input, output, session) {
     #---------------------------
     # Summary Plot Compare Regions
     #---------------------------
-    summaryPlotReg <- function(){
+    summaryPlotReg <- function(titletext){
 
       dataChartPlot <- # All regions
         dataMapx() %>% tidyr::complete(scenario,param,subRegion,x) %>%
@@ -614,26 +615,29 @@ server <- function(input, output, session) {
                      labeller = labeller(param = label_wrap_gen(15))
                      )+
           theme(legend.position="right",
+                legend.text=element_text(size=titletext),
                 legend.title = element_blank(),
-                plot.margin=margin(20,20,0,0,"pt"),
-                aspect.ratio=0.75)}
+                plot.margin=margin(20,20,0,0,"pt"))}
       cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
     }
 
 
     output$summaryReg <- renderPlot({
-      summaryPlotReg()
+      summaryPlotReg(10)
     },
-    height=function(){200*length(unique(dataMapx()$param))},
-    width=function(){200*length(subsetRegionsx())}
+    height=function(){200*length(unique(dataMapx()$param))}
+    # width=function(){200*length(subsetRegionsx())}
     )
 
     output$downloadPlotSumReg <- downloadHandler(
       filename = "summaryChartReg.png",
       content = function(file) {
-        ggsave(file,plot=summaryPlotReg(),
-               width=min(49,max(15,1*length(unique(dataMapx()$subRegion)))),
-               height=min(49,max(12,1*length(unique(dataMapx()$param)))),units="in")
+        ggsave(file,plot=summaryPlotReg(10),
+               # width=min(49,max(15,1*length(unique(dataMapx()$subRegion))),
+               # height=min(49,max(12,1*length(unique(dataMapx()$param)))),units="in")
+               height = exportHeight(1, 49, length(unique(dataMapx()$param)), 2),
+               width = exportWidth(49, length(unique(subsetRegionsx())), 2),
+               units = "in")
       })
 
 
@@ -671,24 +675,32 @@ server <- function(input, output, session) {
         scale_y_continuous(position = "right")+
         geom_bar(position="stack", stat="identity") +
         facet_grid(param~scenario, scales="free",switch="y")+
-        theme(legend.position="right",
+        theme(legend.position="bottom",
               legend.title = element_blank(),
-              plot.margin=margin(20,20,0,0,"pt"),
-              aspect.ratio=1)}
-    cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+              legend.margin=margin(0,0,0,0,"pt"),
+              legend.key.height=unit(0, "cm"),
+              text = element_text(size = 12.5),
+              plot.margin=margin(20,20,20,0,"pt"))}
+    cowplot::plot_grid(plotlist=plist,ncol=2,align = "v")
   }
 
 
   output$plot <- renderPlot({
     chartPlot()
   },
-  height=function(){300*length(unique(dataChartx()$param))}
+  height=function(){150*length(unique(dataChartx()$param))}
   )
 
   output$downloadPlotChart <- downloadHandler(
     filename = "barChart.png",
     content = function(file) {
-      ggsave(file,plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
+      ggsave(file,plot=chartPlot(),
+      width=exportWidth(26, length(unique(dataChartx()$param)), 2),
+      height=exportHeight(2, 49, length(unique(dataChartx()$param)), 5),
+      unit = "in"
+      )
+      # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
+        # max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
     })
 
   #---------------------------
@@ -745,8 +757,8 @@ server <- function(input, output, session) {
       fs <- c("table.csv", "summaryCharts.png", "barCharts.png")
       write.csv(data(), "table.csv")
       ggsave("summaryCharts.png",plot=summaryPlot(),
-             height = sum_hi(),
-             width=sum_wi(),
+             height = sum_hi(3, 49),
+             width=sum_wi(3, 49),
              units="in")
       ggsave("barCharts.png",plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
       print(fs)
