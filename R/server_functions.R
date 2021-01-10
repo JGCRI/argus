@@ -148,3 +148,28 @@ parse_local <- function(input){
     return(NULL)
   }
 }
+
+#' exportHeight
+#'
+#' generate height for exported images
+#' @param input number of columns, max height, number of planned elements, height per element
+#' @importFrom magrittr %>%
+#' @export
+exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
+  if (numelement%%chartsperrow==0){
+    return(min(max_height_in, ((numelement%/%chartsperrow))*lenperchart))
+  }else{
+    return(min(max_height_in, ((numelement%/%chartsperrow)+1)*lenperchart))
+  }
+}
+
+#' exportWidth
+#'
+#' generate width for exported images
+#' @param input max width,number of planned elements,width per element
+#' @importFrom magrittr %>%
+#' @export
+exportWidth<-function(max_width_in, numelement, lenperchart){
+  print(numelement)
+  return(min(max_width_in, (numelement)*lenperchart))
+}

@@ -54,11 +54,13 @@ ui <- fluidPage(
   div(actionLink(inputId='help', label='', icon = icon("question","fa-1x"),
                  onclick ="window.open('https://jgcri.github.io/rdataviz/', '_blank')"),style="padding:15px 5px;float: right"),
   # div(style = "float:left;",fas fa-cog"
-    div(tags$a(id = "downloadSettings",
+    div(tags$a(tags$i(class="fas fa-cog",
+                      style="float:left;margin-right:5px"),
+               id = "downloadSettings",
                class = "btn btn-default shiny-download-link download_button",
                href = "",
                target = "_blank",
-               download = NA, icon("cog"), "Save Settings"),
+               download = NA, "Save Settings"),
         style="padding:5px; float:left;margin-top:5px"),
 
     div(style = "padding:5px;margin-top:5px",
@@ -212,7 +214,7 @@ ui <- fluidPage(
                        )
                      )),
                      div(
-                       style = "margin-top:-30px",
+                       style = "margin-bottom:30px",
                        plotOutput(outputId = "summary")
                        ),
                      width = "100%"

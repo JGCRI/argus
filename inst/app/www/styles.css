@@ -55,13 +55,6 @@ body > div > div.row > div.col-sm-4 > form > div:nth-child(8) > div.input-group 
   margin-bottom: -4px
 }
 
-#downloadSettings > i {
-   visibility: hidden; !important
-}
-
-#downloadSettings > i.fa {
-   visibility: hidden; !important
-}
 
 
 

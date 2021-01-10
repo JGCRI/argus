@@ -517,7 +517,7 @@ server <- function(input, output, session) {
       theme(legend.position="top",
             legend.text=element_text(size=titletext),
             legend.title = element_blank(),
-            plot.margin=margin(20,20,0,0,"pt"),
+            plot.margin=margin(20,20,20,0,"pt"),
             text=element_text(size=textsize),
             aspect.ratio = aspectratio
             )
@@ -541,22 +541,23 @@ server <- function(input, output, session) {
         file,
         plot=summaryPlot(0.75, 10, 10),
         #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-        height = exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
-        width=exportWidth(10, length(unique(dataChartx()$param)), 3),
+        height = rdataviz::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
+        width=rdataviz::exportWidth(10, length(unique(dataChartx()$param)), 3),
         units="in"
       )
     })
-    exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
-      if (numelement%%chartsperrow==0){
-        return(min(max_height_in, ((numelement%/%chartsperrow))*lenperchart))
-      }else{
-        return(min(max_height_in, ((numelement%/%chartsperrow)+1)*lenperchart))
-      }
-    }
-    exportWidth<-function(max_width_in, numelement, lenperchart){
-      print(numelement)
-      return(min(max_width_in, (numelement)*lenperchart))
-    }
+
+    # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
+    #   if (numelement%%chartsperrow==0){
+    #     return(min(max_height_in, ((numelement%/%chartsperrow))*lenperchart))
+    #   }else{
+    #     return(min(max_height_in, ((numelement%/%chartsperrow)+1)*lenperchart))
+    #   }
+    # }
+    # exportWidth<-function(max_width_in, numelement, lenperchart){
+    #   print(numelement)
+    #   return(min(max_width_in, (numelement)*lenperchart))
+    # }
 
     #---------------------------
     # Subset Regions Selected
@@ -617,7 +618,7 @@ server <- function(input, output, session) {
           theme(legend.position="right",
                 legend.text=element_text(size=titletext),
                 legend.title = element_blank(),
-                plot.margin=margin(20,20,0,0,"pt"))}
+                plot.margin=margin(20,20,20,20,"pt"))}
       cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
     }
 
@@ -635,8 +636,8 @@ server <- function(input, output, session) {
         ggsave(file,plot=summaryPlotReg(10),
                # width=min(49,max(15,1*length(unique(dataMapx()$subRegion))),
                # height=min(49,max(12,1*length(unique(dataMapx()$param)))),units="in")
-               height = exportHeight(1, 49, length(unique(dataMapx()$param)), 2),
-               width = exportWidth(49, length(unique(subsetRegionsx())), 2),
+               height = rdataviz::exportHeight(1, 49, length(unique(dataMapx()$param)), 2),
+               width = rdataviz::exportWidth(49, length(unique(subsetRegionsx())), 2),
                units = "in")
       })
 
@@ -681,22 +682,22 @@ server <- function(input, output, session) {
               legend.key.height=unit(0, "cm"),
               text = element_text(size = 12.5),
               plot.margin=margin(20,20,20,0,"pt"))}
-    cowplot::plot_grid(plotlist=plist,ncol=2,align = "v")
+    cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
   }
 
 
   output$plot <- renderPlot({
     chartPlot()
   },
-  height=function(){150*length(unique(dataChartx()$param))}
+  height=function(){300*length(unique(dataChartx()$param))}
   )
 
   output$downloadPlotChart <- downloadHandler(
     filename = "barChart.png",
     content = function(file) {
       ggsave(file,plot=chartPlot(),
-      width=exportWidth(26, length(unique(dataChartx()$param)), 2),
-      height=exportHeight(2, 49, length(unique(dataChartx()$param)), 5),
+      width=rdataviz::exportWidth(49, length(unique(dataChartx()$param)), 2),
+      height=rdataviz::exportHeight(1, 49, length(unique(dataChartx()$param)), 5),
       unit = "in"
       )
       # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
