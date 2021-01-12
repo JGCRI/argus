@@ -49,7 +49,7 @@ server <- function(input, output, session) {
   dataDefault <- rdataviz::exampleData
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
-
+  # session$sendCustomMessage("setsetting", c("data", unique(dataSum()$scenario)))
   #---------------------------
   # Settings
   #---------------------------
@@ -75,15 +75,21 @@ server <- function(input, output, session) {
 
   #gcamdatapath: file filemap: file paramsSelected:  scenarioSelected filedata settingdata github urlfiledata regionsselected  help tabs do
 
+    # observeEvent(input$scenariosSelected,{
+    #   print(input)
+    #   print(input$scenariosSelected)
+    # })
+
    observeEvent(input$settingdata,{
     setting <- settings()
     # updateTextInput(session, "urlfiledata", value = "boo")
     # updatePickerInput(session, "scenariosSelected", selected = c("Scenario 1", "Scenario 2"))
     # updatePickerInput(session, "regionsSelected", selected = c("BengalBay", "IrrawaddyR"))
     for (x in names(setting)){
-      # session$sendCustomMessage("setsetting", c(x, setting[[x]]))
       if ((x == "regionsSelected")||(x == "scenariosSelected")||(x=="paramsSelected")||(x=="scenarioRefSelected")||(x == "subsetRegions")){
         updatePickerInput(session, x, selected = setting[[x]])
+        print(x)
+        print(setting[[x]])
       }
     }
     print("=====================================================")
@@ -200,6 +206,7 @@ server <- function(input, output, session) {
   #---------------------------
   data_raw <- reactive({
     if (is.null(input$filedata) & is.null(dataGCAMx()) & ("" == input$urlfiledata)) {
+      print("memes")
       rdataviz::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
@@ -221,7 +228,6 @@ server <- function(input, output, session) {
   })
 
   data <- reactive({
-
     # Aggregate across classes
     tblAggsums <- data_raw() %>%
       dplyr::filter(aggregate == "sum") %>%
@@ -311,11 +317,12 @@ server <- function(input, output, session) {
   # Reactive Regions Select based on inputs
   #---------------------------
   regionsSelectedx <- reactive({
-    if (input$regionsSelected == "All" &
-        length(input$regionsSelected) == 1) {
-      unique(data()$subRegion)
-    } else{
-      input$regionsSelected
+    if (input$regionsSelected == "All" && length(input$regionsSelected) == 1) {
+      return(unique(data()$subRegion))
+    } else if (is.null(input$regionsSelected)){
+      return(unique(data()$subRegion))
+    }else{
+      return(input$regionsSelected)
     }
   })
 
@@ -581,11 +588,12 @@ server <- function(input, output, session) {
     # Reactive Regions Select based on inputs
     #---------------------------
     subsetRegionsx <- reactive({
-      if (input$subsetRegions == "All" &
-          length(input$subsetRegions) == 1) {
-        unique(dataMapx()$subRegion)
+      if (input$subsetRegions == "All" && length(input$subsetRegions) == 1) {
+        return(unique(dataMapx()$subRegion))
+      } else if (is.null(input$subsetRegions)){
+        return(unique(dataMapx()$subRegion)[1:4])
       } else{
-        input$subsetRegions
+        return(input$subsetRegions)
       }
     })
 

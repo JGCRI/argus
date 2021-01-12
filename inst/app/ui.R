@@ -40,18 +40,12 @@ ui <- fluidPage(
   #            ".shiny-output-error:before { visibility: hidden; }"
   # ),
   # tags$style(HTML("#plot {overflow-y:scroll; overflow-x:hidden}")),
-  # tags$script("
-  #   Shiny.addCustomMessageHandler('setsetting', function(value) {
-  #   console.log(value);
-  #   Shiny.setInputValue(value[0], value.slice(1,value.length));
-  #   });
-  #   $(document).on('shiny:inputchanged', function(event) {
-  #       //console.log(event);
-  #       console.log('[input] ' + event.name + ': ' + event.value);
-  #       //Shiny.setInputValue('urlfiledata', 'boohoo');
-  #       //Shiny.setInputValue('paramsSelected', ['Electricity Generation by Fuel (TWh)', 'Final Energy by Fuel (EJ)']);
-  #     });
-  # "),
+  tags$script("
+    Shiny.addCustomMessageHandler('setsetting', function(value) {
+    console.log(value);
+    Shiny.setInputValue(value[0], value.slice(1,value.length));
+    });
+  "),
   #---------------------------
   # Initial Settings/Theme
   #---------------------------
@@ -63,22 +57,22 @@ ui <- fluidPage(
     div(actionLink(inputId='help', label='', icon = icon("question","fa-1x"),
                    onclick ="window.open('https://jgcri.github.io/rdataviz/', '_blank')"),style="padding:15px 5px;float: right"),
     # div(style = "float:left;",fas fa-cog"
-      div(tags$a(tags$i(class="fas fa-cog",
-                        style="float:left;margin-right:5px"),
-                 id = "downloadSettings",
-                 class = "btn btn-default shiny-download-link download_button",
-                 href = "",
-                 target = "_blank",
-                 download = NA, "Save Settings"),
-          style="padding:5px; float:left;margin-top:5px"),
+    div(tags$a(tags$i(class="fas fa-cog",
+                      style="float:left;margin-right:5px"),
+               id = "downloadSettings",
+               class = "btn btn-default shiny-download-link download_button",
+               href = "",
+               target = "_blank",
+               download = NA, "Save Settings"),
+        style="padding:5px; float:left;margin-top:5px"),
 
-      div(style = "padding:5px;margin-top:5px",
-          tags$label(class="btn btn-default shiny-download-link download_button shiny-bound-output",
-                     tags$span(class="btn download_button", "Upload Settings",
-                               style = "padding:0px",
-                               tags$i(class="fas fa-cog",
-                                      style="float:left;margin-right:5px"),
-                               tags$input(type="file", id="settingdata", name="settingdata", class="shiny-bound-input", style = "display:none")))),
+    div(style = "padding:5px;margin-top:5px",
+        tags$label(class="btn btn-default shiny-download-link download_button shiny-bound-output",
+                   tags$span(class="btn download_button", "Upload Settings",
+                             style = "padding:0px",
+                             tags$i(class="fas fa-cog",
+                                    style="float:left;margin-right:5px"),
+                             tags$input(type="file", id="settingdata", name="settingdata", class="shiny-bound-input", style = "display:none")))),
 
 
   # <div style="display: block; width: 100px; height: 20px; overflow: hidden;"
@@ -234,7 +228,7 @@ ui <- fluidPage(
                                 # Regions
                                 uiOutput('subsetRegions'),
                               )),
-                              column(, div(
+                              column(6, div(
                                 downloadButton(
                                   'downloadPlotSumReg',
                                   NULL,

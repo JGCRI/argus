@@ -12,6 +12,7 @@
 .charts{
   overflow:auto;
   height:60vh;
+  widht:70vh;
   position:relative;
 }
 
