@@ -269,8 +269,8 @@ server <- function(input, output, session) {
     pickerInput(
       inputId = "scenarioRefSelected",
       label = "Select Ref Scenario",
-      choices = unique(dataSum()$scenario),
-      selected = unique(dataSum()$scenario)[1],
+      choices = unique(dataSumx()$scenario),
+      selected = unique(dataSumx()$scenario)[1],
       multiple = F
     )
   })
