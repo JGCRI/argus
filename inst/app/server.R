@@ -636,8 +636,8 @@ server <- function(input, output, session) {
         ggsave(file,plot=summaryPlotReg(10),
                # width=min(49,max(15,1*length(unique(dataMapx()$subRegion))),
                # height=min(49,max(12,1*length(unique(dataMapx()$param)))),units="in")
-               height = rdataviz::exportHeight(1, 49, length(unique(dataMapx()$param)), 2),
-               width = rdataviz::exportWidth(49, length(unique(subsetRegionsx())), 2),
+               height = rdataviz::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
+               width = rdataviz::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
                units = "in")
       })
 
@@ -696,8 +696,8 @@ server <- function(input, output, session) {
     filename = "barChart.png",
     content = function(file) {
       ggsave(file,plot=chartPlot(),
-      width=rdataviz::exportWidth(49, length(unique(dataChartx()$param)), 2),
-      height=rdataviz::exportHeight(1, 49, length(unique(dataChartx()$param)), 5),
+      width=rdataviz::exportWidth(49, length(unique(dataChartx()$param)), 5),
+      height=rdataviz::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
       unit = "in"
       )
       # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){

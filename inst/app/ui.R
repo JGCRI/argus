@@ -40,37 +40,45 @@ ui <- fluidPage(
   #            ".shiny-output-error:before { visibility: hidden; }"
   # ),
   # tags$style(HTML("#plot {overflow-y:scroll; overflow-x:hidden}")),
-
+  # tags$script("
+  #   Shiny.addCustomMessageHandler('setsetting', function(value) {
+  #   console.log(value);
+  #   Shiny.setInputValue(value[0], value.slice(1,value.length));
+  #   });
+  #   $(document).on('shiny:inputchanged', function(event) {
+  #       //console.log(event);
+  #       console.log('[input] ' + event.name + ': ' + event.value);
+  #       //Shiny.setInputValue('urlfiledata', 'boohoo');
+  #       //Shiny.setInputValue('paramsSelected', ['Electricity Generation by Fuel (TWh)', 'Final Energy by Fuel (EJ)']);
+  #     });
+  # "),
   #---------------------------
   # Initial Settings/Theme
   #---------------------------
   #shinythemes::themeSelector(),
   #theme = shinythemes::shinytheme("spacelab"),
+    div(downloadButton('downloadAll', "All",  class = "download_button"), style="padding:10px; float: right"),
+    div(actionLink(inputId='github', label='', icon = icon("github","fa-1x"),
+                   onclick ="window.open('https://github.com/JGCRI/rdataviz', '_blank')"),style="padding:15px 5px;float: right"),
+    div(actionLink(inputId='help', label='', icon = icon("question","fa-1x"),
+                   onclick ="window.open('https://jgcri.github.io/rdataviz/', '_blank')"),style="padding:15px 5px;float: right"),
+    # div(style = "float:left;",fas fa-cog"
+      div(tags$a(tags$i(class="fas fa-cog",
+                        style="float:left;margin-right:5px"),
+                 id = "downloadSettings",
+                 class = "btn btn-default shiny-download-link download_button",
+                 href = "",
+                 target = "_blank",
+                 download = NA, "Save Settings"),
+          style="padding:5px; float:left;margin-top:5px"),
 
-
-  div(downloadButton('downloadAll', "All",  class = "download_button"), style="padding:10px; float: right"),
-  div(actionLink(inputId='github', label='', icon = icon("github","fa-1x"),
-                 onclick ="window.open('https://github.com/JGCRI/rdataviz', '_blank')"),style="padding:15px 5px;float: right"),
-  div(actionLink(inputId='help', label='', icon = icon("question","fa-1x"),
-                 onclick ="window.open('https://jgcri.github.io/rdataviz/', '_blank')"),style="padding:15px 5px;float: right"),
-  # div(style = "float:left;",fas fa-cog"
-    div(tags$a(tags$i(class="fas fa-cog",
-                      style="float:left;margin-right:5px"),
-               id = "downloadSettings",
-               class = "btn btn-default shiny-download-link download_button",
-               href = "",
-               target = "_blank",
-               download = NA, "Save Settings"),
-        style="padding:5px; float:left;margin-top:5px"),
-
-    div(style = "padding:5px;margin-top:5px",
-        tags$label(class="btn btn-default shiny-download-link download_button shiny-bound-output",
-                   tags$span(class="btn download_button", "Upload Settings",
-                             style = "padding:0px",
-                             tags$i(class="fas fa-cog",
-                                    style="float:left;margin-right:5px"),
-                             tags$input(type="file", id="settingdata", name="settingdata", class="shiny-bound-input", style = "display:none")))),
-    # ),
+      div(style = "padding:5px;margin-top:5px",
+          tags$label(class="btn btn-default shiny-download-link download_button shiny-bound-output",
+                     tags$span(class="btn download_button", "Upload Settings",
+                               style = "padding:0px",
+                               tags$i(class="fas fa-cog",
+                                      style="float:left;margin-right:5px"),
+                               tags$input(type="file", id="settingdata", name="settingdata", class="shiny-bound-input", style = "display:none")))),
 
 
   # <div style="display: block; width: 100px; height: 20px; overflow: hidden;"
@@ -81,7 +89,7 @@ ui <- fluidPage(
   # <input id="filedata" name="filedata" type="file" style="display: none;" multiple="multiple" accept=".csv,.zip" class="shiny-bound-input">
 
   titlePanel(
-    p("RDataViz", style = "color:#3474A7"),
+    p("RDataViz", style = "color:#3474A7;"),
     windowTitle = "RDataViz"
     ),
 
@@ -90,6 +98,7 @@ ui <- fluidPage(
   #---------------------------
   sidebarLayout(
     sidebarPanel(
+      # style="position: fixed; width:30%",
       tabsetPanel(
         type = "tabs",
         id="tabs",
@@ -161,7 +170,6 @@ ui <- fluidPage(
         #---------------------------
         tabPanel(
           "Home",
-
           style = "margin-bottom: 30px; margin-top: 30px; margin-right: 50px; margin-left: 50px; border-color: #A9A9A9; border-width: thin;border-style: solid;padding: 20px",
           h1("Welcome!",style="font-weight: bold; color = #A9A9A9"),
           p(tags$em("rdataviz"),"is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."),
@@ -214,14 +222,19 @@ ui <- fluidPage(
                        )
                      )),
                      div(
-                       style = "margin-bottom:30px",
+                       class="charts",
                        plotOutput(outputId = "summary")
                        ),
                      width = "100%"
                    ),
                    tabPanel("Compare Regions",
                             br(),
-                            fluidRow(column(12, div(
+                            fluidRow(
+                              column(6,div(
+                                # Regions
+                                uiOutput('subsetRegions'),
+                              )),
+                              column(, div(
                                 downloadButton(
                                   'downloadPlotSumReg',
                                   NULL,
@@ -231,12 +244,10 @@ ui <- fluidPage(
                                 style = "float: right"
                               )
                             )),
-                            fluidRow(column(12,div(
-                              # Regions
-                              uiOutput('subsetRegions'),
-
-                            ))),
-                            plotOutput(outputId = "summaryReg"),
+                            div(
+                              class="charts",
+                              plotOutput(outputId = "summaryReg"),
+                            ),
                             width = "100%")
                  )),
         #---------------------------
@@ -253,8 +264,10 @@ ui <- fluidPage(
             6, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png",  class = "download_button"), style = "float: right")
           )),
           br(),
-          plotOutput(outputId = "plot", width = "100%")
-                 ),
+          div(
+            class="charts",
+            plotOutput(outputId = "plot", width = "100%", height="100%")),
+          ),
           tabPanel("Compare Regions")
           )
         ),
