@@ -1,0 +1,24 @@
+gcamdatabasepath: ''
+filemap: ~
+loadsetting: 0
+github: 0
+urlfiledata: ''
+scenariosSelected:
+- Scenario 1
+- Scenario 2
+regionsSelected: All
+filedata: ~
+help: 0
+tabs: csv
+paramsSelected:
+- Chosen Mix
+- Ag Production (Mt)
+- CO2 Emissions by Sector (MTCO2eq)
+- Electricity Generation by Fuel (TWh)
+- Final Energy by Fuel (EJ)
+- GDP (Billion 1990 USD)
+- Land Allocation (1000 km2)
+- Population (Millions)
+- Water Withdrawal by Sector (km3)
+settingdata: ~
+scenarioRefSelected: Scenario 1

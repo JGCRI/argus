@@ -47,31 +47,37 @@ server <- function(input, output, session) {
   # Load Default Datasets from rdataviz
   #---------------------------
   dataDefault <- rdataviz::exampleData
+  # settingsDefault <- rdataviz::
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
-  flag <- 0
   # session$sendCustomMessage("setsetting", c("data", unique(dataSum()$scenario)))
   #---------------------------
   # Settings
   #---------------------------
 
+
   output$downloadSettings <- downloadHandler(
     filename = "settings.yaml",
     content = function(filename) {
-      # input.df = ldply(reactiveValuesToList(input), function(t) t[toDataFrame]())
-      # input.df = as.data.frame(matrix(unlist(reactiveValuesToList(input)),nrow=length(reactiveValuesToList(input)),byrow=TRUE))
-      # write.csv(input.df, filename)
       write_yaml(reactiveValuesToList(input), filename)
-      # lapply(input, write, filename, append=TRUE, ncolumns=1000)
   })
 
 
   settings <- reactive({
+    print(input$settingdata)
     if (is.null(input$settingdata)){
       return(reactiveValuesToList(input))
     }else{
       return(read_yaml(input$settingdata$datapath))
     }
+  })
+
+  observeEvent(input$settingdata,{
+    setValues(settings())
+  })
+
+  observeEvent(input$defaultsetting,{
+    setValues(read_yaml("../extdata/settings.yaml"))
   })
 
   #gcamdatapath: file filemap: file paramsSelected:  scenarioSelected filedata settingdata github urlfiledata regionsselected  help tabs do
@@ -81,26 +87,89 @@ server <- function(input, output, session) {
 #       print(input$scenariosSelected)
 #     })
 
-   observeEvent(input$settingdata,{
-    setting <- settings()
-    # updateTextInput(session, "urlfiledata", value = "boo")
-    # updatePickerInput(session, "scenariosSelected", selected = c("Scenario 1", "Scenario 2"))
-    # updatePickerInput(session, "regionsSelected", selected = c("BengalBay", "IrrawaddyR"))
-    for (x in names(setting)){
-      if ((x == "regionsSelected")||(x == "scenariosSelected")||(x=="paramsSelected")||(x=="scenarioRefSelected")||(x == "subsetRegions")){
-        updatePickerInput(session, x, selected = setting[[x]])
-        print(x)
-        print(setting[[x]])
-      }
-    }
-    print("=====================================================")
-    for (i in names(reactiveValuesToList(input))){
-      print(paste("[+]", i))
-      print(reactiveValuesToList(input)[[i]])
-      print("------------------------------")
-    }
+  # tabPanel(
+  #   "All",
+  #   br(),
+  #   fluidRow(column(6, p(
+  #     'Sum of Regions Selected'
+  #   )),
+  #   column(
+  #     6, div(
+  #       downloadButton(
+  #         'downloadPlotSum',
+  #         NULL,
+  #         download = "summaryChart.png",
+  #         class = "download_button"
+  #       ),
+  #       style = "float: right"
+  #     )
+  #   )),
+  #   div(
+  #     class="charts",
+  #     plotOutput(outputId = "summary")
+  #   ),
+  #   width = "100%"
+  # ),
+
+  observeEvent(input$loadsetting, {
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        fileInput(
+          inputId = "settingdata",
+          label = "Upload yaml",
+          accept = c(".yaml"),
+          multiple = TRUE,
+          width = "100%"
+          ),
+        fluidRow(
+          column(6,
+                 div(
+                   tags$a(tags$i(class="fas fa-cog",
+                                 style="float:center;margin-right:5px"),
+                          id = "downloadSettings",
+                          class = "btn btn-default shiny-download-link download_button",
+                          href = "",
+                          target = "_blank",
+                          download = NA, "Save Settings"),
+                   style = "float:center"
+                 )),
+          column(6,
+                 div(actionLink(inputId='defaultsetting',
+                                label='Default Setting',
+                                class = "btn btn-default shiny-download-link download_button",
+                                icon = icon("cog","fa-1x"
+                                            ),
+                      ),
+                     )
+                 # div(
+                 #
+                 #   tags$a(tags$i(class="fas fa-cog",
+                 #                 style="float:center;margin-right:5px"),
+                 #          id = "defaultsetting",
+                 #          class = "btn btn-default shiny-download-link download_button",
+                 #          "Default Settings")
+                 # ))
+            )
+          )
+        )
+      )
   })
 
+
+
+   setValues <- function(setting){
+     for (x in names(setting)){
+       print(x)
+       if ((x == "regionsSelected")||(x == "scenariosSelected")||(x=="paramsSelected")||(x=="scenarioRefSelected")||(x == "subsetRegions")){
+         updatePickerInput(session, x, selected = setting[[x]])
+         print(x)
+         print(setting[[x]])
+       }
+     }
+   }
 
   #---------------------------
   # Data File (GCAM)

@@ -72,15 +72,12 @@ addMissing<-function(data){
 #' @importFrom magrittr %>%
 #' @export
 parse_zip <- function(file){
-  print("zip found 2.0")
   tmpdir <- tempdir()
   setwd(tmpdir)
   zip::unzip(
     file, exdir = tmpdir
   )
-  print(dir())
   for(i in dir()){
-    print(i)
     if (endsWith(i, ".csv")){
       return(utils::read.csv(i) %>% as.data.frame())
     }
@@ -94,15 +91,12 @@ parse_zip <- function(file){
 #' @importFrom magrittr %>%
 #' @export
 parse_remote <- function(input){
-  print(input$urlfiledata)
-  print("----")
   if (tools::file_ext(input$urlfiledata) == ""){
     if (grepl("./$",input$urlfiledata)){
       #GCAM
       utils::read.csv(input$urlfiledata) %>%
         as.data.frame()
     } else if((!grepl("./$",input$urlfiledata, "/") || !grepl(".zip$",input$urlfiledata) || !grepl(".csv$",input$urlfiledata))){
-      print("+++++")
       if (grepl(".zip", input$urlfiledata, fixed=TRUE)){
         temp <- tempfile()
         utils::download.file(input$urlfiledata, temp)
@@ -170,6 +164,5 @@ exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
 #' @importFrom magrittr %>%
 #' @export
 exportWidth<-function(max_width_in, numelement, lenperchart){
-  print(numelement)
   return(min(max_width_in, (numelement)*lenperchart))
 }
