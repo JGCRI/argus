@@ -49,6 +49,7 @@ server <- function(input, output, session) {
   dataDefault <- rdataviz::exampleData
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
+  flag <- 0
   # session$sendCustomMessage("setsetting", c("data", unique(dataSum()$scenario)))
   #---------------------------
   # Settings
@@ -75,10 +76,10 @@ server <- function(input, output, session) {
 
   #gcamdatapath: file filemap: file paramsSelected:  scenarioSelected filedata settingdata github urlfiledata regionsselected  help tabs do
 
-    # observeEvent(input$scenariosSelected,{
-    #   print(input)
-    #   print(input$scenariosSelected)
-    # })
+#     observeEvent(input$scenariosSelected,{
+#       print(input)
+#       print(input$scenariosSelected)
+#     })
 
    observeEvent(input$settingdata,{
     setting <- settings()
@@ -247,11 +248,16 @@ server <- function(input, output, session) {
   # Scenarios Select
   #---------------------------
   output$selectScenarios = renderUI({
+    # if(is.null(input$scenariosSelected)){
+    #   print("sentz")
+    #   session$sendCustomMessage("setsetting", c("scenariosSelected", unique(dataSum()$scenario)))
+    #   updatePickerInput(session, "scenariosSelected", selected = unique(dataSum()$scenario))
+    # }
     pickerInput(
       inputId = "scenariosSelected",
       label = "Select Scenarios",
       choices = unique(dataSum()$scenario),
-      selected = unique(dataSum()$scenario),
+      selected = unique(dataSumx()$scenario),
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -279,11 +285,16 @@ server <- function(input, output, session) {
   # Parameters Select
   #---------------------------
   output$selectParams = renderUI({
+    # if(is.null(input$selectParams)){
+    #   print("sentzX")
+    #   # session$sendCustomMessage("setsetting", c("scenariosSelected", unique(dataSum()$scenario)))
+    #   updatePickerInput(session, "paramsSelected", selected = "Chosen Mix")
+    # }
     pickerInput(
       inputId = "paramsSelected",
       label = "Select Params",
       choices = c("Chosen Mix", unique(dataSum()$param)),
-      selected = "Chosen Mix",
+      selected = paramsSelectedx(),
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -298,6 +309,11 @@ server <- function(input, output, session) {
   # Regions Select
   #---------------------------
   output$selectRegions = renderUI({
+    # if(is.null(input$regionsSelected)){
+    #   print("sentzX")
+    #   # session$sendCustomMessage("setsetting", c("scenariosSelected", unique(dataSum()$scenario)))
+    #   updatePickerInput(session, "regionsSelected", "All")
+    # }
     pickerInput(
       inputId = "regionsSelected",
       label = "Select Regions",
@@ -330,7 +346,7 @@ server <- function(input, output, session) {
   # Reactive Params based on inputs
   #---------------------------
   paramsSelectedx <- reactive({
-    if (any(input$paramsSelected == "Chosen Mix") &
+    if (any(input$paramsSelected == "Chosen Mix") &&
         length(input$paramsSelected) == 1) {
       paramsCheck <- unique(data()$param)[unique(data()$param) %in%
                                             rdataviz::constants()$chosenMix]
@@ -339,8 +355,28 @@ server <- function(input, output, session) {
       } else{
         unique(data()$param)
       }
+    }else if (is.null(input$paramsSelected)){
+      print("memextz")
+      paramsCheck <- c("Chosen Mix", unique(data()$param)[unique(data()$param) %in%
+                                            rdataviz::constants()$chosenMix])
+      return(paramsCheck)
     } else{
+      print("memeasd")
       input$paramsSelected
+    }
+  })
+
+  scenarioSelectedx <- reactive({
+    if (input$scenariosSelected == "All" && length(input$scenariosSelected) > 0) {
+      print("meme1")
+      return(unique(dataSum()$scenario))
+    } else if (is.null(input$scenariosSelected)){
+      print("meme2")
+      return(unique(dataSum()$scenario))
+    }else{
+      print("meme3")
+      print(input$scenariosSelected)
+      return(input$scenariosSelected)
     }
   })
 
@@ -371,9 +407,15 @@ server <- function(input, output, session) {
 
   # Filter Data after Reactive Choices -------------------
   dataSumx <- reactive({
-    dataSum() %>%
-      dplyr::filter(scenario %in% input$scenariosSelected,
+    # print("----")
+    print(unique(scenarioSelectedx()))
+    print(paramsSelectedx())
+    # print("----")
+    x <- dataSum() %>%
+      dplyr::filter(scenario %in% scenarioSelectedx(),
                     param %in% paramsSelectedx())
+    print(x)
+    return(x)
   })
 
   #---------------------------
@@ -574,7 +616,7 @@ server <- function(input, output, session) {
         inputId = "subsetRegions",
         label = "Select Regions to Compare",
         choices = unique(dataMap()$subRegion),
-        selected = unique(dataMap()$subRegion)[1:4],
+        selected = subsetRegionsx(),
         multiple = TRUE,
         options = list(
           `actions-box` = TRUE,
