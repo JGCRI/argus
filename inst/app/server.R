@@ -111,8 +111,8 @@ server <- function(input, output, session) {
                                 label='Default Setting',
                                 class = "btn btn-default shiny-download-link download_button",
                                 icon = icon("cog","fa-1x"
-                                            ),
-                      ),
+                                            )
+                      )
                      )
                  # div(
                  #
@@ -777,7 +777,7 @@ server <- function(input, output, session) {
 
   output$plot <- renderPlot({
     chartPlot()
-  }
+  },
   height=function(){300*length(unique(dataChartx()$param))}
   )
 

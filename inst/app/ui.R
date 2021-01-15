@@ -169,23 +169,21 @@ ui <- fluidPage(
         tabPanel(
           "Home",
           style = "margin-bottom: 30px; margin-top: 30px; margin-right: 50px; margin-left: 50px; border-color: #A9A9A9; border-width: thin;border-style: solid;padding: 20px",
+          div(
+          class="charts",
           h1("Welcome!",style="font-weight: bold; color = #A9A9A9"),
           p(tags$em("rdataviz"),"is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."),
-          h3("Citation",style="font-weight: bold; color = #A9A9A9"),
-          hr(style="border-top: 1px solid #bbb;"),
-          p("Khan, Z., Tang, S., Wild, T., Vernon, C., 2021. rdataviz - An R shiny application to interactively vizualize data across scenarios, parameters and regions.Journal of Open Source Software, DOI: XXXX"),
           h3("How-to",style="font-weight: bold; color = #A9A9A9"),
           hr(style="border-top: 1px solid #bbb;"),
           tags$ul(
-          tags$li(tags$b("Step 1:"),"Choose Project Folder (For saving all project files)"),
-          tags$li(tags$b("Step 2:"),"Load/Save Settings (This will be a file to save all current options on the app, which can be loaded in the future to return to a certain state)"),
-          tags$li(tags$b("Step 3:"),"Choose Data"),
+          tags$li(tags$b("Step 1:"),"Choose Data"),
           tags$ul(
-            tags$li("Choose a csv, zip, or GCAM output directory containing columns: 'subRegion', 'scenario', 'year', 'param', 'class', 'value'."),
-            tags$li("GCAM and url input are still under development.")),
-          tags$li(tags$b("Step 4:"),"Select scenarios, regions and parameters"),
-          tags$li(tags$b("Step 5:"),"Save settings"),
-          tags$li(tags$b("Step 6:"),"Download all / Explore output")),
+            tags$li("Choose a csv, url, or GCAM output directory."),
+            tags$li("Minimum columns required: 'subRegion', 'value'"),
+            tags$li("Optional columns: 'scenario', 'year', 'param', 'class'")),
+          tags$li(tags$b("Step 2:"),"Select scenarios, regions and parameters."),
+          tags$li(tags$b("Step 3 (Optional):"),"Save settings, which can be loaded later."),
+          tags$li(tags$b("Step 4 (Optional):"),"Download indiviudal or all outputs.")),
           h3("Output Tabs", style="font-weight: bold; color = #A9A9A9"),
           hr(style="border-top: 1px solid #bbb;"),
           tags$ul(
@@ -194,8 +192,11 @@ ui <- fluidPage(
             tags$li(tags$b("Charts:"),"Detailed visualization of the input data in the form of bar graphs displaying the absolute difference across scenarios"),
             tags$li(tags$b("Maps:"),"Under Development"),
             tags$li(tags$b("Table:"),"Table displaying the input data, including search and sort functions")),
+          h3("Citation",style="font-weight: bold; color = #A9A9A9"),
+          hr(style="border-top: 1px solid #bbb;"),
+          p("Khan, Z., Tang, S., Wild, T., Vernon, C., 2021. rdataviz - An R shiny application to interactively vizualize data across scenarios, parameters and regions.Journal of Open Source Software, DOI: XXXX"),
           width = "100%"
-        ),
+        )),
 
         #---------------------------
         # Main Panel: Summary Tab
@@ -275,7 +276,9 @@ ui <- fluidPage(
         tabPanel("Maps",
                  tabsetPanel(type = "pills",
                    tabPanel("Summary",
-                 uiOutput(outputId = "map")
+                            div(
+                              class="charts",
+                              uiOutput(outputId = "map"))
                  ),
                  tabPanel("Compare Years"),
                  tabPanel("Class"),
@@ -288,14 +291,14 @@ ui <- fluidPage(
         tabPanel(
           "Table",
           br(),
-          fluidRow(column(6, p(
-            'Sum of Regions Selected'
-          )),
+          fluidRow(
           column(
-            6, div(downloadButton('downloadTable', NULL, download = "table.csv", class="download_button"), style = "float: right")
+            12, div(downloadButton('downloadTable', NULL, download = "table.csv", class="download_button"), style = "float: right")
           )),
           br(),
-          DTOutput(outputId = "table")
+          div(
+            class="charts",
+          DTOutput(outputId = "table"))
         )
       )
     )
