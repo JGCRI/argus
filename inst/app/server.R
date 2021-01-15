@@ -82,35 +82,6 @@ server <- function(input, output, session) {
 
   #gcamdatapath: file filemap: file paramsSelected:  scenarioSelected filedata settingdata github urlfiledata regionsselected  help tabs do
 
-#     observeEvent(input$scenariosSelected,{
-#       print(input)
-#       print(input$scenariosSelected)
-#     })
-
-  # tabPanel(
-  #   "All",
-  #   br(),
-  #   fluidRow(column(6, p(
-  #     'Sum of Regions Selected'
-  #   )),
-  #   column(
-  #     6, div(
-  #       downloadButton(
-  #         'downloadPlotSum',
-  #         NULL,
-  #         download = "summaryChart.png",
-  #         class = "download_button"
-  #       ),
-  #       style = "float: right"
-  #     )
-  #   )),
-  #   div(
-  #     class="charts",
-  #     plotOutput(outputId = "summary")
-  #   ),
-  #   width = "100%"
-  # ),
-
   observeEvent(input$loadsetting, {
     showModal(
       modalDialog(
@@ -130,7 +101,6 @@ server <- function(input, output, session) {
                    tags$a(tags$i(class="fas fa-cog",
                                  style="float:center;margin-right:5px"),
                           id = "downloadSettings",
-                          class = "btn btn-default shiny-download-link download_button",
                           href = "",
                           target = "_blank",
                           download = NA, "Save Settings"),
@@ -807,7 +777,7 @@ server <- function(input, output, session) {
 
   output$plot <- renderPlot({
     chartPlot()
-  },
+  }
   height=function(){300*length(unique(dataChartx()$param))}
   )
 
