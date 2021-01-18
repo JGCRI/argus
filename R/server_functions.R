@@ -146,10 +146,16 @@ parse_local <- function(input){
 #' exportHeight
 #'
 #' generate height for exported images
-#' @param input number of columns, max height, number of planned elements, height per element
+#' @param chartsperrow number of columns
+#' @param max_height_in max height
+#' @param numelement number of planned elements
+#' @param lenperchart height per element
 #' @importFrom magrittr %>%
 #' @export
-exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
+exportHeight<-function(chartsperrow,
+                       max_height_in,
+                       numelement,
+                       lenperchart){
   if (numelement%%chartsperrow==0){
     return(min(max_height_in, ((numelement%/%chartsperrow))*lenperchart))
   }else{
@@ -160,7 +166,9 @@ exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
 #' exportWidth
 #'
 #' generate width for exported images
-#' @param input max width,number of planned elements,width per element
+#' @param max_width_in max width
+#' @param numelement number of planned elements
+#' @param lenperchart height per element
 #' @importFrom magrittr %>%
 #' @export
 exportWidth<-function(max_width_in, numelement, lenperchart){

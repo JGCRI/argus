@@ -7,7 +7,11 @@
 exportWidth(max_width_in, numelement, lenperchart)
 }
 \arguments{
-\item{input}{max width,number of planned elements,width per element}
+\item{max_width_in}{max width}
+
+\item{numelement}{number of planned elements}
+
+\item{lenperchart}{height per element}
 }
 \description{
 generate width for exported images

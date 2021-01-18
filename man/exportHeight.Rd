@@ -7,7 +7,13 @@
 exportHeight(chartsperrow, max_height_in, numelement, lenperchart)
 }
 \arguments{
-\item{input}{number of columns, max height, number of planned elements, height per element}
+\item{chartsperrow}{number of columns}
+
+\item{max_height_in}{max height}
+
+\item{numelement}{number of planned elements}
+
+\item{lenperchart}{height per element}
 }
 \description{
 generate height for exported images
