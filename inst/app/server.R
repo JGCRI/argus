@@ -66,8 +66,8 @@ server <- function(input, output, session) {
                  div(downloadButton(
                    outputId='downloadSettings',
                    label="Save Settings",
-                   download = "settings.csv"),
-                   class = "download_button",
+                   download = "settings.csv",
+                   class = "download_button"),
                    style = "float:center"
                  ))
           ,
