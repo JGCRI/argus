@@ -17,36 +17,293 @@ library(tmap)
 library(leaflet)
 library(leafsync)
 library(rgcam)
-
-#---------------------------
-# Overall Strtucture
-#---------------------------
-
-# Side Bar:
-#   - Input csv
-#   - Input gcam project
-#   - Input scenarios
-#   - Input ref scenario
-#   - Input parameters
-#   - Input regions
-#   - Input years
-# Main Panel:
-#   - Summary (Summary plots aggregated by chosen params and regions)
-#   - Charts (Bar Charts comparing scenarios aggregated by chosen params and regions)
-#   - Maps (Maps comapring scenarios aggregated by params for single years)
-#   - Table (Raw data table being used)
+library(plyr)
 
 #---------------------------
 # Server object
 #---------------------------
 
-server <- function(input, output) {
+server <- function(input, output, session) {
+
   #---------------------------
   # Load Default Datasets from rdataviz
   #---------------------------
   dataDefault <- rdataviz::exampleData
+  # settingsDefault <- rdataviz::
   map <- rmap::mapGCAMReg32
   ggplottheme <- ggplot2::theme_bw()
+  # session$sendCustomMessage("setsetting", c("data", unique(dataSum()$scenario)))
+
+
+  #---------------------------
+  # Settings
+  #---------------------------
+
+  # Initialize Settings
+  settings <- reactive({data.frame()})
+  settingsVars <- c("urlSelect",
+                    "regionsSelect",
+                    "scenariosSelect",
+                    "scenarioRefSelect",
+                    "paramsSelect")
+
+  # Create Modal for Settings Download and Loading
+  observeEvent(input$loadsetting, {
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        fileInput(
+          inputId = "settingdata",
+          label = "Upload csv",
+          accept = c(".csv"),
+          multiple = TRUE,
+          width = "100%"
+        ),
+        fluidRow(
+          column(6,
+                 div(downloadButton(
+                   outputId='downloadSettings',
+                   label="Save Settings",
+                   download = "settings.csv"),
+                   class = "download_button",
+                   style = "float:center"
+                 ))
+          ,
+          column(6,
+                 div(actionLink(inputId='defaultsetting',
+                                label='Default Setting',
+                                class = "btn btn-default shiny-download-link download_button",
+                                icon = icon("cog","fa-1x")
+                 )
+                 )
+          )
+        )
+      )
+    )
+  })
+
+
+  # Download Settings
+  output$downloadSettings <- downloadHandler(
+    filename = "settings.csv",
+    content = function(filename) {
+      write.csv(data.frame(variable=settingsVars,
+                           value=c(paste(input$urlfiledata,collapse=";"),
+                                   paste(regionsSelectedx(),collapse=";"),
+                                   paste(scenariosSelectedx(),collapse=";"),
+                                   paste(scenarioRefSelectedx(),collapse=";"),
+                                   paste(paramsSelectedx(),collapse=";"))),
+                file=filename,
+                row.names = F)
+    })
+
+
+
+
+  # Load Settings Data if Selected
+  observeEvent(input$settingdata,{
+    settings <- reactive({
+      if (!is.null(input$settingdata)){
+        return(read.csv(input$settingdata$datapath,header=T)%>%as.data.frame())
+      }
+    })
+    print("Settings file loaded.")
+    print(settings())
+
+    # Make sure all variables in settings are valid
+    if(any(!settingsVars %in% unique(settings()$variable))){
+     showModal(modalDialog(
+        title = "Settings Variable Error.",
+        print(paste("Setting variable(s) not valid: ",
+                    paste(unique(settings()$variable)[
+                      !unique(settings()$variable) %in% settingsVars],collapse=", "),
+              sep=""))
+     ))
+    } else {
+
+    # Update All Reactive Inputs Based on Settings Loaded
+    if(nrow(settings())>0){
+
+      # URL Update
+      # settingsURL <- unlist(
+      #   strsplit(
+      #     (settings()%>%dplyr::filter(variable=="urlSelect"))$value
+      #     ,split=";")
+      # )
+      # updateTextInput(
+      #     session=session,
+      #     inputId = "urlfiledata",
+      #     value = settingsURL,
+      #   )
+
+      # Regions Update
+      settingsRegions <- unlist(
+        strsplit(
+          (settings()%>%dplyr::filter(variable=="regionsSelect"))$value
+          ,split=";")
+      )
+      if(any(unique(settingsRegions) %in% unique(data()$subRegion))){
+      updatePickerInput(
+        session=session,
+        inputId = "regionsSelected",
+        selected = unique(settingsRegions)[unique(settingsRegions) %in% unique(data()$subRegion)],
+      )
+      } else{
+        showModal(modalDialog(
+          title = "Settings Region Error.",
+          "None of the regions selected in the settings file are available in the data.
+          Using default selection."
+        ))
+      }
+
+      # Parameters Update
+      settingsParams <- unlist(
+        strsplit(
+          (settings()%>%dplyr::filter(variable=="paramsSelect"))$value
+          ,split=";")
+      )
+      if(any(unique(settingsParams) %in% unique(data()$param))){
+        updatePickerInput(
+          session=session,
+          inputId = "paramsSelected",
+          selected = unique(settingsParams)[unique(settingsParams) %in% unique(data()$param)],
+        )
+      } else{
+        showModal(modalDialog(
+          title = "Settings Param Error.",
+          "None of the params selected in the settings file are available in the data.
+          Using default selection."
+        ))
+      }
+
+      # Scenario Update
+      settingsScenario <- unlist(
+        strsplit(
+          (settings()%>%dplyr::filter(variable=="scenariosSelect"))$value
+          ,split=";")
+      )
+      if(any(unique(settingsScenario) %in% unique(data()$scenario))){
+        updatePickerInput(
+          session=session,
+          inputId = "scenariosSelected",
+          selected = unique(settingsScenario)[unique(settingsScenario) %in% unique(data()$scenario)],
+        )
+      } else{
+        showModal(modalDialog(
+          title = "Settings Scenario Error.",
+          "None of the scenarios selected in the settings file are available in the data.
+          Using default selection."
+        ))
+      }
+
+      # Reference Scenario Update
+      settingsRefScenario <- unlist(
+        strsplit(
+          (settings()%>%dplyr::filter(variable=="scenarioRefSelect"))$value
+          ,split=";")
+      )
+      if(any(unique(settingsRefScenario) %in% unique(data()$scenario))){
+        updatePickerInput(
+          session=session,
+          inputId = "scenarioRefSelected",
+          selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
+        )
+      } else{
+        showModal(modalDialog(
+          title = "Settings Ref Scenario Error.",
+          "The Ref Scenario selected in the settings file is not available in the data.
+          Using default selection."
+        ))
+      }
+
+
+    }
+  }
+  })
+
+  # Attempt to read settings if selected
+  observeEvent(input$settingdata,
+               if(!is.null(input$settingdata)){
+                 if(grepl(".csv",input$settingdata$datapath)){
+                   #removeModal()
+                 }else{
+                   showModal(modalDialog(
+                     title = "Incorrect file type loaded",
+                     "Settings file must be a .csv"
+                   ))
+                 }
+               })
+
+  # Attempt to read default settings if selected
+  observeEvent(input$defaultsetting,{
+
+    settings <- reactive({
+      return(data.frame(variable=settingsVars) %>%
+                          dplyr::mutate(value="Default"))
+    })
+
+    #---------------------------
+    # Update input File to Default (NULL)
+    #---------------------------
+    rv$filedatax <- NULL
+
+    #---------------------------
+    # Scenarios Select
+    #---------------------------
+   updatePickerInput(
+        inputId = "scenariosSelected",
+        session=session,
+        choices = unique(data()$scenario),
+        selected = unique(data()$scenario))
+
+    #---------------------------
+    # Ref Scenario Select
+    #---------------------------
+    updatePickerInput(
+        inputId = "scenarioRefSelected",
+        session=session,
+        choices = unique(data()$scenario)[unique(data()$scenario)
+                                             %in% scenariosSelectedx()],
+        selected = (unique(data()$scenario)[unique(data()$scenario)
+                                               %in% scenariosSelectedx()])[1])
+
+    #---------------------------
+    # Parameters Select
+    #---------------------------
+    updatePickerInput(
+        inputId = "paramsSelected",
+        session=session,
+        choices = c("Chosen Mix", unique(data()$param)),
+        selected = unique(data()$param)[1:5])
+
+    #---------------------------
+    # Regions Select
+    #---------------------------
+    updatePickerInput(
+        inputId = "regionsSelected",
+        session=session,
+        choices = unique(data()$subRegion),
+        selected = unique(data()$subRegion))
+
+    #---------------------------
+    # Subset Regions Selected
+    #---------------------------
+    updatePickerInput(
+        inputId = "subsetRegions",
+        session=session,
+        choices = unique(data()$subRegion),
+        selected = unique(data()$subRegion)[1:4])
+  })
+
+  # Close Modal After Loading Default
+  observeEvent(input$defaultsetting,
+               if(!is.null(input$defaultsetting)){
+                 removeModal()
+               })
+
+
 
   #---------------------------
   # Data File (GCAM)
@@ -66,48 +323,48 @@ server <- function(input, output) {
   # Get names of scenarios in GCAM database.....................
   gcamScenariosx <- reactive({
 
-  if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
-  gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",gcamdatabasepathx())); gcamdatabasePath_dir
-  gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', gcamdatabasepathx()); gcamdatabasePath_file
-  # Save Message from rgcam::localDBConn to a text file and then extract names
-  zz <- file(paste(getwd(),"/test.txt",sep=""), open = "wt")
-  sink(zz,type="message")
-  rgcam::localDBConn(gcamdatabasePath_dir,gcamdatabasePath_file)
-  sink()
-  closeAllConnections()
-  # Read temp file
-  con <- file(paste(getwd(),"/test.txt",sep=""),open = "r")
-  first_line <- readLines(con,n=1); first_line
-  closeAllConnections()
-  if(grepl("error",first_line,ignore.case = T)){stop(paste(first_line))}
-  print(first_line)
-  if(file.exists(paste(getwd(),"/test.txt",sep=""))){unlink(paste(getwd(),"/test.txt",sep=""))}
-  # Extract scenario names from saved line
-  s1 <- gsub(".*:","",first_line);s1
-  s2 <- gsub(" ","",s1);s2
-  as.vector(unlist(strsplit(s2,",")))
-  }else{
-    gcamdatabasepathx()
-  }
+    if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
+      gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",gcamdatabasepathx())); gcamdatabasePath_dir
+      gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', gcamdatabasepathx()); gcamdatabasePath_file
+      # Save Message from rgcam::localDBConn to a text file and then extract names
+      zz <- file(paste(getwd(),"/test.txt",sep=""), open = "wt")
+      sink(zz,type="message")
+      rgcam::localDBConn(gcamdatabasePath_dir,gcamdatabasePath_file)
+      sink()
+      closeAllConnections()
+      # Read temp file
+      con <- file(paste(getwd(),"/test.txt",sep=""),open = "r")
+      first_line <- readLines(con,n=1); first_line
+      closeAllConnections()
+      if(grepl("error",first_line,ignore.case = T)){stop(paste(first_line))}
+      print(first_line)
+      if(file.exists(paste(getwd(),"/test.txt",sep=""))){unlink(paste(getwd(),"/test.txt",sep=""))}
+      # Extract scenario names from saved line
+      s1 <- gsub(".*:","",first_line);s1
+      s2 <- gsub(" ","",s1);s2
+      as.vector(unlist(strsplit(s2,",")))
+    }else{
+      gcamdatabasepathx()
+    }
   })
 
   output$gcamScenarios = renderUI({
     if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
-    pickerInput(
-      inputId = "gcamScenariosSelected",
-      label = "Select Available GCAM Scenarios",
-      choices = unique(gcamScenariosx()),
-      selected = unique(gcamScenariosx()),
-      multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `deselect-all-text` = "None",
-        `select-all-text` = "All",
-        `none-selected-text` = "None Selected"
-      )
-    )}else{
-      NULL
-    }
+      pickerInput(
+        inputId = "gcamScenariosSelected",
+        label = "Select Available GCAM Scenarios",
+        choices = unique(gcamScenariosx()),
+        selected = unique(gcamScenariosx()),
+        multiple = TRUE,
+        options = list(
+          `actions-box` = TRUE,
+          `deselect-all-text` = "None",
+          `select-all-text` = "All",
+          `none-selected-text` = "None Selected"
+        )
+      )}else{
+        NULL
+      }
   })
 
   #...................................
@@ -115,33 +372,33 @@ server <- function(input, output) {
   dataGCAMx <- reactive({
 
     if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
-    tempdir <- paste(getwd(),"/tempdir",sep="")
-    dir.create(tempdir)
-    gcamdatabasepath_i <- gcamdatabasepathx()
-    scenOrigNames_i <- input$gcamScenariosSelected
-    scenNewNames_i <- paste(input$gcamScenariosSelected,"NEW",sep="")
-    regionsSelect_i <- "Southeast Asia"
-    paramsSelect_i <- c("gdp","pop","agProdByCrop")
+      tempdir <- paste(getwd(),"/tempdir",sep="")
+      dir.create(tempdir)
+      gcamdatabasepath_i <- gcamdatabasepathx()
+      scenOrigNames_i <- input$gcamScenariosSelected
+      scenNewNames_i <- paste(input$gcamScenariosSelected,"NEW",sep="")
+      regionsSelect_i <- "Southeast Asia"
+      paramsSelect_i <- c("gdp","pop","agProdByCrop")
 
-    dataGCAMraw <- rdataviz::readgcam(reReadData = T,
-                                      dirOutputs = tempdir,
-                                      gcamdatabase = gcamdatabasepath_i,
-                                      scenOrigNames = scenOrigNames_i,
-                                      scenNewNames = scenNewNames_i,
-                                      dataProj = "projFile",
-                                      #dataProjPath = dataProjPath_i,
-                                      regionsSelect = regionsSelect_i,
-                                      paramsSelect= paramsSelect_i)
+      dataGCAMraw <- rdataviz::readgcam(reReadData = T,
+                                        dirOutputs = tempdir,
+                                        gcamdatabase = gcamdatabasepath_i,
+                                        scenOrigNames = scenOrigNames_i,
+                                        scenNewNames = scenNewNames_i,
+                                        dataProj = "projFile",
+                                        #dataProjPath = dataProjPath_i,
+                                        regionsSelect = regionsSelect_i,
+                                        paramsSelect= paramsSelect_i)
 
-    unlink(tempdir, recursive = T)
+      unlink(tempdir, recursive = T)
 
-    dataGCAMraw$data %>% as_tibble() %>%
-      dplyr::select(scenario, region, subRegion, param,
-                    class1, class2, x, vintage, aggregate, units,
-                    value) %>%
-      dplyr::rename(class=class1)-> dataGCAM
+      dataGCAMraw$data %>% as_tibble() %>%
+        dplyr::select(scenario, region, subRegion, param,
+                      class1, class2, x, vintage, aggregate, units,
+                      value) %>%
+        dplyr::rename(class=class1)-> dataGCAM
 
-    dataGCAM
+      dataGCAM
     } else {
       NULL
     }
@@ -151,30 +408,56 @@ server <- function(input, output) {
   #---------------------------
   # Data File (CSV)
   #---------------------------
+
+  # Create your own reactive values that you can modify because input is read only
+  rv <- reactiveValues()
+  # Observe File Inputs
+  observeEvent(input$filedata, {
+    rv$filedatax=input$filedata
+    # URL Update
+    updateTextInput(
+      session=session,
+      inputId = "urlfiledata",
+      value = "",
+    )
+    })
+  observeEvent(input$urlfiledata, {
+    rv$urlfiledatax=input$urlfiledata})
+  eventReactive(input$urlfiledata, {
+    rv$filedatax=NULL})
+
+  # Read in Raw Data
   data_raw <- reactive({
-    if (is.null(input$filedata) & is.null(dataGCAMx()) & ("" == input$urlfiledata)) {
-      rdataviz::addMissing(
+    if (is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
+      return(rdataviz::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-      )
-    } else if(!is.null(input$filedata) & is.null(dataGCAMx()) & ("" == input$urlfiledata)) {
-      rdataviz::addMissing(
+      ))
+      rv$filedatax <- NULL
+      rv$urlfiledatax <- NULL
+    } else if(!is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
+      return(rdataviz::addMissing(
         rdataviz::parse_local(input)%>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-      )
-    } else if(is.null(input$filedata) & !is.null(dataGCAMx()) & ("" == input$urlfiledata)){
-      dataGCAMx() %>%
-        dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+      ))
+      rv$filedatax <- NULL
+      rv$urlfiledatax <- NULL
+    } else if(is.null(rv$filedatax) & !is.null(dataGCAMx()) & ("" == rv$urlfiledatax)){
+      return(dataGCAMx() %>%
+        dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
+      rv$filedatax <- NULL
+      rv$urlfiledatax <- NULL
     }else{
-      rdataviz::addMissing(
-       rdataviz::parse_remote(input)%>%
-         dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-      )
+      return(rdataviz::addMissing(
+        rdataviz::parse_remote(input)%>%
+          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+      ))
+      rv$filedatax <- NULL
+      rv$urlfiledatax <- NULL
     }
   })
 
   data <- reactive({
-
     # Aggregate across classes
     tblAggsums <- data_raw() %>%
       dplyr::filter(aggregate == "sum") %>%
@@ -197,8 +480,8 @@ server <- function(input, output) {
     pickerInput(
       inputId = "scenariosSelected",
       label = "Select Scenarios",
-      choices = unique(dataSum()$scenario),
-      selected = unique(dataSum()$scenario),
+      choices = unique(data()$scenario),
+      selected = unique(data()$scenario),
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -216,9 +499,11 @@ server <- function(input, output) {
     pickerInput(
       inputId = "scenarioRefSelected",
       label = "Select Ref Scenario",
-      choices = unique(dataSum()$scenario),
-      selected = unique(dataSum()$scenario)[1],
-      multiple = F,
+      choices = unique(data()$scenario)[unique(data()$scenario)
+                                           %in% scenariosSelectedx()],
+      selected = (unique(data()$scenario)[unique(data()$scenario)
+                                             %in% scenariosSelectedx()])[1],
+      multiple = F
     )
   })
 
@@ -229,8 +514,8 @@ server <- function(input, output) {
     pickerInput(
       inputId = "paramsSelected",
       label = "Select Params",
-      choices = c("Chosen Mix", unique(dataSum()$param)),
-      selected = "Chosen Mix",
+      choices = c("Chosen Mix", unique(data()$param)),
+      selected = unique(data()$param)[1:5],
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -248,8 +533,8 @@ server <- function(input, output) {
     pickerInput(
       inputId = "regionsSelected",
       label = "Select Regions",
-      choices = c("All", unique(data()$subRegion)),
-      selected = "All",
+      choices = unique(data()$subRegion),
+      selected = unique(data()$subRegion),
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -261,14 +546,54 @@ server <- function(input, output) {
   })
 
   #---------------------------
+  # Subset Regions Selected
+  #---------------------------
+  output$subsetRegions = renderUI({
+    pickerInput(
+      inputId = "subsetRegions",
+      label = "Select Regions to Compare",
+      choices = unique(dataMapx()$subRegion),
+      selected = unique(dataMapx()$subRegion)[1:4],
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `deselect-all-text` = "None",
+        `select-all-text` = "All",
+        `none-selected-text` = "None Selected"
+      ))
+  })
+
+  #---------------------------
+  # Reactive Regions Select based on inputs
+  #---------------------------
+  subsetRegionsx <- reactive({
+    if (input$subsetRegions == "All" && length(input$subsetRegions) == 1) {
+      return(unique(dataMapx()$subRegion))
+    } else if (is.null(input$subsetRegions)){
+      return(unique(dataMapx()$subRegion)[1:4])
+    } else{
+      return(input$subsetRegions)
+    }
+  })
+
+
+  #---------------------------
+  # Reactive Reference Scenario Select
+  #---------------------------
+
+  scenarioRefSelectedx <- reactive({
+    input$scenarioRefSelected
+  })
+
+
+  #---------------------------
   # Reactive Regions Select based on inputs
   #---------------------------
   regionsSelectedx <- reactive({
-    if (input$regionsSelected == "All" &
-        length(input$regionsSelected) == 1) {
-      unique(data()$subRegion)
-    } else{
-      input$regionsSelected
+    if (input$regionsSelected == "All" && length(input$regionsSelected) == 1) {
+      return(unique(data()$subRegion))
+    } else {
+      return(input$regionsSelected)
     }
   })
 
@@ -276,7 +601,7 @@ server <- function(input, output) {
   # Reactive Params based on inputs
   #---------------------------
   paramsSelectedx <- reactive({
-    if (any(input$paramsSelected == "Chosen Mix") &
+    if (any(input$paramsSelected == "Chosen Mix") &&
         length(input$paramsSelected) == 1) {
       paramsCheck <- unique(data()$param)[unique(data()$param) %in%
                                             rdataviz::constants()$chosenMix]
@@ -285,8 +610,19 @@ server <- function(input, output) {
       } else{
         unique(data()$param)
       }
-    } else{
+    }else{
       input$paramsSelected
+    }
+  })
+
+  #---------------------------
+  # Reactive Scenarios based on inputs
+  #---------------------------
+  scenariosSelectedx <- reactive({
+    if (input$scenariosSelected == "All" && length(input$scenariosSelected) > 0) {
+      return(unique(dataSum()$scenario))
+    } else{
+      return(input$scenariosSelected)
     }
   })
 
@@ -317,9 +653,13 @@ server <- function(input, output) {
 
   # Filter Data after Reactive Choices -------------------
   dataSumx <- reactive({
-    dataSum() %>%
-      dplyr::filter(scenario %in% input$scenariosSelected,
+    print(unique(scenariosSelectedx()))
+    print(paramsSelectedx())
+    x <- dataSum() %>%
+      dplyr::filter(scenario %in% scenariosSelectedx(),
                     param %in% paramsSelectedx())
+    print(x)
+    return(x)
   })
 
   #---------------------------
@@ -456,22 +796,28 @@ server <- function(input, output) {
   #---------------------------
   # Summary Plot
   #---------------------------
-  summaryPlot <- function(){
+  summaryPlot <- function(aspectratio, textsize, titletext){
     ggplot2::ggplot(dataSumx(),
                     aes(x=x,y=value,
                         group=scenario,
-                        color=scenario)) +
+                        color=scenario))+
+      geom_line(size=1.25) +
       ggplottheme +
       geom_line() +
       ylab(NULL) +  xlab(NULL) +
       facet_wrap(.~param, scales="free", ncol = 3,
                  labeller = labeller(param = label_wrap_gen(15)))+
       theme(legend.position="top",
-            plot.margin=margin(10,10,0,0,"pt"))
+            legend.text=element_text(size=titletext),
+            legend.title = element_blank(),
+            plot.margin=margin(20,20,20,0,"pt"),
+            text=element_text(size=textsize),
+            aspect.ratio = aspectratio
+      )
   }
 
   output$summary <- renderPlot({
-    summaryPlot()
+    summaryPlot(NULL, 17.5, 20)
   },
   height=function(){
     if (length(unique(dataChartx()$param))%%3==0){
@@ -479,111 +825,82 @@ server <- function(input, output) {
     }else{
       return(((length(unique(dataChartx()$param))%/%3)+1)*250)
     }
-  }
+  },
+  width=function(){
+    if (length(unique(dataChartx()$param))==1){
+      return(300)
+    }else if (length(unique(dataChartx()$param))==2){
+      return(500)
+    }else{
+      return("auto")
+    }
+    }
   )
   output$downloadPlotSum <- downloadHandler(
     filename = "summaryPlot.png",
     content = function(file) {
       ggsave(
         file,
-        plot=summaryPlot(),
+        plot=summaryPlot(0.75, 10, 10),
         #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-        height = sum_hi(),
-        width=sum_wi(),
+        height = rdataviz::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
+        width=rdataviz::exportWidth(10, length(unique(dataChartx()$param)), 3),
         units="in"
       )
     })
-    sum_hi<-function(){
-    if (length(unique(dataChartx()$param))%%3==0){
-      return(((length(unique(dataChartx()$param))%/%3))*3)
-    }else{
-      return(((length(unique(dataChartx()$param))%/%3)+1)*3)
-    }
-    }
-    sum_wi<-function(){
-      if (length(unique(dataChartx()$param))<3){
-        return(((length(unique(dataChartx()$param))))*2)
-      }else{
-        return(10)
-      }
-    }
 
-    #---------------------------
-    # Subset Regions Selected
-    #---------------------------
-    output$subsetRegions = renderUI({
-      pickerInput(
-        inputId = "subsetRegions",
-        label = "Select Regions to Compare",
-        choices = unique(dataMap()$subRegion),
-        selected = unique(dataMap()$subRegion)[1:4],
-        multiple = TRUE,
-        options = list(
-          `actions-box` = TRUE,
-          `deselect-all-text` = "None",
-          `select-all-text` = "All",
-          `none-selected-text` = "None Selected"
-      ))
+
+  #---------------------------
+  # Summary Plot Compare Regions
+  #---------------------------
+  summaryPlotReg <- function(titletext){
+
+    dataChartPlot <- # All regions
+      dataMapx() %>% tidyr::complete(scenario,param,subRegion,x) %>%
+      dplyr::mutate(value=case_when(is.na(value)~0,
+                                    TRUE~value))%>%
+      dplyr::filter(subRegion %in% subsetRegionsx())
+
+    plist <- list()
+    for(i in 1:length(unique(dataChartPlot$param))){
+
+      plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                       filter(param==unique(dataChartPlot$param)[i]),
+                                     aes(x=x,y=value,
+                                         group=scenario,
+                                         color=scenario)) +
+        ggplottheme +
+        ylab(NULL) + xlab(NULL) +
+        geom_line() +
+        scale_y_continuous(position = "right")+
+        facet_grid(param~subRegion, scales="free",switch="y",
+                   labeller = labeller(param = label_wrap_gen(15))
+        )+
+        theme(legend.position="right",
+              legend.text=element_text(size=titletext),
+              legend.title = element_blank(),
+              plot.margin=margin(20,20,20,20,"pt"))}
+    cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+  }
+
+
+  output$summaryReg <- renderPlot({
+    summaryPlotReg(10)
+  },
+  height=function(){200*length(unique(dataMapx()$param))},
+  width=function(){max(400,200*length(subsetRegionsx())+100)}
+  )
+
+  output$downloadPlotSumReg <- downloadHandler(
+    filename = "summaryChartReg.png",
+    content = function(file) {
+      ggsave(file,plot=summaryPlotReg(10),
+             # width=min(49,max(15,1*length(unique(dataMapx()$subRegion))),
+             # height=min(49,max(12,1*length(unique(dataMapx()$param)))),units="in")
+             height = rdataviz::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
+             width = rdataviz::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
+             units = "in")
     })
-
-    #---------------------------
-    # Reactive Regions Select based on inputs
-    #---------------------------
-    subsetRegionsx <- reactive({
-      if (input$subsetRegions == "All" &
-          length(input$subsetRegions) == 1) {
-        unique(dataMapx()$subRegion)
-      } else{
-        input$subsetRegions
-      }
-    })
-
-    #---------------------------
-    # Summary Plot Compare Regions
-    #---------------------------
-    summaryPlotReg <- function(){
-
-      dataChartPlot <- # All regions
-        dataMapx() %>% tidyr::complete(scenario,param,subRegion,x) %>%
-        dplyr::mutate(value=case_when(is.na(value)~0,
-                                      TRUE~value))%>%
-        dplyr::filter(subRegion %in% subsetRegionsx())
-
-      plist <- list()
-      for(i in 1:length(unique(dataChartPlot$param))){
-
-        plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                         filter(param==unique(dataChartPlot$param)[i]),
-                                       aes(x=x,y=value,
-                                           group=scenario,
-                                           color=scenario)) +
-          ggplottheme +
-          ylab(NULL) + xlab(NULL) +
-          geom_line() +
-          scale_y_continuous(position = "right")+
-          facet_grid(param~subRegion, scales="free",switch="y",
-                     labeller = labeller(param = label_wrap_gen(15)))+
-          theme(legend.position="top",
-                legend.title = element_blank(),
-                plot.margin=margin(10,10,0,0,"pt"))}
-      cowplot::plot_grid(plotlist=plist,ncol=1,align = "v", axis="l")
-    }
-
-
-    output$summaryReg <- renderPlot({
-      summaryPlotReg()
-    },
-    height=function(){200*length(unique(dataMapx()$param))},
-    width=function(){200*length(subsetRegionsx())}
-    )
-
-    output$downloadPlotSumReg <- downloadHandler(
-      filename = "summaryChartReg.png",
-      content = function(file) {
-        ggsave(file,plot=summaryPlotReg(),
-               width=min(49,max(15,1*length(unique(dataMapx()$subRegion)))),
-               height=min(49,max(12,1*length(unique(dataMapx()$param)))),units="in")
-      })
 
 
   #---------------------------
@@ -599,7 +916,7 @@ server <- function(input, output) {
       # Check Color Palettes
       palAdd <- rmap::colors()$pal_Basic
       missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
-                                                     names(rmap::colors()$pal_rmap)]
+                                                 names(rmap::colors()$pal_rmap)]
       if (length(missNames) > 0) {
         palAdd <- palAdd[1:length(missNames)]
         names(palAdd) <- missNames
@@ -620,10 +937,12 @@ server <- function(input, output) {
         scale_y_continuous(position = "right")+
         geom_bar(position="stack", stat="identity") +
         facet_grid(param~scenario, scales="free",switch="y")+
-        theme(legend.position="right",
+        theme(legend.position="bottom",
               legend.title = element_blank(),
-              plot.margin=margin(20,20,0,0,"pt"),
-              aspect.ratio=1)}
+              legend.margin=margin(0,0,0,0,"pt"),
+              legend.key.height=unit(0, "cm"),
+              text = element_text(size = 12.5),
+              plot.margin=margin(20,20,20,0,"pt"))}
     cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
   }
 
@@ -637,34 +956,40 @@ server <- function(input, output) {
   output$downloadPlotChart <- downloadHandler(
     filename = "barChart.png",
     content = function(file) {
-      ggsave(file,plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
+      ggsave(file,plot=chartPlot(),
+             width=rdataviz::exportWidth(49, length(unique(dataChartx()$param)), 5),
+             height=rdataviz::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
+             unit = "in"
+      )
+      # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
+      # max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
     })
 
   #---------------------------
   # Maps
   #---------------------------
 
-    output$map <- renderUI({
+  output$map <- renderUI({
 
-      dataMapxi = dataMapx() %>%
-        filter(param %in% paramsSelectedx()[1],
-               scenario %in% input$scenariosSelected[1],
-               x %in% c("2010"))
+    dataMapxi = dataMapx() %>%
+      filter(param %in% paramsSelectedx()[1],
+             scenario %in% input$scenariosSelected[1],
+             x %in% c("2010"))
 
-      mapx <- (rmap::mapFind(dataMapxi))$subRegShapeFound;
-      mapx@data <- mapx@data %>%
-        dplyr::left_join(dataMapxi)%>%
-        dplyr::select("subRegion","value")%>%
-        unique(); mapx@data
-      mapx_1 <- tm_shape(mapx) +
-        tm_polygons(col = "value") +
-        tm_layout(legend.outside = T,
-                  legend.show = F)
+    mapx <- (rmap::mapFind(dataMapxi))$subRegShapeFound;
+    mapx@data <- mapx@data %>%
+      dplyr::left_join(dataMapxi)%>%
+      dplyr::select("subRegion","value")%>%
+      unique(); mapx@data
+    mapx_1 <- tm_shape(mapx) +
+      tm_polygons(col = "value") +
+      tm_layout(legend.outside = T,
+                legend.show = F)
 
-      m1<-tmap_leaflet(mapx_1) %>% clearControls()
-      m2<-tmap_leaflet(mapx_1)
-      sync(m1,m2,ncol=1)
-    })
+    m1<-tmap_leaflet(mapx_1) %>% clearControls()
+    m2<-tmap_leaflet(mapx_1)
+    sync(m1,m2,ncol=1)
+  })
 
   #---------------------------
   # Data Table
@@ -691,17 +1016,23 @@ server <- function(input, output) {
       tmpdir <- tempdir()
       setwd(tempdir())
       print(tempdir())
-      fs <- c("table.csv", "summaryCharts.png", "barCharts.png")
+      fs <- c("table.csv",
+              "summaryCharts.png",
+              "barCharts.png"
+              )
       write.csv(data(), "table.csv")
-      ggsave("summaryCharts.png",plot=summaryPlot(),
-             height = sum_hi(),
-             width=sum_wi(),
-             units="in")
-      ggsave("barCharts.png",plot=chartPlot(),width=13,height=max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
+      ggsave("summaryCharts.png",plot=summaryPlot(0.75, 10, 10),
+             width=13,
+             height=max(10,min(45,5*length(unique(dataChartx()$param)))/3),
+             units="in"
+             )
+      ggsave("barCharts.png",plot=chartPlot(),
+             width=13,
+             height=max(10,min(45,5*length(unique(dataChartx()$param)))),
+             units="in"
+             )
       print(fs)
       zip::zip(zipfile=file, files=fs)
     }
   )
-
-
 }

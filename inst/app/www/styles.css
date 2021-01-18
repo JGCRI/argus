@@ -9,6 +9,13 @@
   font-size:90% !important;
 }
 
+.charts{
+  overflow:auto;
+  height:60vh;
+  widht:70vh;
+  position:relative;
+}
+
 #selectRegions .dropdown-toggle{
   font-size: 90%;
   height:25px !important;
@@ -54,3 +61,17 @@ body > div > div.row > div.col-sm-4 > form > div:nth-child(8) > div.input-group 
   font-size:80%;
   margin-bottom: -4px
 }
+
+.sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 160px; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  background-color: #111; /* Black */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+}
+
+

@@ -72,15 +72,12 @@ addMissing<-function(data){
 #' @importFrom magrittr %>%
 #' @export
 parse_zip <- function(file){
-  print("zip found 2.0")
   tmpdir <- tempdir()
   setwd(tmpdir)
   zip::unzip(
     file, exdir = tmpdir
   )
-  print(dir())
   for(i in dir()){
-    print(i)
     if (endsWith(i, ".csv")){
       return(utils::read.csv(i) %>% as.data.frame())
     }
@@ -94,15 +91,12 @@ parse_zip <- function(file){
 #' @importFrom magrittr %>%
 #' @export
 parse_remote <- function(input){
-  print(input$urlfiledata)
-  print("----")
   if (tools::file_ext(input$urlfiledata) == ""){
     if (grepl("./$",input$urlfiledata)){
       #GCAM
       utils::read.csv(input$urlfiledata) %>%
         as.data.frame()
     } else if((!grepl("./$",input$urlfiledata, "/") || !grepl(".zip$",input$urlfiledata) || !grepl(".csv$",input$urlfiledata))){
-      print("+++++")
       if (grepl(".zip", input$urlfiledata, fixed=TRUE)){
         temp <- tempfile()
         utils::download.file(input$urlfiledata, temp)
@@ -147,4 +141,36 @@ parse_local <- function(input){
   }else{
     return(NULL)
   }
+}
+
+#' exportHeight
+#'
+#' generate height for exported images
+#' @param chartsperrow number of columns
+#' @param max_height_in max height
+#' @param numelement number of planned elements
+#' @param lenperchart height per element
+#' @importFrom magrittr %>%
+#' @export
+exportHeight<-function(chartsperrow,
+                       max_height_in,
+                       numelement,
+                       lenperchart){
+  if (numelement%%chartsperrow==0){
+    return(min(max_height_in, ((numelement%/%chartsperrow))*lenperchart))
+  }else{
+    return(min(max_height_in, ((numelement%/%chartsperrow)+1)*lenperchart))
+  }
+}
+
+#' exportWidth
+#'
+#' generate width for exported images
+#' @param max_width_in max width
+#' @param numelement number of planned elements
+#' @param lenperchart height per element
+#' @importFrom magrittr %>%
+#' @export
+exportWidth<-function(max_width_in, numelement, lenperchart){
+  return(min(max_width_in, (numelement)*lenperchart))
 }

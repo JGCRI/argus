@@ -10,7 +10,6 @@
 #'  rdataviz::exampleData
 #' }
 "exampleData"
-
 #-----------------
 # Internal Data
 #-----------------
