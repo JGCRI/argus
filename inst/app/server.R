@@ -653,12 +653,11 @@ server <- function(input, output, session) {
 
   # Filter Data after Reactive Choices -------------------
   dataSumx <- reactive({
-    print(unique(scenariosSelectedx()))
-    print(paramsSelectedx())
+    # print(unique(scenariosSelectedx()))
+    # print(paramsSelectedx())
     x <- dataSum() %>%
       dplyr::filter(scenario %in% scenariosSelectedx(),
                     param %in% paramsSelectedx())
-    print(x)
     return(x)
   })
 
@@ -837,7 +836,7 @@ server <- function(input, output, session) {
     }
   )
   output$downloadPlotSum <- downloadHandler(
-    filename = "summaryPlot.png",
+    filename = "summaryChart.png",
     content = function(file) {
       ggsave(
         file,
@@ -1017,19 +1016,26 @@ server <- function(input, output, session) {
       setwd(tempdir())
       print(tempdir())
       fs <- c("table.csv",
-              "summaryCharts.png",
-              "barCharts.png"
+              "summaryChart.png",
+              "barCharts.png",
+              "summaryChartReg.png"
               )
       write.csv(data(), "table.csv")
-      ggsave("summaryCharts.png",plot=summaryPlot(0.75, 10, 10),
-             width=13,
-             height=max(10,min(45,5*length(unique(dataChartx()$param)))/3),
+      ggsave("summaryChart.png", plot=summaryPlot(0.75, 10, 10),
+             #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
+             height = rdataviz::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
+             width=rdataviz::exportWidth(10, length(unique(dataChartx()$param)), 3),
              units="in"
-             )
+      )
       ggsave("barCharts.png",plot=chartPlot(),
-             width=13,
-             height=max(10,min(45,5*length(unique(dataChartx()$param)))),
-             units="in"
+              width=rdataviz::exportWidth(49, length(unique(dataChartx()$param)), 5),
+              height=rdataviz::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
+              unit = "in"
+             )
+      ggsave("summaryChartReg.png", plot=summaryPlotReg(10),
+             height = rdataviz::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
+             width = rdataviz::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
+             units = "in"
              )
       print(fs)
       zip::zip(zipfile=file, files=fs)
