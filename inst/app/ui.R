@@ -32,6 +32,7 @@ ui <- fluidPage(
   #---------------------------
   #shinythemes::themeSelector(),
   #theme = shinythemes::shinytheme("spacelab"),
+  actionButton(inputId = "test", label="test"),
   div(downloadButton('downloadAll', "All",  class = "download_button"), style="padding:10px; float: right"),
   div(actionLink(inputId='github', label='', icon = icon("github","fa-1x"),
                  onclick ="window.open('https://github.com/JGCRI/rdataviz', '_blank')"),style="padding:15px 5px;float: right"),

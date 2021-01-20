@@ -138,6 +138,7 @@ server <- function(input, output, session) {
       #     value = settingsURL,
       #   )
 
+
       # Regions Update
       settingsRegions <- unlist(
         strsplit(
@@ -757,6 +758,7 @@ server <- function(input, output, session) {
         scenRef_i = unique(dataChartx()$scenario)[1]
       } else{
         scenRef_i <- input$scenarioRefSelected
+        print(scenRef_i)
       }
     } # Check if Ref Scenario Chosen
 
@@ -764,12 +766,17 @@ server <- function(input, output, session) {
     tbl_pd <- dataChartx() %>%
       dplyr::filter(scenario == scenRef_i)
 
+    print(tbl_pd)
+
     for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
                                             scenRef_i]) {
       tbl_temp <- dataChartx() %>%
         dplyr::filter(scenario %in% c(scenRef_i, k))
+      print(tbl_temp)
+      print(tbl_temp$value)
       tbl_temp <- tbl_temp %>%
         tidyr::spread(scenario, value)
+      print(tbl_temp)
 
       tbl_temp[is.na(tbl_temp)] <- 0
 
@@ -942,6 +949,50 @@ server <- function(input, output, session) {
               legend.key.height=unit(0, "cm"),
               text = element_text(size = 12.5),
               plot.margin=margin(20,20,20,0,"pt"))}
+    cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+  }
+
+  observeEvent(input$test, {
+    PrcntChartPlot()
+  })
+
+  PrcntChartPlot <- function(){
+
+    dataChartPlot <- dataDiffAbsx()
+
+    plist <- list()
+    for(i in 1:length(unique(dataChartPlot$param))){
+      # Check Color Palettes
+      palAdd <- rmap::colors()$pal_Basic
+      missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
+                                                 names(rmap::colors()$pal_rmap)]
+      if (length(missNames) > 0) {
+        palAdd <- palAdd[1:length(missNames)]
+        names(palAdd) <- missNames
+        palCharts <- c(rmap::colors()$pal_rmap, palAdd)
+      } else{
+        palCharts <- rmap::colors()$pal_rmap
+      }
+
+      plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                       filter(param==unique(dataChartPlot$param)[i])%>%
+                                       droplevels(),
+                                     aes(x=x,y=value,
+                                         group=scenario,
+                                         fill=class)) +
+        ggplottheme +
+        ylab(NULL) + xlab(NULL) +
+        scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+        scale_y_continuous(position = "right")+
+        geom_bar(position="stack", stat="identity") +
+        facet_grid(param~scenario, scales="free",switch="y")+
+        theme(legend.position="bottom",
+              legend.title = element_blank(),
+              legend.margin=margin(0,0,0,0,"pt"),
+              legend.key.height=unit(0, "cm"),
+              text = element_text(size = 12.5),
+              plot.margin=margin(20,20,20,0,"pt"))
+      }
     cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
   }
 
