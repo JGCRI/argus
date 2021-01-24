@@ -5,6 +5,13 @@
   border:0px;
 }
 
+.diff_button{
+  font-size:12px !important;
+  color:#FFFFFF;
+  background: rgb(182,182,182);
+  border:0px;
+}
+
 .sidebar{
   font-size:90% !important;
 }
