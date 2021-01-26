@@ -416,8 +416,8 @@ server <- function(input, output, session) {
   #initializing abs, percDiff, and absDiff
 
   rv$abs = 1;
-  rv$percDiff = 1;
-  rv$absDiff = 1;
+  rv$percDiff = 0;
+  rv$absDiff = 0;
 
 
     # Observe File Inputs
@@ -900,8 +900,8 @@ server <- function(input, output, session) {
 
   observeEvent(input$absDiff, {
     rv$abs = 0;
-    rv$percDiff = 1;
-    rv$absDiff = 0;
+    rv$percDiff = 0;
+    rv$absDiff = 1;
   })
 
   #---------------------------
@@ -1016,15 +1016,18 @@ server <- function(input, output, session) {
   # Chart Plot
   #---------------------------
   chartPlot <- function(){
-    aesz = aes(x=x,y=value,
-               group=scenario,
-               fill=class)
+    print(rv)
+    print(rv$abs)
+    print(rv$percDiff)
+    print(rv$absDiff)
     if(rv$abs == 1){
-      dataChartPlot <- dataDiffAbsx()
+      print("abs")
+      dataChartPlot <- dataChartx()
     }else if(rv$percDiff == 1){
+      print("perc diff")
       dataChartPlot <- dataPrcntAbsx()
-      aesz = aes(x=x,y=value, group=class)
     }else if(rv$absDiff == 1){
+      print("abs diff")
       dataChartPlot <- dataDiffAbsx()
     }
 
@@ -1043,40 +1046,76 @@ server <- function(input, output, session) {
         palCharts <- rmap::colors()$pal_rmap
       }
 
-
       plist[[x]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                       filter(param==unique(dataChartPlot$param)[i])%>%
+                                       filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)%>%
                                        droplevels(),
                                       aes(x=x,y=value,
                                           group=scenario,
                                           fill=class))+
         ggplottheme +
         xlab(NULL) +
+        ylab(unique(dataChartPlot$param)[i])+
         scale_fill_manual(breaks=names(palCharts),values=palCharts) +
-        scale_y_continuous(position = "right")+
+        scale_y_continuous(position = "left")+
         geom_bar(position="stack", stat="identity") +
+        facet_grid(param~scenario, scales="free",switch="y")+
         theme(legend.position="bottom",
+              strip.text.y = element_blank(),
               legend.title = element_blank(),
               legend.margin=margin(0,0,0,0,"pt"),
               legend.key.height=unit(0, "cm"),
               text = element_text(size = 12.5),
               plot.margin=margin(20,20,20,0,"pt"))
 
-      plist[[x+1]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                         filter(param==unique(dataChartPlot$param)[i])%>%
+
+      if(rv$percDiff == 1){
+        plist[[x+1]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                         filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
                                          droplevels(),
-                                         aesz) +
-        ggplottheme +
-        ylab(NULL) + xlab(NULL) +
-        geom_line()+
-        geom_point()+
-        scale_colour_manual(values=setNames(palChars, zone))+
-        theme(legend.position="bottom",
-              legend.title = element_blank(),
-              legend.margin=margin(0,0,0,0,"pt"),
-              legend.key.height=unit(0, "cm"),
-              text = element_text(size = 12.5),
-              plot.margin=margin(20,20,20,0,"pt"))
+                                       aes(x=x,y=value,
+                                           # group=class,
+                                           colour=class
+                                           )) +
+          ggplottheme +
+          ylab(NULL) + xlab(NULL) +
+          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+          # scale_y_continuous(position = "right")+
+          # geom_bar(position="stack", stat="identity") +
+          geom_line()+
+          geom_point()+
+          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+          facet_grid(param~scenario, scales="free",switch="y")+
+          theme(legend.position="bottom",
+                strip.text.y = element_blank(),
+                legend.title = element_blank(),
+                legend.margin=margin(0,0,0,0,"pt"),
+                legend.key.height=unit(0, "cm"),
+                text = element_text(size = 12.5),
+                plot.margin=margin(20,20,20,0,"pt"))
+      }else{
+        plist[[x+1]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                           filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
+                                           droplevels(),
+                                         aes(x=x,y=value,
+                                             group=scenario,
+                                             fill=class))+
+          ggplottheme +
+          xlab(NULL) +
+          ylab(NULL) +
+          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+          scale_y_continuous(position = "right")+
+          geom_bar(position="stack", stat="identity") +
+          # geom_line()+
+          # geom_point()+
+          # facet_grid(param~scenario, scales="free",switch="y") +
+          theme(legend.position="bottom",
+                legend.title = element_blank(),
+                strip.text.y = element_blank(),
+                legend.margin=margin(0,0,0,0,"pt"),
+                legend.key.height=unit(0, "cm"),
+                text = element_text(size = 12.5),
+                plot.margin=margin(20,20,20,0,"pt"))
+      }
       x = x+2
     }
     cowplot::plot_grid(plotlist = plist, ncol=2, align="v")

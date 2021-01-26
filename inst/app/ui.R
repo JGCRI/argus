@@ -214,7 +214,7 @@ ui <- fluidPage(
                                                   column(
                                                     2,
                                                          div(
-                                                            actionButton(label="Absolute", inputId = "abs",width="100%", class="diff_button", value=1)
+                                                            actionButton(label="Absolute", inputId = "abs",width="100%", class="diff_button")
                                                             )
                                                          ),
                                                   column(
