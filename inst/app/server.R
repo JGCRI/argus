@@ -900,8 +900,8 @@ server <- function(input, output, session) {
 
   observeEvent(input$absDiff, {
     rv$abs = 0;
-    rv$percDiff = 1;
-    rv$absDiff = 0;
+    rv$percDiff = 0;
+    rv$absDiff = 1;
   })
 
   #---------------------------
