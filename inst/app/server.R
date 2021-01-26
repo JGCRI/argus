@@ -900,8 +900,8 @@ server <- function(input, output, session) {
 
   observeEvent(input$absDiff, {
     rv$abs = 0;
-    rv$percDiff = 0;
-    rv$absDiff = 1;
+    rv$percDiff = 1;
+    rv$absDiff = 0;
   })
 
   #---------------------------
@@ -1073,16 +1073,17 @@ server <- function(input, output, session) {
                                          filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
                                          droplevels(),
                                        aes(x=x,y=value,
-                                           group=class,
-                                           # colour=class
+                                           # group=class,
+                                           colour=class
                                            )) +
           ggplottheme +
           ylab(NULL) + xlab(NULL) +
           scale_fill_manual(breaks=names(palCharts),values=palCharts) +
           # scale_y_continuous(position = "right")+
           # geom_bar(position="stack", stat="identity") +
-          geom_line(stat="identity")+
-          geom_point(stat="identity")+
+          geom_line()+
+          geom_point()+
+          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
           facet_grid(param~scenario, scales="free",switch="y")+
           theme(legend.position="bottom",
                 strip.text.y = element_blank(),
