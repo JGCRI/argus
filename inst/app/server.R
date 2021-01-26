@@ -1073,17 +1073,16 @@ server <- function(input, output, session) {
                                          filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
                                          droplevels(),
                                        aes(x=x,y=value,
-                                           # group=class,
-                                           colour=class
+                                           group=class,
+                                           # colour=class
                                            )) +
           ggplottheme +
           ylab(NULL) + xlab(NULL) +
           scale_fill_manual(breaks=names(palCharts),values=palCharts) +
           # scale_y_continuous(position = "right")+
           # geom_bar(position="stack", stat="identity") +
-          geom_line()+
-          geom_point()+
-          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+          geom_line(stat="identity")+
+          geom_point(stat="identity")+
           facet_grid(param~scenario, scales="free",switch="y")+
           theme(legend.position="bottom",
                 strip.text.y = element_blank(),
@@ -1107,7 +1106,7 @@ server <- function(input, output, session) {
           geom_bar(position="stack", stat="identity") +
           # geom_line()+
           # geom_point()+
-          # facet_grid(param~scenario, scales="free",switch="y") +
+          facet_grid(param~scenario, scales="free",switch="y") +
           theme(legend.position="bottom",
                 legend.title = element_blank(),
                 strip.text.y = element_blank(),
