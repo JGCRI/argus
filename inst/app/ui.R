@@ -233,8 +233,7 @@ ui <- fluidPage(
                                                     class="charts",
                                                     plotOutput(outputId = "plot", width = "100%", height="100%")),
                                        ),
-                                       tabPanel("Compare Regions"),
-                                       p("hello")
+                                       tabPanel("Compare Regions")
                            )
                   ),
                   #---------------------------

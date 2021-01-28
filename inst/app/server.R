@@ -1020,8 +1020,10 @@ server <- function(input, output, session) {
     print(rv$abs)
     print(rv$percDiff)
     print(rv$absDiff)
+    g <- 2
     if(rv$abs == 1){
       print("abs")
+      g <- 1
       dataChartPlot <- dataChartx()
     }else if(rv$percDiff == 1){
       print("perc diff")
@@ -1045,9 +1047,67 @@ server <- function(input, output, session) {
       } else{
         palCharts <- rmap::colors()$pal_rmap
       }
+      print(palCharts)
 
-      plist[[x]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                       filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)%>%
+      chartz <- dataChartPlot %>%
+        filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)
+      z<-x
+      if(rv$percDiff == 1){
+        plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                           filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
+                                           droplevels(),
+                                         aes(x=x,y=value,
+                                             # group=class,
+                                             colour=class
+                                         )) +
+          ggplottheme +
+          ylab(NULL) + xlab(NULL) +
+          scale_color_manual(breaks=names(palCharts),values=palCharts) +
+          # scale_y_continuous(position = "right")+
+          # geom_bar(position="stack", stat="identity") +
+          geom_line()+
+          geom_point()+
+          scale_color_manual(breaks=names(palCharts),values=palCharts) +
+          facet_grid(param~scenario, scales="free",switch="y")+
+          theme(legend.position="bottom",
+                strip.text.y = element_blank(),
+                legend.title = element_blank(),
+                legend.margin=margin(0,0,0,0,"pt"),
+                legend.key.height=unit(0, "cm"),
+                text = element_text(size = 12.5),
+                plot.margin=margin(20,20,20,0,"pt"))
+        x = x+2
+      }else if(rv$absDiff == 1){
+        plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                           filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
+                                           droplevels(),
+                                         aes(x=x,y=value,
+                                             group=scenario,
+                                             fill=class))+
+          ggplottheme +
+          xlab(NULL) +
+          ylab(NULL) +
+          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+          scale_y_continuous(position = "left")+
+          geom_bar(position="stack", stat="identity") +
+          # geom_line()+
+          # geom_point()+
+          facet_grid(param~scenario, scales="free",switch="y") +
+          theme(legend.position="bottom",
+                legend.title = element_blank(),
+                strip.text.y = element_blank(),
+                legend.margin=margin(0,0,0,0,"pt"),
+                legend.key.height=unit(0, "cm"),
+                text = element_text(size = 12.5),
+                plot.margin=margin(20,20,20,0,"pt"))
+        x = x+2
+      }else{
+        chartz <- dataChartPlot %>%
+          filter(param==unique(dataChartPlot$param)[i])
+        x=x+1
+      }
+
+      plist[[z]] <-  ggplot2::ggplot(chartz%>%
                                        droplevels(),
                                       aes(x=x,y=value,
                                           group=scenario,
@@ -1065,60 +1125,9 @@ server <- function(input, output, session) {
               legend.margin=margin(0,0,0,0,"pt"),
               legend.key.height=unit(0, "cm"),
               text = element_text(size = 12.5),
-              plot.margin=margin(20,20,20,0,"pt"))
-
-
-      if(rv$percDiff == 1){
-        plist[[x+1]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                         filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
-                                         droplevels(),
-                                       aes(x=x,y=value,
-                                           # group=class,
-                                           colour=class
-                                           )) +
-          ggplottheme +
-          ylab(NULL) + xlab(NULL) +
-          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
-          # scale_y_continuous(position = "right")+
-          # geom_bar(position="stack", stat="identity") +
-          geom_line()+
-          geom_point()+
-          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
-          facet_grid(param~scenario, scales="free",switch="y")+
-          theme(legend.position="bottom",
-                strip.text.y = element_blank(),
-                legend.title = element_blank(),
-                legend.margin=margin(0,0,0,0,"pt"),
-                legend.key.height=unit(0, "cm"),
-                text = element_text(size = 12.5),
-                plot.margin=margin(20,20,20,0,"pt"))
-      }else{
-        plist[[x+1]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                           filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
-                                           droplevels(),
-                                         aes(x=x,y=value,
-                                             group=scenario,
-                                             fill=class))+
-          ggplottheme +
-          xlab(NULL) +
-          ylab(NULL) +
-          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
-          scale_y_continuous(position = "right")+
-          geom_bar(position="stack", stat="identity") +
-          # geom_line()+
-          # geom_point()+
-          facet_grid(param~scenario, scales="free",switch="y") +
-          theme(legend.position="bottom",
-                legend.title = element_blank(),
-                strip.text.y = element_blank(),
-                legend.margin=margin(0,0,0,0,"pt"),
-                legend.key.height=unit(0, "cm"),
-                text = element_text(size = 12.5),
-                plot.margin=margin(20,20,20,0,"pt"))
-      }
-      x = x+2
+              plot.margin=margin(20,0,20,0,"pt"))
     }
-    cowplot::plot_grid(plotlist = plist, ncol=2, align="v")
+    cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
   }
 
   output$plot <- renderPlot({
