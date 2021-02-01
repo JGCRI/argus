@@ -138,6 +138,7 @@ server <- function(input, output, session) {
       #     value = settingsURL,
       #   )
 
+
       # Regions Update
       settingsRegions <- unlist(
         strsplit(
@@ -411,7 +412,15 @@ server <- function(input, output, session) {
 
   # Create your own reactive values that you can modify because input is read only
   rv <- reactiveValues()
-  # Observe File Inputs
+
+  #initializing abs, percDiff, and absDiff
+
+  rv$abs = 1;
+  rv$percDiff = 0;
+  rv$absDiff = 0;
+
+
+    # Observe File Inputs
   observeEvent(input$filedata, {
     rv$filedatax=input$filedata
     # URL Update
@@ -757,15 +766,94 @@ server <- function(input, output, session) {
         scenRef_i = unique(dataChartx()$scenario)[1]
       } else{
         scenRef_i <- input$scenarioRefSelected
+        print(scenRef_i)
       }
     } # Check if Ref Scenario Chosen
 
     # Calculate Diff Values
     tbl_pd <- dataChartx() %>%
       dplyr::filter(scenario == scenRef_i)
-
     for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
                                             scenRef_i]) {
+      tbl_temp <- dataChartx() %>%
+        dplyr::filter(scenario %in% c(scenRef_i, k))
+      # print("tbl_temp")
+      # print(tbl_temp)
+      # print("tbl_temp$value")
+      # print(tbl_temp$value)
+      tbl_temp <- tbl_temp %>%
+        tidyr::spread(scenario, value)
+      # print("tbl_temp post spread")
+      # print(tbl_temp)
+
+      tbl_temp[is.na(tbl_temp)] <- 0
+
+      tbl_temp <- tbl_temp %>%
+        dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
+        dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
+      # print("tbl temp post mute")
+      # print(tbl_temp)
+      tbl_temp <- tbl_temp %>%
+        tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
+      # print("tidyr")
+      # print(tbl_temp)
+      tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
+      # print("bind_rows")
+      # print(tbl_pd)
+    }
+
+    tbl_pd <- tbl_pd %>%
+      dplyr::mutate(scenario = factor(scenario,
+                                      levels = c(scenRef_i,
+                                                 unique(
+                                                   tbl_pd$scenario
+                                                 )[unique(tbl_pd$scenario) != scenRef_i])))
+    # print(tbl_pd)
+    tbl_pd
+  })
+
+  #---------------------------
+  # Data Chart Absolute Diff
+  #---------------------------
+  dataPrcntAbsx <- reactive({
+    diffText <- " Prcent Abs"
+
+    if (is.null(input$scenarioRefSelected)) {
+      print(paste("No reference scenario provided", sep = ""))
+      print(paste(
+        "Using ",
+        unique(dataChartx()$scenario)[1],
+        " as reference",
+        sep = ""
+      ))
+      scenRef_i = unique(dataChartx()$scenario)[1]
+    } else{
+      if (!input$scenarioRefSelected %in% unique(dataChartx()$scenario)) {
+        print(paste(
+          "scenario ",
+          input$scenarioRefSelected,
+          " not in scenarios",
+          sep = ""
+        ))
+        print(paste(
+          "Using ",
+          unique(dataChartx()$scenario)[1],
+          " as reference",
+          sep = ""
+        ))
+        scenRef_i = unique(dataChartx()$scenario)[1]
+      } else{
+        scenRef_i <- input$scenarioRefSelected
+        print(scenRef_i)
+      }
+    } # Check if Ref Scenario Chosen
+
+    # Calculate Diff Values
+    tbl_pd <- dataChartx() %>%
+      dplyr::filter(scenario == scenRef_i)
+    for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
+                                            scenRef_i]) {
+      print(k)
       tbl_temp <- dataChartx() %>%
         dplyr::filter(scenario %in% c(scenRef_i, k))
       tbl_temp <- tbl_temp %>%
@@ -773,12 +861,13 @@ server <- function(input, output, session) {
 
       tbl_temp[is.na(tbl_temp)] <- 0
 
+      #Important Code
+
       tbl_temp <- tbl_temp %>%
-        dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
+        dplyr::mutate(!!paste(k, diffText, sep = "") := 100*((get(k)/get(scenRef_i))-1)) %>%
         dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
       tbl_temp <- tbl_temp %>%
-        tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep =
-                                                                                                      "")]))
+        tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
       tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
     }
 
@@ -788,9 +877,32 @@ server <- function(input, output, session) {
                                                  unique(
                                                    tbl_pd$scenario
                                                  )[unique(tbl_pd$scenario) != scenRef_i])))
+    print(dplyr::filter(tbl_pd, scenario %in% c(paste(k, diffText, sep = ""))))
     tbl_pd
   })
 
+  observeEvent(input$test, {
+    PrcntChartPlot()
+    print(input)
+  })
+
+  observeEvent(input$abs, {
+    rv$abs = 1;
+    rv$percDiff = 0;
+    rv$absDiff = 0;
+  })
+
+  observeEvent(input$percDiff, {
+    rv$abs = 0;
+    rv$percDiff = 1;
+    rv$absDiff = 0;
+  })
+
+  observeEvent(input$absDiff, {
+    rv$abs = 0;
+    rv$percDiff = 0;
+    rv$absDiff = 1;
+  })
 
   #---------------------------
   # Summary Plot
@@ -894,8 +1006,6 @@ server <- function(input, output, session) {
     filename = "summaryChartReg.png",
     content = function(file) {
       ggsave(file,plot=summaryPlotReg(10),
-             # width=min(49,max(15,1*length(unique(dataMapx()$subRegion))),
-             # height=min(49,max(12,1*length(unique(dataMapx()$param)))),units="in")
              height = rdataviz::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
              width = rdataviz::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
              units = "in")
@@ -906,12 +1016,26 @@ server <- function(input, output, session) {
   # Chart Plot
   #---------------------------
   chartPlot <- function(){
-
-    dataChartPlot <- dataDiffAbsx()
+    print(rv)
+    print(rv$abs)
+    print(rv$percDiff)
+    print(rv$absDiff)
+    g <- 2
+    if(rv$abs == 1){
+      print("abs")
+      g <- 1
+      dataChartPlot <- dataChartx()
+    }else if(rv$percDiff == 1){
+      print("perc diff")
+      dataChartPlot <- dataPrcntAbsx()
+    }else if(rv$absDiff == 1){
+      print("abs diff")
+      dataChartPlot <- dataDiffAbsx()
+    }
 
     plist <- list()
+    x = 1
     for(i in 1:length(unique(dataChartPlot$param))){
-
       # Check Color Palettes
       palAdd <- rmap::colors()$pal_Basic
       missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
@@ -923,28 +1047,88 @@ server <- function(input, output, session) {
       } else{
         palCharts <- rmap::colors()$pal_rmap
       }
+      print(palCharts)
 
-      plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                       filter(param==unique(dataChartPlot$param)[i])%>%
+      chartz <- dataChartPlot %>%
+        filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)
+      z<-x
+      if(rv$percDiff == 1){
+        plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                           filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
+                                           droplevels(),
+                                         aes(x=x,y=value,
+                                             # group=class,
+                                             colour=class
+                                         )) +
+          ggplottheme +
+          ylab(NULL) + xlab(NULL) +
+          scale_color_manual(breaks=names(palCharts),values=palCharts) +
+          # scale_y_continuous(position = "right")+
+          # geom_bar(position="stack", stat="identity") +
+          geom_line()+
+          geom_point()+
+          scale_color_manual(breaks=names(palCharts),values=palCharts) +
+          facet_grid(param~scenario, scales="free",switch="y")+
+          theme(legend.position="bottom",
+                strip.text.y = element_blank(),
+                legend.title = element_blank(),
+                legend.margin=margin(0,0,0,0,"pt"),
+                legend.key.height=unit(0, "cm"),
+                text = element_text(size = 12.5),
+                plot.margin=margin(20,20,20,0,"pt"))
+        x = x+2
+      }else if(rv$absDiff == 1){
+        plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                           filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
+                                           droplevels(),
+                                         aes(x=x,y=value,
+                                             group=scenario,
+                                             fill=class))+
+          ggplottheme +
+          xlab(NULL) +
+          ylab(NULL) +
+          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+          scale_y_continuous(position = "left")+
+          geom_bar(position="stack", stat="identity") +
+          # geom_line()+
+          # geom_point()+
+          facet_grid(param~scenario, scales="free",switch="y") +
+          theme(legend.position="bottom",
+                legend.title = element_blank(),
+                strip.text.y = element_blank(),
+                legend.margin=margin(0,0,0,0,"pt"),
+                legend.key.height=unit(0, "cm"),
+                text = element_text(size = 12.5),
+                plot.margin=margin(20,20,20,0,"pt"))
+        x = x+2
+      }else{
+        chartz <- dataChartPlot %>%
+          filter(param==unique(dataChartPlot$param)[i])
+        x=x+1
+      }
+
+      plist[[z]] <-  ggplot2::ggplot(chartz%>%
                                        droplevels(),
-                                     aes(x=x,y=value,
-                                         group=scenario,
-                                         fill=class)) +
+                                      aes(x=x,y=value,
+                                          group=scenario,
+                                          fill=class))+
         ggplottheme +
-        ylab(NULL) + xlab(NULL) +
+        xlab(NULL) +
+        ylab(unique(dataChartPlot$param)[i])+
         scale_fill_manual(breaks=names(palCharts),values=palCharts) +
-        scale_y_continuous(position = "right")+
+        scale_y_continuous(position = "left")+
         geom_bar(position="stack", stat="identity") +
         facet_grid(param~scenario, scales="free",switch="y")+
         theme(legend.position="bottom",
+              strip.text.y = element_blank(),
               legend.title = element_blank(),
               legend.margin=margin(0,0,0,0,"pt"),
               legend.key.height=unit(0, "cm"),
               text = element_text(size = 12.5),
-              plot.margin=margin(20,20,20,0,"pt"))}
-    cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+              plot.margin=margin(20,0,20,0,"pt"))
+    }
+    cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
   }
-
 
   output$plot <- renderPlot({
     chartPlot()
@@ -1002,7 +1186,6 @@ server <- function(input, output, session) {
   output$downloadTable <- downloadHandler(
     file = "table.csv",
     content = function(file) {
-      print(class(data()))
       write.csv(data() , file)
     })
 
