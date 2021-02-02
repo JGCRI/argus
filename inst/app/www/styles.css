@@ -5,6 +5,13 @@
   border:0px;
 }
 
+.diff_button{
+  font-size:12px !important;
+  color:#FFFFFF;
+  background: #404040;
+  border:0px;
+}
+
 .sidebar{
   font-size:90% !important;
 }
@@ -15,11 +22,7 @@
   widht:70vh;
   position:relative;
 }
-
-#selectRegions .dropdown-toggle{
-  font-size: 90%;
-  height:25px !important;
-}
+/*
 #selectScenarios  div  div  button{
   font-size: 90%;
   height:25px !important;
@@ -32,6 +35,7 @@
   font-size: 90%;
   height:25px !important;
 }
+*/
 body > div > div.row > div.col-sm-4 > form > div:nth-child(2) > div > div.input-group > input{
   font-size:90%;
   height:25px !important;
@@ -73,5 +77,3 @@ body > div > div.row > div.col-sm-4 > form > div:nth-child(8) > div.input-group 
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
 }
-
-

@@ -32,6 +32,7 @@ ui <- fluidPage(
   #---------------------------
   #shinythemes::themeSelector(),
   #theme = shinythemes::shinytheme("spacelab"),
+  actionButton(inputId = "test", label="test"),
   div(downloadButton('downloadAll', "All",  class = "download_button"), style="padding:10px; float: right"),
   div(actionLink(inputId='github', label='', icon = icon("github","fa-1x"),
                  onclick ="window.open('https://github.com/JGCRI/rdataviz', '_blank')"),style="padding:15px 5px;float: right"),
@@ -100,7 +101,7 @@ ui <- fluidPage(
       # Params
       uiOutput('selectParams'),
       # Regions
-      uiOutput('selectRegions'),
+      uiOutput('selectRegions')
 
     ),
 
@@ -205,33 +206,73 @@ ui <- fluidPage(
                            tabsetPanel(type = "pills",
                                        tabPanel("All",
                                                 br(),
-                                                fluidRow(column(6, p(
+                                                fluidRow(
+                                                  column(
+                                                    3, p(
                                                   'Sum of Regions Selected'
-                                                )),
-                                                column(
-                                                  6, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png",  class = "download_button"), style = "float: right")
-                                                )),
-                                                br(),
-                                                div(
-                                                  class="charts",
-                                                  plotOutput(outputId = "plot", width = "100%", height="100%")),
-                                       ),
-                                       tabPanel("Compare Regions")
+                                                    )),
+                                                  column(
+                                                    2,
+                                                         div(
+                                                            actionButton(label="Absolute", inputId = "abs",width="100%", class="diff_button")
+                                                            )
+                                                         ),
+                                                  column(
+                                                    2,
+                                                         actionButton(label="Absolute Difference", inputId = "absDiff",width="100%", class="diff_button")
+                                                         ),
+                                                  column(
+                                                    2,
+                                                         actionButton(label="Percent Difference", inputId = "percDiff", width="100%", class="diff_button")
+                                                         ),
+                                                  column(
+                                                    3, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png",  class = "download_button"), style = "float: right")
+                                                  )),
+                                                  br(),
+                                                  div(
+                                                    class="charts",
+                                                    plotOutput(outputId = "plot", width = "100%", height="100%")),
+                                       )#,
+                                      # tabPanel("Compare Regions")
                            )
                   ),
                   #---------------------------
                   # Main Panel: Maps Tab
                   #---------------------------
                   tabPanel("Maps",
+                           br(),
                            tabsetPanel(type = "pills",
-                                       tabPanel("Summary",
+                                       tabPanel("Base Map",
                                                 div(
                                                   class="charts",
-                                                  uiOutput(outputId = "map"))
-                                       ),
-                                       tabPanel("Compare Years"),
-                                       tabPanel("Class"),
-                                       tabPanel("Class Compare years")
+                                                  plotOutput(outputId = "mapBase", width = "100%", height="100%"))
+                                                ),
+                                       tabPanel("Summary",
+                                                fluidRow(
+                                                  column(
+                                                    6,
+                                                    div(
+                                                uiOutput('selectMapYear')),
+                                                style = "float: left"),
+                                                column(
+                                                  3,
+                                                  div(
+                                                  br(),
+                                                  br(),
+                                                pickerInput(
+                                                  inputId = "mapLegend",
+                                                  label = "Legend Type",
+                                                  choices = c("kmean","pretty"),
+                                                  selected = "kmean",
+                                                  multiple = F)),
+                                                style = "float: right")),
+                                                div(
+                                                  class="charts",
+                                                  plotOutput(outputId = "map", width = "100%", height="100%"))
+                                       )#,
+                                       #tabPanel("Compare Years"),
+                                       #tabPanel("Class"),
+                                       #tabPanel("Class Compare years")
                            )
                   ),
                   #---------------------------
