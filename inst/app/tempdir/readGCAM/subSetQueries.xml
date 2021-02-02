@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<queries>
+ <aQuery>
+  <all-regions/>
+  <supplyDemandQuery title="ag production by tech">
+   <axis1 name="technology">technology[@name]</axis1>
+   <axis2 name="Year">physical-output[@vintage]</axis2>
+   <xPath buildList="true" dataName="output" group="false" sumAll="false">*[@type=&apos;sector&apos; and (local-name()=&apos;AgSupplySector&apos;)]/
+            *[@type=&apos;subsector&apos;]/*[@type=&apos;technology&apos;]/
+            output-primary/physical-output/node()</xPath>
+   <comments/>
+  </supplyDemandQuery>
+ </aQuery>
+ <aQuery>
+  <all-regions/>
+  <gdpQueryBuilder title="GDP MER by region">
+   <axis1 name="region">region</axis1>
+   <axis2 name="Year">gdp-mer</axis2>
+   <xPath buildList="true" dataName="gdp-mer" group="false" sumAll="false">GDP/gdp-mer/text()</xPath>
+   <comments/>
+  </gdpQueryBuilder>
+ </aQuery>
+ <aQuery>
+  <all-regions/>
+  <demographicsQuery title="Population by region">
+   <axis1 name="region">region</axis1>
+   <axis2 name="Year">populationMiniCAM</axis2>
+   <xPath buildList="true" dataName="total-population" group="false" sumAll="false">demographics/populationMiniCAM/total-population/node()</xPath>
+   <comments/>
+  </demographicsQuery>
+ </aQuery>
+</queries>

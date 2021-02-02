@@ -101,7 +101,7 @@ ui <- fluidPage(
       # Params
       uiOutput('selectParams'),
       # Regions
-      uiOutput('selectRegions'),
+      uiOutput('selectRegions')
 
     ),
 
@@ -232,23 +232,47 @@ ui <- fluidPage(
                                                   div(
                                                     class="charts",
                                                     plotOutput(outputId = "plot", width = "100%", height="100%")),
-                                       ),
-                                       tabPanel("Compare Regions")
+                                       )#,
+                                      # tabPanel("Compare Regions")
                            )
                   ),
                   #---------------------------
                   # Main Panel: Maps Tab
                   #---------------------------
                   tabPanel("Maps",
+                           br(),
                            tabsetPanel(type = "pills",
-                                       tabPanel("Summary",
+                                       tabPanel("Base Map",
                                                 div(
                                                   class="charts",
-                                                  uiOutput(outputId = "map"))
-                                       ),
-                                       tabPanel("Compare Years"),
-                                       tabPanel("Class"),
-                                       tabPanel("Class Compare years")
+                                                  plotOutput(outputId = "mapBase", width = "100%", height="100%"))
+                                                ),
+                                       tabPanel("Summary",
+                                                fluidRow(
+                                                  column(
+                                                    6,
+                                                    div(
+                                                uiOutput('selectMapYear')),
+                                                style = "float: left"),
+                                                column(
+                                                  3,
+                                                  div(
+                                                  br(),
+                                                  br(),
+                                                pickerInput(
+                                                  inputId = "mapLegend",
+                                                  label = "Legend Type",
+                                                  choices = c("kmean","pretty"),
+                                                  selected = "kmean",
+                                                  multiple = F)),
+                                                style = "float: right")),
+                                                div(
+                                                  class="charts",
+                                                  plotOutput(outputId = "map", width = "100%", height="100%"))
+                                       )#,
+                                       #tabPanel("Compare Years"),
+                                       #tabPanel("Class"),
+                                       #tabPanel("Class Compare years")
                            )
                   ),
                   #---------------------------
