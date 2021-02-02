@@ -8,6 +8,7 @@ library(shinythemes)
 library(leaflet)
 library(DT)
 library(shinyalert)
+library(shinyWidgets)
 
 #---------------------------
 # ui object
