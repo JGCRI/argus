@@ -145,10 +145,34 @@ mapdfFind <- function(dataTbl) {
     }
 
 
+    mapFindx <- get(paste(gsub("subReg","map",subRegChosen),"df",sep=""))
+
+    print(paste("Using map: ", unique(mapFindx$subRegionType), sep = ""))
+
+
+    #.....................................................
+    # Check if no subregions in pre-loaded maps
+    #.....................................................
+
+    if(T){
+
+      subRegNotInShapeFoundx <- unique(dataTbl$subRegion)[!unique(dataTbl$subRegion) %in% unique(mapFindx$subRegion)]
+
+      if (!is.null(subRegNotInShapeFoundx)) {
+        if (length(subRegNotInShapeFoundx) > 0) {
+          print(paste(
+            "subRegions in data not present in shapefile are: ",
+            paste(subRegNotInShapeFoundx, collapse = ", "),
+            sep = ""
+          ))
+        }
+      }
+    }
+
     #.....................................................
     # Return Map
     #.....................................................
-    mapFindx <- get(paste(gsub("subReg","map",subRegChosen),"df",sep=""))
+
 
     invisible(mapFindx)
 
