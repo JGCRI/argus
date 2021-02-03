@@ -1,0 +1,16 @@
+---
+title: "argus"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{argus}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Guide"></a>Guide
+<!-- ------------------------>
+<!-- ------------------------>
+
+To be added
