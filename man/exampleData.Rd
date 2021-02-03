@@ -20,8 +20,8 @@ exampleData
 }
 \examples{
 \dontrun{
- library(rdataviz);
- rdataviz::exampleData
+ library(argus);
+ argus::exampleData
 }
 }
 \keyword{datasets}

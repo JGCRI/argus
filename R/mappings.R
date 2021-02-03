@@ -10,7 +10,7 @@
 #' @return A list of assumptions
 #' @export
 #' @examples
-#' library(rdataviz)
+#' library(argus)
 #' a<-mappings()
 #' a # will give full list of mappings
 #' @importFrom magrittr %>%

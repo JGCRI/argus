@@ -33,19 +33,18 @@ ui <- fluidPage(
   #---------------------------
   #shinythemes::themeSelector(),
   #theme = shinythemes::shinytheme("spacelab"),
-  actionButton(inputId = "test", label="test"),
   div(downloadButton('downloadAll', "All",  class = "download_button"), style="padding:10px; float: right"),
   div(actionLink(inputId='github', label='', icon = icon("github","fa-1x"),
-                 onclick ="window.open('https://github.com/JGCRI/rdataviz', '_blank')"),style="padding:15px 5px;float: right"),
+                 onclick ="window.open('https://github.com/JGCRI/argus', '_blank')"),style="padding:15px 5px;float: right"),
   div(actionLink(inputId='help', label='', icon = icon("question","fa-1x"),
-                 onclick ="window.open('https://jgcri.github.io/rdataviz/', '_blank')"),style="padding:15px 5px;float: right"),
+                 onclick ="window.open('https://jgcri.github.io/argus/', '_blank')"),style="padding:15px 5px;float: right"),
   # div(style = "float:left;",fas fa-cog"
   div(actionLink(inputId='loadsetting', label='', icon = icon("cog","fa-1x"),
   ),style="padding:15px 5px;float:right"),
 
     titlePanel(
-    p("RDataViz", style = "color:#3474A7;"),
-    windowTitle = "RDataViz"
+    p("Argus", style = "color:#3474A7;"),
+    windowTitle = "Argus"
   ),
 
   #---------------------------
@@ -74,7 +73,7 @@ ui <- fluidPage(
           textInput(
             inputId = "urlfiledata",
             label = "Enter url to csv or zip file",
-            placeholder =  "https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv"),
+            placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"),
           br(),
           width = "100%"
         ),
@@ -122,7 +121,7 @@ ui <- fluidPage(
                     div(
                       class="charts",
                       h1("Welcome!",style="font-weight: bold; color = #A9A9A9"),
-                      p(tags$em("rdataviz"),"is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."),
+                      p(tags$em("argus"),"is an R shiny app that interactively visualizes data cross scenarios, parameters, and regions."),
                       h3("How-to",style="font-weight: bold; color = #A9A9A9"),
                       hr(style="border-top: 1px solid #bbb;"),
                       tags$ul(
@@ -144,7 +143,7 @@ ui <- fluidPage(
                         tags$li(tags$b("Table:"),"Table displaying the input data, including search and sort functions")),
                       h3("Citation",style="font-weight: bold; color = #A9A9A9"),
                       hr(style="border-top: 1px solid #bbb;"),
-                      p("Khan, Z., Tang, S., Wild, T., Vernon, C., 2021. rdataviz - An R shiny application to interactively vizualize data across scenarios, parameters and regions.Journal of Open Source Software, DOI: XXXX"),
+                      p("Khan, Z., Tang, S., Wild, T., Vernon, C., 2021. argus - An R shiny application to interactively vizualize data across scenarios, parameters and regions.Journal of Open Source Software, DOI: XXXX"),
                       width = "100%"
                     )),
 

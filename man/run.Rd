@@ -14,8 +14,8 @@ Function to launch Shiny Application.
 }
 \examples{
 \dontrun{
-library(rdataviz)
-rdataviz::run()
+library(argus)
+argus::run()
 }
 
 }

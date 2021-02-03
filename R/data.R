@@ -6,8 +6,8 @@
 #' @format R table or .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::exampleData
+#'  library(argus);
+#'  argus::exampleData
 #' }
 "exampleData"
 #-----------------
@@ -16,14 +16,14 @@
 
 #' xmlQueries xml file
 #'
-#' @source rdataviz
+#' @source argus
 #' @format .xml
 #' @examples
 #' \dontrun{
-#'  library(rdataviz); library(XML)
-#'  rdataviz::xmlQueries
+#'  library(argus); library(XML)
+#'  argus::xmlQueries
 #'  # Can save xml
-#'  XML::saveXML(rdataviz::xmlQueries, file=paste(getwd(), "/xmlQueries.xml", sep = ""))
+#'  XML::saveXML(argus::xmlQueries, file=paste(getwd(), "/xmlQueries.xml", sep = ""))
 #' }
 "xmlQueries"
 
@@ -35,8 +35,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::data_capac_fac
+#'  library(argus);
+#'  argus::data_capac_fac
 #' }
 "data_capac_fac"
 
@@ -48,8 +48,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::tech_mapping
+#'  library(argus);
+#'  argus::tech_mapping
 #' }
 "data_tech_mapping"
 
@@ -59,8 +59,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::data_capac_fac_int
+#'  library(argus);
+#'  argus::data_capac_fac_int
 #' }
 "data_capac_fac_int"
 
@@ -71,8 +71,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::data_A23.globaltech_retirement
+#'  library(argus);
+#'  argus::data_A23.globaltech_retirement
 #' }
 "data_A23.globaltech_retirement"
 
@@ -82,8 +82,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::data_cap_cost_int_cool
+#'  library(argus);
+#'  argus::data_cap_cost_int_cool
 #' }
 "data_cap_cost_int_cool"
 
@@ -93,8 +93,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::data_cap_cost_int_tech
+#'  library(argus);
+#'  argus::data_cap_cost_int_tech
 #' }
 "data_cap_cost_int_tech"
 
@@ -104,8 +104,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::data_cap_cost_cool
+#'  library(argus);
+#'  argus::data_cap_cost_cool
 #' }
 "data_cap_cost_cool"
 
@@ -115,8 +115,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::data_capfactors
+#'  library(argus);
+#'  argus::data_capfactors
 #' }
 "data_capfactors"
 
@@ -126,8 +126,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::data_cap_cost_tech
+#'  library(argus);
+#'  argus::data_cap_cost_tech
 #' }
 "data_cap_cost_tech"
 
@@ -137,8 +137,8 @@
 #' @format .csv
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
-#'  rdataviz::grid050
+#'  library(argus);
+#'  argus::grid050
 #' }
 "grid050"
 
@@ -154,7 +154,7 @@
 #' @format List
 #' @examples
 #' \dontrun{
-#'  library(rdataviz);
+#'  library(argus);
 #'  names(mapsSubRegions)
 #' }
 "mapsSubRegions"
@@ -169,7 +169,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapCountriesdf, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -183,7 +183,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapStatesdf, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -201,7 +201,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapGCAMReg32df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -216,7 +216,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapGCAMBasinsdf, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -234,7 +234,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapGCAMLanddf, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -259,7 +259,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapHydroShed1df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -274,7 +274,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapHydroShed2df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -289,7 +289,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapHydroShed3df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -308,7 +308,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS52HUC2df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -326,7 +326,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS49HUC2df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -339,7 +339,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS52HUC4df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -357,7 +357,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS49HUC4df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -376,7 +376,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS52df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -390,7 +390,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS52Compactdf, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -404,7 +404,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS49df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -418,7 +418,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS52Countydf, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -432,7 +432,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS52CountyCompactdf, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -446,7 +446,7 @@
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapUS49Countydf, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -464,7 +464,7 @@
 #' @format R tibble
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapGCAMBasinsUS52df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -477,7 +477,7 @@
 #' @format R tibble
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapGCAMBasinsUS49df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -487,11 +487,11 @@
 
 #' GCAM Land cropped to US52
 #'
-#' @source Created from rmap maps
+#' @source Created from argus maps
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapGCAMLandUS52df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -501,11 +501,11 @@
 
 #' GCAM Land cropped to US49
 #'
-#' @source Created from rmap maps.
+#' @source Created from argus maps.
 #' @format A SpatialPolygonsDataFrame
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapGCAMLandUS49df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -523,7 +523,7 @@
 #' @format R tibble
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapGCAMReg32US52df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -537,7 +537,7 @@
 #' @format R tibble
 #' @examples
 #' \dontrun{
-#'  library(sp); library(rdataviz); library(ggplot2)
+#'  library(sp); library(argus); library(ggplot2)
 #'  ggplot() +
 #'  geom_polygon(data = mapCountriesUS52df, aes(x = long, y = lat, group = group),
 #'              colour = "black", fill = NA)
@@ -554,7 +554,7 @@
 #' #' @format R tibble
 #' #' @examples
 #' #' \dontrun{
-#' #'  library(sp); library(rdataviz); library(ggplot2)
+#' #'  library(sp); library(argus); library(ggplot2)
 #' #'  ggplot() +
 #' #'  geom_polygon(data = mapIntersectGCAMBasinCountrydf, aes(x = long, y = lat, group = group),
 #' #'              colour = "black", fill = NA)
@@ -567,7 +567,7 @@
 #' #' @format R tibble
 #' #' @examples
 #' #' \dontrun{
-#' #'  library(sp); library(rdataviz); library(ggplot2)
+#' #'  library(sp); library(argus); library(ggplot2)
 #' #'  ggplot() +
 #' #'  geom_polygon(data = mapIntersectGCAMBasin32Regdf, aes(x = long, y = lat, group = group),
 #' #'              colour = "black", fill = NA)
@@ -580,7 +580,7 @@
 #' #' @format R tibble
 #' #' @examples
 #' #' \dontrun{
-#' #'  library(sp); library(rdataviz); library(ggplot2)
+#' #'  library(sp); library(argus); library(ggplot2)
 #' #'  ggplot() +
 #' #'  geom_polygon(data = mapIntersectGCAMBasinUS52df, aes(x = long, y = lat, group = group),
 #' #'              colour = "black", fill = NA)
@@ -594,7 +594,7 @@
 #' #' @format R tibble
 #' #' @examples
 #' #' \dontrun{
-#' #'  library(sp); library(rdataviz); library(ggplot2)
+#' #'  library(sp); library(argus); library(ggplot2)
 #' #'  ggplot() +
 #' #'  geom_polygon(data = mapIntersectGCAMBasinUS52Countydf, aes(x = long, y = lat, group = group),
 #' #'              colour = "black", fill = NA)

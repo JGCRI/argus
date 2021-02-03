@@ -1,6 +1,6 @@
 #' mapdfFind
 #'
-#' Given a data.frame with a subRegion column, this function searches for an appropriate map from the pre-loaded rmap maps.
+#' Given a data.frame with a subRegion column, this function searches for an appropriate map from the pre-loaded argus maps.
 #'
 #' @param dataTbl Palette name to view the palette colors. Eg. colors("pal_Basic")
 #' @keywords map, find
@@ -20,7 +20,7 @@ mapdfFind <- function(dataTbl) {
         subRegNum-> subRegionMap}
 
   #......................................................
-  # Check columns and map subRegions to rmap shape regions
+  # Check columns and map subRegions to argus shape regions
   #.....................................................
 
   if(T){
@@ -39,9 +39,9 @@ mapdfFind <- function(dataTbl) {
 
     subRegShapeTblOrig <- unique(dataTbl$subRegion)
 
-    # Map subRegions to rmap regions
+    # Map subRegions to argus regions
     dataTbl <- dataTbl %>%
-      dplyr::left_join(rmap::mappings("subRegionMap"),by="subRegion")%>%
+      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion")%>%
       dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
                                         TRUE~subRegion))%>%
       dplyr::select(-subRegionMap)
@@ -51,13 +51,6 @@ mapdfFind <- function(dataTbl) {
   }
 
     #.....................................................
-    # Load Pre-built map regions
-    #......................................................
-
-    # rdataviz::mapsSubRegions
-
-
-    #.....................................................
     # Find how many regions in the datatbl belong to different maps
     #.....................................................
 
@@ -65,11 +58,11 @@ mapdfFind <- function(dataTbl) {
 
       mapReg <- data.frame()
 
-      for (i in 1:length(rdataviz::mapsSubRegions)) {
+      for (i in 1:length(argus::mapsSubRegions)) {
         subRegNum_i <-
-          length(subRegShapeTbl[subRegShapeTbl %in% rdataviz::mapsSubRegions[[i]]])
+          length(subRegShapeTbl[subRegShapeTbl %in% argus::mapsSubRegions[[i]]])
         dfx <-
-          data.frame(map = names(rdataviz::mapsSubRegions)[i], subRegNum = subRegNum_i)
+          data.frame(map = names(argus::mapsSubRegions)[i], subRegNum = subRegNum_i)
         mapReg <- mapReg %>% dplyr::bind_rows(dfx)
       }
 

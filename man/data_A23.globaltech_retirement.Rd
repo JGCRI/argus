@@ -18,8 +18,8 @@ data_A23.globaltech_retirement
 }
 \examples{
 \dontrun{
- library(rdataviz);
- rdataviz::data_A23.globaltech_retirement
+ library(argus);
+ argus::data_A23.globaltech_retirement
 }
 }
 \keyword{datasets}

@@ -27,7 +27,7 @@ folder which may have been created from an old run.}
 
 \item{gcamdatabase}{Default = NULL. Full path to GCAM database folder.}
 
-\item{queryFile}{Defualt = NULL. When NULL loads pre-saved xml file rdataviz::xmlQueries}
+\item{queryFile}{Defualt = NULL. When NULL loads pre-saved xml file argus::xmlQueries}
 
 \item{dataProjFile}{Default = NULL. Optional. A default 'dataProj.proj' is produced if no .Proj file is specified.}
 

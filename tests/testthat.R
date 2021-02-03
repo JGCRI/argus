@@ -1,4 +1,4 @@
 library(testthat)
-library(rdataviz)
+library(argus)
 
-test_check("rdataviz")
+test_check("argus")

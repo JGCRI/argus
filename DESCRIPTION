@@ -1,4 +1,4 @@
-Package: rdataviz
+Package: argus
 Title: Interactive data visualizationa
 Version: 0.1.0
 Authors@R: c(person("Zarrar", "Khan", email = "zarrar.khan@pnnl.gov", role = c("aut", "cre"),
@@ -6,8 +6,8 @@ Authors@R: c(person("Zarrar", "Khan", email = "zarrar.khan@pnnl.gov", role = c("
 		   person("Tom", "Wild", role = c("aut"),comment = c(ORCID ="0000-0002-8147-8553")),
 		   person("Chris", "Vernon", role = c("aut")))
 Description: R shiny package to interactively visualize data across scenarios, parameters and regions.
-URL: https://github.com/JGCRI/rdataviz
-BugReports: https://github.com/JGCRI/rdataviz/issues
+URL: https://github.com/JGCRI/argus
+BugReports: https://github.com/JGCRI/argus/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
