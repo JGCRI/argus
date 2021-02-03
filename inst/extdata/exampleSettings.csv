@@ -1,5 +1,5 @@
 variable,value
-urlSelect,https://raw.githubusercontent.com/JGCRI/rdataviz/main/inst/extdata/exampleData.csv
+urlSelect,https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv
 regionsSelect,SChinaSea;SepikR;SittaungR;SolomonIsl;Southeast Asia;ThaiGulf;VietnamCst;XunJiang
 scenariosSelect,Scenario 2
 scenarioRefSelect,Scenario 2

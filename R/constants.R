@@ -1,6 +1,6 @@
 #' constants
 #'
-#' This function holds the various constants used in the rdataviz package
+#' This function holds the various constants used in the argus package
 #'
 #' List of Constants
 #' \itemize{
@@ -10,7 +10,7 @@
 #' @return A list of constants
 #' @export
 #' @examples \dontrun{
-#' library(rdataviz)
+#' library(argus)
 #' constants()$chosenMix
 #' }
 

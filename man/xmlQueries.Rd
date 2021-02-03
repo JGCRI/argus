@@ -8,7 +8,7 @@
 .xml
 }
 \source{
-rdataviz
+argus
 }
 \usage{
 xmlQueries
@@ -18,10 +18,10 @@ xmlQueries xml file
 }
 \examples{
 \dontrun{
- library(rdataviz); library(XML)
- rdataviz::xmlQueries
+ library(argus); library(XML)
+ argus::xmlQueries
  # Can save xml
- XML::saveXML(rdataviz::xmlQueries, file=paste(getwd(), "/xmlQueries.xml", sep = ""))
+ XML::saveXML(argus::xmlQueries, file=paste(getwd(), "/xmlQueries.xml", sep = ""))
 }
 }
 \keyword{datasets}

@@ -18,8 +18,8 @@ data_tech_mapping
 }
 \examples{
 \dontrun{
- library(rdataviz);
- rdataviz::tech_mapping
+ library(argus);
+ argus::tech_mapping
 }
 }
 \keyword{datasets}

@@ -8,7 +8,7 @@
 A SpatialPolygonsDataFrame
 }
 \source{
-Created from rmap maps.
+Created from argus maps.
 }
 \usage{
 mapGCAMLandUS49df
@@ -18,7 +18,7 @@ GCAM Land cropped to US49
 }
 \examples{
 \dontrun{
- library(sp); library(rdataviz); library(ggplot2)
+ library(sp); library(argus); library(ggplot2)
  ggplot() +
  geom_polygon(data = mapGCAMLandUS49df, aes(x = long, y = lat, group = group),
              colour = "black", fill = NA)

@@ -21,7 +21,7 @@ This function has all the mappings used to convert between different categories
 List of Mappings
 }
 \examples{
-library(rdataviz)
+library(argus)
 a<-mappings()
 a # will give full list of mappings
 }

@@ -9,7 +9,7 @@ library(lineprof)
 
 # Raw Map Data
 #dataMapx
-#regionsx = rdataviz::constants("US52")
+#regionsx = argus::constants("US52")
 regionsx = c("Argentina","Peru","Uruguay")
 dataMap_raw <- tibble::tibble(
   subRegion=c(regionsx,regionsx),
@@ -21,19 +21,19 @@ dataMap_raw <- tibble::tibble(
 
 tm1 <- system.time(
   {
-    for(i in 1:10){x <-rdataviz::mapFind(dataMap_raw)}
+    for(i in 1:10){x <-rmap::mapFind(dataMap_raw)}
   })
 
 tm2 <- system.time(
   {
-    for(i in 1:10){x1 <-rdataviz::mapFind1(dataMap_raw)}
+    for(i in 1:10){x1 <-argus::mapdfFind(dataMap_raw)}
   })
 
 tm1
 tm2
 
 
-dataMap_raw <- read.csv("C:/Z/models/rdataviz/inst/extdata/exampleData.csv",header=T)%>%
+dataMap_raw <- read.csv("C:/Z/models/argus/inst/extdata/exampleData.csv",header=T)%>%
   tibble::as_tibble(); dataMap_raw; dataMap_raw$param%>%unique()
 
 tblAggsums <- dataMap_raw %>%
@@ -51,7 +51,7 @@ tblAggmeans <- dataMap_raw %>%
   dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
 dataMap_raw<- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup() %>%
-  dplyr::left_join(rdataviz::mappings("mappingGCAMBasins"),by="subRegion") %>%
+  dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
   dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
                                     TRUE~subRegion)) %>%
   dplyr::select(-subRegionMap); dataMap_raw%>%head()
@@ -340,11 +340,11 @@ tm2 <- system.time(
         # Create ggplot path from shapefile
 
         # Choose relevant shapefile and subset gridfile
-        shp <- rdataviz::mapFind1(data_map)
+        shp <- argus::mapFind1(data_map)
         subRegionCol <- unique(shp$subRegionType)
 
         if(subRegionCol=="US52" & US52Compact==T){
-          shp <- rdataviz::mapUS52Compactdf
+          shp <- argus::mapUS52Compactdf
           subRegionCol <- "US52Compact"
         }
 
@@ -379,7 +379,7 @@ tm2 <- system.time(
         latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
 
 
-        shp_bg <- rdataviz::mapCountriesdf%>%
+        shp_bg <- argus::mapCountriesdf%>%
           dplyr::filter(long > longLimMinbg,
                         long < longLimMaxbg,
                         lat > latLimMinbg,
@@ -432,7 +432,7 @@ for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
 
 dataMap_raw_regions <- dataMap_raw %>%
   dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-  dplyr::left_join(rdataviz::mappings("mappingGCAMBasins"),by="subRegion") %>%
+  dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
   dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
                                     TRUE~subRegion)) %>%
   dplyr::select(-subRegionMap) %>%
@@ -440,7 +440,7 @@ dataMap_raw_regions <- dataMap_raw %>%
   dplyr::select(subRegion) %>%
   unique(); dataMap_raw_regions
 
-dataMapPlot <- rdataviz::mapFind1(dataMap_raw_regions)%>%
+dataMapPlot <- argus::mapFind1(dataMap_raw_regions)%>%
   dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
   dplyr::group_by(subRegion) %>%
   dplyr::mutate(minLong = min(long),
@@ -472,7 +472,7 @@ latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
 latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
 
 
-shp_bg <- rdataviz::mapCountriesdf%>%
+shp_bg <- argus::mapCountriesdf%>%
   dplyr::filter(long > longLimMinbg,
                 long < longLimMaxbg,
                 lat > latLimMinbg,

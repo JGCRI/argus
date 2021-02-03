@@ -18,8 +18,8 @@ grid050
 }
 \examples{
 \dontrun{
- library(rdataviz);
- rdataviz::grid050
+ library(argus);
+ argus::grid050
 }
 }
 \keyword{datasets}

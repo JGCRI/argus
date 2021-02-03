@@ -7,8 +7,7 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 library(cowplot)
-library(rdataviz)
-library(rmap)
+library(argus)
 library(shinyWidgets)
 library(tools)
 library(RCurl)
@@ -24,6 +23,7 @@ library(broom)
 # Options
 #---------------------------
 options(shiny.maxRequestSize=100*1024^2)
+pal_all <- argus::mappings()$pal_all
 
 #---------------------------
 # Server object
@@ -32,11 +32,9 @@ options(shiny.maxRequestSize=100*1024^2)
 server <- function(input, output, session) {
 
   #---------------------------
-  # Load Default Datasets from rdataviz
+  # Load Default Datasets from argus
   #---------------------------
-  dataDefault <- rdataviz::exampleData
-  # settingsDefault <- rdataviz::
-  map <- rmap::mapGCAMReg32
+  dataDefault <- argus::exampleData
   ggplottheme <- ggplot2::theme_bw()
   # session$sendCustomMessage("setsetting", c("data", unique(dataSum()$scenario)))
 
@@ -386,7 +384,7 @@ server <- function(input, output, session) {
       regionsSelect_i <- "Southeast Asia"
       paramsSelect_i <- c("gdp","pop","agProdByCrop")
 
-      dataGCAMraw <- rdataviz::readgcam(reReadData = T,
+      dataGCAMraw <- argus::readgcam(reReadData = T,
                                         dirOutputs = tempdir,
                                         gcamdatabase = gcamdatabasepath_i,
                                         scenOrigNames = scenOrigNames_i,
@@ -443,15 +441,15 @@ server <- function(input, output, session) {
   # Read in Raw Data
   data_raw <- reactive({
     if (is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
-      return(rdataviz::addMissing(
+      return(argus::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
       rv$filedatax <- NULL
       rv$urlfiledatax <- NULL
     } else if(!is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
-      return(rdataviz::addMissing(
-        rdataviz::parse_local(input)%>%
+      return(argus::addMissing(
+        argus::parse_local(input)%>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
       rv$filedatax <- NULL
@@ -462,8 +460,8 @@ server <- function(input, output, session) {
       rv$filedatax <- NULL
       rv$urlfiledatax <- NULL
     }else{
-      return(rdataviz::addMissing(
-        rdataviz::parse_remote(input)%>%
+      return(argus::addMissing(
+        argus::parse_remote(input)%>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
       rv$filedatax <- NULL
@@ -628,7 +626,7 @@ server <- function(input, output, session) {
     if (any(input$paramsSelected == "Chosen Mix") &&
         length(input$paramsSelected) == 1) {
       paramsCheck <- unique(data()$param)[unique(data()$param) %in%
-                                            rdataviz::constants()$chosenMix]
+                                            argus::constants()$chosenMix]
       if (length(paramsCheck) >= 1) {
         paramsCheck
       } else{
@@ -969,8 +967,8 @@ server <- function(input, output, session) {
         file,
         plot=summaryPlot(0.75, 10, 10),
         #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-        height = rdataviz::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
-        width=rdataviz::exportWidth(10, length(unique(dataChartx()$param)), 3),
+        height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
+        width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
         units="in"
       )
     })
@@ -1021,8 +1019,8 @@ server <- function(input, output, session) {
     filename = "summaryChartReg.png",
     content = function(file) {
       ggsave(file,plot=summaryPlotReg(10),
-             height = rdataviz::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
-             width = rdataviz::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
+             height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
+             width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
              units = "in")
     })
 
@@ -1052,15 +1050,16 @@ server <- function(input, output, session) {
     x = 1
     for(i in 1:length(unique(dataChartPlot$param))){
       # Check Color Palettes
-      palAdd <- rmap::colors()$pal_Basic
+      palAdd <- c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise")
+
       missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
-                                                 names(rmap::colors()$pal_rmap)]
+                                                 names(pal_all)]
       if (length(missNames) > 0) {
         palAdd <- palAdd[1:length(missNames)]
         names(palAdd) <- missNames
-        palCharts <- c(rmap::colors()$pal_rmap, palAdd)
+        palCharts <- c(pal_all, palAdd)
       } else{
-        palCharts <- rmap::colors()$pal_rmap
+        palCharts <- pal_all
       }
       print(palCharts)
 
@@ -1155,8 +1154,8 @@ server <- function(input, output, session) {
     filename = "barChart.png",
     content = function(file) {
       ggsave(file,plot=chartPlot(),
-             width=rdataviz::exportWidth(49, length(unique(dataChartx()$param)), 5),
-             height=rdataviz::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
+             width=argus::exportWidth(49, length(unique(dataChartx()$param)), 5),
+             height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
              unit = "in"
       )
       # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
@@ -1174,7 +1173,7 @@ server <- function(input, output, session) {
   output$mapBase <- renderPlot({
 
     dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
-      dplyr::left_join(rdataviz::mappings("mappingGCAMBasins"),by="subRegion") %>%
+      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
       dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
                                         TRUE~subRegion)) %>%
       dplyr::select(-subRegionMap)
@@ -1190,7 +1189,7 @@ server <- function(input, output, session) {
         dplyr::select(subRegion) %>%
         unique(); dataMap_raw_regions
 
-      dataMapPlot <- rdataviz::mapdfFind(dataMap_raw_regions)%>%
+      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
         dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
         dplyr::group_by(subRegion) %>%
         dplyr::mutate(minLong = min(long),
@@ -1222,7 +1221,7 @@ server <- function(input, output, session) {
         latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
 
 
-        shp_bg <- rdataviz::mapCountriesdf%>%
+        shp_bg <- argus::mapCountriesdf%>%
           dplyr::filter(long > longLimMinbg,
                         long < longLimMaxbg,
                         lat > latLimMinbg,
@@ -1265,7 +1264,7 @@ server <- function(input, output, session) {
   output$map <- renderPlot({
 
     dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
-      dplyr::left_join(rdataviz::mappings("mappingGCAMBasins"),by="subRegion") %>%
+      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
       dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
                                         TRUE~subRegion)) %>%
       dplyr::select(-subRegionMap)
@@ -1275,7 +1274,7 @@ server <- function(input, output, session) {
     naColor = "green"
     breaks_n = 6
     legendType = input$mapLegend
-    palAbsChosen <- "pal_hot"
+    palAbsChosen <- c("yellow2","goldenrod","darkred")
     yearsSelect <- input$mapYear
     paramsSelect <- unique(dataMap_raw$param)
 
@@ -1324,7 +1323,7 @@ server <- function(input, output, session) {
         paletteAbs = "red"
         if(length(unique(format(unique(dataMap_raw_param$value), nsmall=2, digits=2, big.mark = ",")))!=1){
           breaks_map = format(unique(dataMap_raw_param$value), nsmall=2, digits=2, big.mark = ",")
-          paletteAbs <- grDevices::colorRampPalette(rmap::colors()[[palAbsChosen]])(length(breaks_map)); paletteAbs
+          paletteAbs <- grDevices::colorRampPalette(palAbsChosen)(length(breaks_map)); paletteAbs
           data_map <- data_map %>%
             dplyr::mutate(brks = factor(brks,levels=breaks_map))
         }
@@ -1341,7 +1340,7 @@ server <- function(input, output, session) {
                         brks = factor(brks,levels=breaks_map_levels))
 
         # Select Palettes
-        paletteAbs <- grDevices::colorRampPalette(rmap::colors()[[palAbsChosen]])(length(breaks_map_levels)); paletteAbs
+        paletteAbs <- grDevices::colorRampPalette(palAbsChosen)(length(breaks_map_levels)); paletteAbs
         paletteDiff <- "BrBG"
       }
 
@@ -1351,11 +1350,11 @@ server <- function(input, output, session) {
       # Create ggplot path from shapefile
 
       # Choose relevant shapefile and subset gridfile
-      shp <- rdataviz::mapdfFind(data_map)
+      shp <- argus::mapdfFind(data_map)
       subRegionCol <- unique(shp$subRegionType)
 
       if(subRegionCol=="US52" & US52Compact==T){
-        shp <- rdataviz::mapUS52Compactdf
+        shp <- argus::mapUS52Compactdf
         subRegionCol <- "US52Compact"
       }
 
@@ -1390,7 +1389,7 @@ server <- function(input, output, session) {
       latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
 
 
-      shp_bg <- rdataviz::mapCountriesdf%>%
+      shp_bg <- argus::mapCountriesdf%>%
         dplyr::filter(long > longLimMinbg,
                       long < longLimMaxbg,
                       lat > latLimMinbg,
@@ -1466,18 +1465,18 @@ server <- function(input, output, session) {
       write.csv(data(), "table.csv")
       ggsave("summaryChart.png", plot=summaryPlot(0.75, 10, 10),
              #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-             height = rdataviz::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
-             width=rdataviz::exportWidth(10, length(unique(dataChartx()$param)), 3),
+             height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
+             width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
              units="in"
       )
       ggsave("barCharts.png",plot=chartPlot(),
-              width=rdataviz::exportWidth(49, length(unique(dataChartx()$param)), 5),
-              height=rdataviz::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
+              width=argus::exportWidth(49, length(unique(dataChartx()$param)), 5),
+              height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
               unit = "in"
              )
       ggsave("summaryChartReg.png", plot=summaryPlotReg(10),
-             height = rdataviz::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
-             width = rdataviz::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
+             height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
+             width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
              units = "in"
              )
       print(fs)

@@ -1,7 +1,7 @@
 <!-- badges: start -->
-![R-CMD](https://github.com/JGCRI/rdataviz/workflows/R-CMD/badge.svg)
-![pkgdown](https://github.com/JGCRI/rdataviz/workflows/pkgdown/badge.svg)
-[![codecov](https://codecov.io/gh/JGCRI/rdataviz/branch/dev/graph/badge.svg?token=NDE0ZK7OHN)](https://codecov.io/gh/JGCRI/rdataviz)
+![R-CMD](https://github.com/JGCRI/argus/workflows/R-CMD/badge.svg)
+![pkgdown](https://github.com/JGCRI/argus/workflows/pkgdown/badge.svg)
+[![codecov](https://codecov.io/gh/JGCRI/argus/branch/dev/graph/badge.svg?token=NDE0ZK7OHN)](https://codecov.io/gh/JGCRI/argus)
 <!-- badges: end -->
 
 <!-- ------------------------>
@@ -25,10 +25,10 @@
 
 [Back to Contents](#Contents)
 
-- Online App:  https://zarrar.shinyapps.io/rdataviz/
-- Github: https://github.com/JGCRI/rdataviz
-- Webpage: https://jgcri.github.io/rdataviz/
-- Cheatsheet: https://github.com/JGCRI/rmap/blob/master/rdataviz.pdf
+- Online App:  https://zarrar.shinyapps.io/argus/
+- Github: https://github.com/JGCRI/argus
+- Webpage: https://jgcri.github.io/argus/
+- Cheatsheet: https://github.com/JGCRI/argus/blob/master/argus.pdf
   
 <!-- ------------------------>
 <!-- ------------------------>
@@ -38,7 +38,7 @@
 
 [Back to Contents](#Contents)
 
-`rdataviz` is an R Shiny App to interactively visualize data across scenarios, parameters and regions.
+`argus` is an R Shiny App to interactively visualize data across scenarios, parameters and regions.
 
 
 <!-- ------------------------>
@@ -69,7 +69,7 @@
 install.packages(“devtools”)
 devtools::install_github(“JGCRI/rgcam”)
 devtools::install_github(“JGCRI/rmap”)
-devtools::install_github(“JGCRI/rdataviz”)
+devtools::install_github(“JGCRI/argus”)
 ```
 
 <!-- ------------------------>
@@ -80,7 +80,7 @@ devtools::install_github(“JGCRI/rdataviz”)
 
 [Back to Contents](#Contents)
 
-A detailed step-by-step walkthrough and how-to guide is provided on the [How-to](https://jgcri.github.io/rdataviz/articles/vignette_rdataviz.html) page. 
+A detailed step-by-step walkthrough and how-to guide is provided on the [How-to](https://jgcri.github.io/argus/articles/vignette_argus.html) page. 
 
 
 <!-- ------------------------>

@@ -20,7 +20,7 @@ Excludes Alaska, Hawaii and Puerto Rico. Includes DC.
 }
 \examples{
 \dontrun{
- library(sp); library(rdataviz); library(ggplot2)
+ library(sp); library(argus); library(ggplot2)
  ggplot() +
  geom_polygon(data = mapUS49Countydf, aes(x = long, y = lat, group = group),
              colour = "black", fill = NA)

@@ -6,7 +6,7 @@
 #' @param folderName Default = NULL
 #' @param nameAppend  Default="". Name to append to saved files.
 #' @param gcamdatabase Default = NULL. Full path to GCAM database folder.
-#' @param queryFile Defualt = NULL. When NULL loads pre-saved xml file rdataviz::xmlQueries
+#' @param queryFile Defualt = NULL. When NULL loads pre-saved xml file argus::xmlQueries
 #' @param dataProjFile Default = NULL. Optional. A default 'dataProj.proj' is produced if no .Proj file is specified.
 #' @param scenOrigNames Default = "All". Original Scenarios names in GCAM database in a string vector.
 #' For example c('scenario1','scenario2).
@@ -125,7 +125,7 @@
   # Params and Queries
   #---------------------
 
-  paramQueryMap <- (rdataviz::mappings()$mapParamQuery)%>%dplyr::select(group,param,query)
+  paramQueryMap <- (argus::mappings()$mapParamQuery)%>%dplyr::select(group,param,query)
 
   # Check if queriesSelect is a querySet or one of the queries
   if(!any(c("all","All","ALL") %in% paramsSelect)){
@@ -182,7 +182,7 @@
   }
 
     # Read in xmlFile
-    XML::saveXML(rdataviz::xmlQueries, file=paste(dirOutputs, "/", folderName,"/readGCAM/xmlQueries.xml", sep = ""))
+    XML::saveXML(argus::xmlQueries, file=paste(dirOutputs, "/", folderName,"/readGCAM/xmlQueries.xml", sep = ""))
     queryFile <- paste(dirOutputs, "/", folderName,"/readGCAM/xmlQueries.xml", sep = "")
     queryPath <- gsub("[^/]+$","",queryFile)
     queryxml <- basename(queryFile)
@@ -838,7 +838,7 @@
                           origUnits = Units,
                           origX = year, subRegion=region,
                           scenario = scenNewNames,
-                          value = value * rdataviz::constants("convEJ2TWh"),
+                          value = value * argus::constants("convEJ2TWh"),
                           units = "Final Electricity by Sector (TWh)",
                           vintage = paste("Vint_", year, sep = ""),
                           x = year,
@@ -896,7 +896,7 @@
                           origUnits = Units,
                           origX = year, subRegion=region,
                           scenario = scenNewNames,
-                          value = value * rdataviz::constants("convEJ2TWh"),
+                          value = value * argus::constants("convEJ2TWh"),
                           units = "Final Electricity by Fuel (TWh)",
                           vintage = paste("Vint_", year, sep = ""),
                           x = year,
@@ -1036,7 +1036,7 @@
           }
           if (nrow(tbl)>0) {
             tbl <- tbl %>%
-              dplyr::filter(region %in% rdataviz::constants("US52"))%>%
+              dplyr::filter(region %in% argus::constants("US52"))%>%
               dplyr::filter(!sector %in% "industrial energy use")
           }
           tblUSA <- tbl %>%
@@ -1050,7 +1050,7 @@
                           origUnits = Units,
                           origX = year, subRegion=region,
                           scenario = scenNewNames,
-                          value = value * rdataviz::constants("convEJ2TWh"),
+                          value = value * argus::constants("convEJ2TWh"),
                           units = "Electricity Generation by Fuel (TWh)",
                           vintage = paste("Vint_", year, sep = ""),
                           x = year,
@@ -1077,7 +1077,7 @@
           }
           if (nrow(tbl)>0) {
             tbl <- tbl %>%
-              dplyr::filter(region %in% rdataviz::constants("US52"))
+              dplyr::filter(region %in% argus::constants("US52"))
           }
           tblUSACogen <- tbl %>%
             dplyr::filter(scenario %in% scenOrigNames)%>%
@@ -1090,7 +1090,7 @@
                           origUnits = Units,
                           origX = year, subRegion=region,
                           scenario = scenNewNames,
-                          value = value * rdataviz::constants("convEJ2TWh"),
+                          value = value * argus::constants("convEJ2TWh"),
                           units = "Electricity Generation by Fuel (TWh)",
                           vintage = paste("Vint_", year, sep = ""),
                           x = year,
@@ -1114,7 +1114,7 @@
           if (!is.null(regionsSelect)) {
             tbl <- tbl %>%
               dplyr::filter(region %in% regionsSelect) %>%
-              dplyr::filter(!region %in% rdataviz::constants("US52"))
+              dplyr::filter(!region %in% argus::constants("US52"))
           }
           tblGCAMReg <- tbl %>%
             dplyr::filter(scenario %in% scenOrigNames)%>%
@@ -1127,7 +1127,7 @@
                           origUnits = Units,
                           origX = year, subRegion=region,
                           scenario = scenNewNames,
-                          value = value * rdataviz::constants("convEJ2TWh"),
+                          value = value * argus::constants("convEJ2TWh"),
                           units = "Electricity Generation by Fuel (TWh)",
                           vintage = paste("Vint_", year, sep = ""),
                           x = year,
@@ -1180,7 +1180,7 @@
       # Total final energy by aggregate end-use sector
       if(paramx %in% paramsSelectx){
         if(!is.null(tblelecByTechTWh)){
-          capfactors <- rdataviz::data_capfactors
+          capfactors <- argus::data_capfactors
           capfactors
           tbl <- tblelecByTechTWh  # Tibble
           #rm(tblelecByTechTWh)
@@ -1231,7 +1231,7 @@
 
           counter <- 0
           # NEW--must do loop throug scenarios due to current design of script
-          start_year_i = max(min(unique(tbl$year)),rdataviz::constants("GCAMbaseYear"))
+          start_year_i = max(min(unique(tbl$year)),argus::constants("GCAMbaseYear"))
           end_year_i = max(unique(tbl$year))
           temp_list = list()
           for (scen in scenarios){
@@ -1239,7 +1239,7 @@
               dplyr::filter(scenario==scen) %>%
               tidyr::spread(year, value) %>%
               dplyr::mutate_all(~replace(., is.na(.), 0))
-            temp_list <- rdataviz::elecInvest(elec_gen_vintage, world_regions=regionsSelect, start_year=start_year_i, end_year=end_year_i)
+            temp_list <- argus::elecInvest(elec_gen_vintage, world_regions=regionsSelect, start_year=start_year_i, end_year=end_year_i)
             start_yr_hydro <- start_year_i
             end_year <- end_year_i
             temp_df <- tblx %>%
@@ -1262,7 +1262,7 @@
             counter <- counter+1
           }
 
-          addition_costsWhydro <- rdataviz::hydroInvest(addition_costs=addition_costs, start_year=start_year_i)$addition_costs
+          addition_costsWhydro <- argus::hydroInvest(addition_costs=addition_costs, start_year=start_year_i)$addition_costs
 
           tbl1<-tbl2<-tbl3<-tbl4<-tbl5<-tbl6<-tbl7<-tbl8<-tibble::tibble()
 
@@ -1609,7 +1609,7 @@
           tbl <- rgcam::getQuery(dataProjLoaded, queryx)  # Tibble
           if(nrow(tbl)>0){
             # If GCAM USA then remove "USA" region and use states
-            if(any(rdataviz::constants("US52") %in% unique(tbl$region))){
+            if(any(argus::constants("US52") %in% unique(tbl$region))){
               tbl <- tbl %>% dplyr::filter(region!="USA") # Remove region USA and use states instead
             }
           }
@@ -1669,7 +1669,7 @@
           tbl <- rgcam::getQuery(dataProjLoaded, queryx)  # Tibble
           if(nrow(tbl)>0){
             # If GCAM USA then remove "USA" region and use states
-            if(any(rdataviz::constants("US52") %in% unique(tbl$region))){
+            if(any(argus::constants("US52") %in% unique(tbl$region))){
               tbl <- tbl %>% dplyr::filter(region!="USA") # Remove region USA and use states instead
             }
           }
@@ -1730,15 +1730,15 @@
           # Need to add in conveyance losses for USA when running GCAM USA
           # gcamusa.CONVEYANCE_LOSSES <- 0.829937455747218 from constants.R
           if(nrow(tbl)>0){
-            if(any(unique(tbl$region) %in% rdataviz::constants("US52"))){
+            if(any(unique(tbl$region) %in% argus::constants("US52"))){
               tbl <- tbl %>%
                 dplyr::mutate(value = dplyr::case_when(region=="USA"~value/0.829937455747218,
                                                        TRUE~value)) %>%
-                dplyr::filter(!region %in% rdataviz::constants("US52"))
+                dplyr::filter(!region %in% argus::constants("US52"))
             }
           }
           if (!is.null(regionsSelect)) {
-            if(any(regionsSelect %in% rdataviz::constants("US52"))){
+            if(any(regionsSelect %in% argus::constants("US52"))){
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect,"USA"))
             } else {
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect))
@@ -1975,7 +1975,7 @@
         if (queryx %in% queriesx) {
           tbl <- rgcam::getQuery(dataProjLoaded, queryx)  # Tibble
           if (!is.null(regionsSelect)) {
-            if(any(regionsSelect %in% rdataviz::constants("US52"))){
+            if(any(regionsSelect %in% argus::constants("US52"))){
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect,"USA"))
             } else {
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect))
@@ -2374,7 +2374,7 @@
         if (queryx %in% queriesx) {
           tbl <- rgcam::getQuery(dataProjLoaded, queryx)  # Tibble
           if (!is.null(regionsSelect)) {
-            if(any(regionsSelect %in% rdataviz::constants("US52"))){
+            if(any(regionsSelect %in% argus::constants("US52"))){
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect,"USA"))
             } else {
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect))
@@ -2427,7 +2427,7 @@
         if (queryx %in% queriesx) {
           tbl <- rgcam::getQuery(dataProjLoaded, queryx)  # Tibble
           if (!is.null(regionsSelect)) {
-            if(any(regionsSelect %in% rdataviz::constants("US52"))){
+            if(any(regionsSelect %in% argus::constants("US52"))){
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect,"USA"))
             } else {
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect))
@@ -2473,7 +2473,7 @@
         if (queryx %in% queriesx) {
           tbl <- rgcam::getQuery(dataProjLoaded, queryx)  # Tibble
           if (!is.null(regionsSelect)) {
-            if(any(regionsSelect %in% rdataviz::constants("US52"))){
+            if(any(regionsSelect %in% argus::constants("US52"))){
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect,"USA"))
             } else {
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect))
@@ -2518,7 +2518,7 @@
         if (queryx %in% queriesx) {
           tbl <- rgcam::getQuery(dataProjLoaded, queryx)  # Tibble
           if (!is.null(regionsSelect)) {
-            if(any(regionsSelect %in% rdataviz::constants("US52"))){
+            if(any(regionsSelect %in% argus::constants("US52"))){
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect,"USA"))
             } else {
               tbl <- tbl %>% dplyr::filter(region %in% c(regionsSelect))
@@ -2959,7 +2959,7 @@
             tbl <- tbl %>% dplyr::filter(region %in% regionsSelect)
           }
           tbl <- tbl %>%
-            dplyr::left_join(rdataviz::constants("convertGgTgMTC"),by="Units") %>%
+            dplyr::left_join(argus::constants("convertGgTgMTC"),by="Units") %>%
             dplyr::mutate(origValue=value,value=value*Convert*44/12,
                           origUnits=Units,units="Emissions LUC - (MTCO2eq)")%>%
             dplyr::filter(scenario %in% scenOrigNames)%>%
@@ -3009,7 +3009,7 @@
           }
           #emiss_sector_mapping <- read.csv(CO2mappingFile, skip=1)
           tbl <- tbl %>%
-            dplyr::left_join(rdataviz::constants("convertGgTgMTC"),by="Units") %>%
+            dplyr::left_join(argus::constants("convertGgTgMTC"),by="Units") %>%
             dplyr::mutate(origValue=value,value=value*Convert*44/12,
                           origUnits=Units,units="CO2 Emissions by Sector (MTCO2eq)")%>%
             dplyr::mutate(
@@ -3282,8 +3282,8 @@
               class2=dplyr::if_else(class2=="biomass","Crops",class2),
               class2=gsub("backup\\_electricity","Electricity",class2),
               class2=gsub("csp\\_backup","Electricity",class2))%>%
-            dplyr::left_join(rdataviz::constants("GWP")%>%dplyr::rename(class1=ghg),by="class1")%>%
-            dplyr::left_join(rdataviz::constants("convertGgTgMTC"),by="Units") %>%
+            dplyr::left_join(argus::constants("GWP")%>%dplyr::rename(class1=ghg),by="class1")%>%
+            dplyr::left_join(argus::constants("convertGgTgMTC"),by="Units") %>%
             #dplyr::filter(!class1=='CO2') %>%
             dplyr::mutate(origValue=value,
                           value=value*GWPAR5*Convert,
@@ -3436,8 +3436,8 @@
               class1=dplyr::if_else(class1=="biomass","Crops",class1),
               class1=gsub("backup\\_electricity","Electricity",class1),
               class1=gsub("csp\\_backup","Electricity",class1))%>%
-            dplyr::left_join(rdataviz::constants("GWP")%>%dplyr::rename(class2=ghg),by="class2")%>%
-            dplyr::left_join(rdataviz::constants("convertGgTgMTC"),by="Units") %>%
+            dplyr::left_join(argus::constants("GWP")%>%dplyr::rename(class2=ghg),by="class2")%>%
+            dplyr::left_join(argus::constants("convertGgTgMTC"),by="Units") %>%
             dplyr::mutate(origValue=value,
                           value=value*GWPAR5*Convert,
                           origUnits=Units,
@@ -3601,8 +3601,8 @@
               class2=dplyr::if_else(class2=="biomass","Crops",class2),
               class2=gsub("backup\\_electricity","Electricity",class2),
               class2=gsub("csp\\_backup","Electricity",class2))%>%
-            dplyr::left_join(rdataviz::constants("GWP")%>%dplyr::rename(class1=ghg),by="class1")%>%
-            dplyr::left_join(rdataviz::constants("convertGgTgMTC"),by="Units") %>%
+            dplyr::left_join(argus::constants("GWP")%>%dplyr::rename(class1=ghg),by="class1")%>%
+            dplyr::left_join(argus::constants("convertGgTgMTC"),by="Units") %>%
             dplyr::filter(!class1=='CO2') %>%
             dplyr::mutate(origValue=value,
                           value=value*GWPAR5*Convert,
@@ -3922,8 +3922,8 @@
               class2=dplyr::if_else(class2=="biomass","Crops",class2),
               class2=gsub("backup\\_electricity","Electricity",class2),
               class2=gsub("csp\\_backup","Electricity",class2))%>%
-            dplyr::left_join(rdataviz::constants("GWP")%>%dplyr::rename(class1=ghg),by="class1")%>%
-            dplyr::left_join(rdataviz::constants("convertGgTgMTC"),by="Units") %>%
+            dplyr::left_join(argus::constants("GWP")%>%dplyr::rename(class1=ghg),by="class1")%>%
+            dplyr::left_join(argus::constants("convertGgTgMTC"),by="Units") %>%
             dplyr::mutate(origValue=value,
                           value=dplyr::case_when(!is.na(GTPAR5) ~ value*GTPAR5*Convert,
                                                  TRUE ~  value*GWPAR5*Convert),
@@ -4075,8 +4075,8 @@
               class1=dplyr::if_else(class1=="biomass","Crops",class1),
               class1=gsub("backup\\_electricity","Electricity",class1),
               class1=gsub("csp\\_backup","Electricity",class1))%>%
-            dplyr::left_join(rdataviz::constants("GWP")%>%dplyr::rename(class2=ghg),by="class2")%>%
-            dplyr::left_join(rdataviz::constants("convertGgTgMTC"),by="Units") %>%
+            dplyr::left_join(argus::constants("GWP")%>%dplyr::rename(class2=ghg),by="class2")%>%
+            dplyr::left_join(argus::constants("convertGgTgMTC"),by="Units") %>%
             dplyr::mutate(origValue=value,
                           value=dplyr::case_when(!is.na(GTPAR5) ~ value*GTPAR5*Convert,
                                                  TRUE ~  value*GWPAR5*Convert),
@@ -4241,8 +4241,8 @@
               class2=dplyr::if_else(class2=="biomass","Crops",class2),
               class2=gsub("backup\\_electricity","Electricity",class2),
               class2=gsub("csp\\_backup","Electricity",class2))%>%
-            dplyr::left_join(rdataviz::constants("GWP")%>%dplyr::rename(class1=ghg),by="class1")%>%
-            dplyr::left_join(rdataviz::constants("convertGgTgMTC"),by="Units") %>%
+            dplyr::left_join(argus::constants("GWP")%>%dplyr::rename(class1=ghg),by="class1")%>%
+            dplyr::left_join(argus::constants("convertGgTgMTC"),by="Units") %>%
             dplyr::filter(!class1=='CO2') %>%
             dplyr::mutate(origValue=value,
                           value=dplyr::case_when(!is.na(GTPAR5) ~ value*GTPAR5*Convert,
@@ -5026,12 +5026,12 @@
       # unit Conversions
       # -----------
       dataxEJtoMTOE <- datax %>% dplyr::filter(grepl("\\(EJ\\)",units)) %>%
-        dplyr::mutate(value=value*rdataviz::constants("convEJ2MTOE"),
+        dplyr::mutate(value=value*argus::constants("convEJ2MTOE"),
                       units = gsub("\\(EJ\\)","(Mtoe)",units),
                       param = gsub("EJ","MTOE",param)); dataxEJtoMTOE
 
       dataxEJtoTWh <- datax %>% dplyr::filter(grepl("\\(EJ\\)",units)) %>%
-        dplyr::mutate(value=value*rdataviz::constants("convEJ2TWh"),
+        dplyr::mutate(value=value*argus::constants("convEJ2TWh"),
                       units = gsub("\\(EJ\\)","(TWh)",units),
                       param = gsub("EJ","TWh",param))
 
@@ -5211,15 +5211,15 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
   # Mapping files
 
   years_mapping <- (data.frame(year=c(rep("final-calibration-year",1),rep("initial-future-year",18)),
-                               vintage=c(rdataviz::constants("GCAMbaseYear"),seq(rdataviz::constants("GCAMbaseYear")+5,2100,by=5))))%>%
+                               vintage=c(argus::constants("GCAMbaseYear"),seq(argus::constants("GCAMbaseYear")+5,2100,by=5))))%>%
     dplyr::mutate(year=as.character(year));years_mapping
 
-  cap_cost_tech <- rdataviz::data_cap_cost_tech
-  cap_cost_cool <- rdataviz::data_cap_cost_cool
-  cap_cost_int_tech <- rdataviz::data_cap_cost_int_tech
-  cap_cost_int_cool <- rdataviz::data_cap_cost_int_cool
+  cap_cost_tech <- argus::data_cap_cost_tech
+  cap_cost_cool <- argus::data_cap_cost_cool
+  cap_cost_int_tech <- argus::data_cap_cost_int_tech
+  cap_cost_int_cool <- argus::data_cap_cost_int_cool
 
-  s_curve_shutdown <- tibble::as_tibble(rdataviz::data_A23.globaltech_retirement)%>%
+  s_curve_shutdown <- tibble::as_tibble(argus::data_A23.globaltech_retirement)%>%
     dplyr::mutate(year=dplyr::if_else(year=="final-historical-year","final-calibration-year",year),
                   year=dplyr::if_else(year=="initial-nonhistorical-year","initial-future-year",year)); s_curve_shutdown
 
@@ -5240,12 +5240,12 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
   # Combine the cooling technology cost sheets, and the electricity generating technology cost dataframes
   elec_gen_tech_cost <- rbind(cap_cost_tech, cap_cost_int_tech)
   # Get dispatchable capacity factor column added to elec_gen_tech_cost
-  capac_fac <- rdataviz::data_capac_fac
+  capac_fac <- argus::data_capac_fac
   capac_fac %>% dplyr::select(-sector.name, -subsector.name) -> capac_fac_new
   elec_gen_tech_cost <- merge(elec_gen_tech_cost, capac_fac_new, by=c("technology", "year"), all=TRUE)
   elec_gen_tech_cost <- elec_gen_tech_cost[, c(3,4,1,2,5,6,7,8)]  # Redplyr::arrange columns
   # Get intermittent capacity factor column added to elec_gen_tech_cost
-  capac_fac_int <- rdataviz::data_capac_fac_int
+  capac_fac_int <- argus::data_capac_fac_int
   capac_fac_int %>% dplyr::select(-sector.name, -subsector.name) %>%
     dplyr::rename(technology=intermittent.technology) %>% dplyr::rename(capacity.factor.temp=capacity.factor) -> capac_fac_int_new
   elec_gen_tech_cost <- merge(elec_gen_tech_cost, capac_fac_int_new, by=c("technology", "year"), all=TRUE)
@@ -5289,7 +5289,7 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
   D[,'old.technology'] <- NA
   cap_cost <- rbind(cap_cost, D)
 
-  tech_mapping <- rdataviz::data_tech_mapping
+  tech_mapping <- argus::data_tech_mapping
 
   # ============================================================================
   # Some constants and conversion factors
@@ -5313,7 +5313,7 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
     tidyr::separate(temp, c("temp", "vintage"), sep = "=") %>%
     dplyr::select(-temp) %>%
     dplyr::mutate(vintage = as.numeric(vintage)) %>%
-    dplyr::filter(region %in% world_regions, Year <= end_year, vintage >= rdataviz::constants("GCAMbaseYear"), vintage <= end_year, Year >= vintage) -> elec_vintage
+    dplyr::filter(region %in% world_regions, Year <= end_year, vintage >= argus::constants("GCAMbaseYear"), vintage <= end_year, Year >= vintage) -> elec_vintage
 
   # Calculate additions by vintage
   elec_vintage %>%
@@ -5460,12 +5460,12 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
     dplyr::left_join(cap_cost %>%
                        dplyr::select(-sector.name, -input.capital, -fixed.charge.rate),
                      by = c("subsector" = "subsector.name", "technology", "Year" = "year")) %>%
-    dplyr::mutate(add_GW = (add_adj * rdataviz::constants("convEJ2GWh")) / (8760 * capacity.factor),
+    dplyr::mutate(add_GW = (add_adj * argus::constants("convEJ2GWh")) / (8760 * capacity.factor),
                   Units = "GW") -> elec_add_GW
 
   # Calculate final capital investments in billion 2010 USD
   elec_add_GW %>%
-    dplyr::mutate(cap_invest = (add_GW * rdataviz::constants("convGW_kW") * capital.overnight * rdataviz::constants("convUSD_1975_2010")) / 1e9,
+    dplyr::mutate(cap_invest = (add_GW * argus::constants("convGW_kW") * capital.overnight * argus::constants("convUSD_1975_2010")) / 1e9,
                   Units = "billion 2010 USD") -> elec_add_cap_invest
 
   # Calculate final premature retirements in GW
@@ -5476,7 +5476,7 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
                        dplyr::select(-sector.name, -input.capital, -fixed.charge.rate),
                      by = c("subsector" = "subsector.name", "technology", "vintage" = "year")) %>%
     dplyr::mutate(capital.overnight = dplyr::if_else(vintage == 2010, capital.overnight * .5, capital.overnight * 1),
-                  early_ret_GW = (early_ret * rdataviz::constants("convEJ2GWh")) / (8760 * capacity.factor),
+                  early_ret_GW = (early_ret * argus::constants("convEJ2GWh")) / (8760 * capacity.factor),
                   Units = "GW") -> elec_ret_GW
 
   # Calculate unrecovered capital costs of prematurely retired assets
@@ -5487,7 +5487,7 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
                        dplyr::select(technology, year, lifetime),
                      by = c("technology", "year")) %>%
     dplyr::mutate(dep_factor = 1 - ((Year - vintage) / lifetime),
-                  unrec_cap = (early_ret_GW * rdataviz::constants("convGW_kW") * capital.overnight * dep_factor * rdataviz::constants("convUSD_1975_2010")) / 1e9,
+                  unrec_cap = (early_ret_GW * argus::constants("convGW_kW") * capital.overnight * dep_factor * argus::constants("convUSD_1975_2010")) / 1e9,
                   Units = "billion 2010 USD") -> elec_ret_cap_cost
 
   # ============================================================================
@@ -5499,7 +5499,7 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
     dplyr::summarise(cap_invest = sum(cap_invest,na.rm=T)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(Year >= start_year) %>%
-    dplyr::mutate(cap_invest=dplyr::if_else(Year==rdataviz::constants("GCAMbaseYear"),0,cap_invest))%>%
+    dplyr::mutate(cap_invest=dplyr::if_else(Year==argus::constants("GCAMbaseYear"),0,cap_invest))%>%
     tidyr::spread(Year, cap_invest) %>%
     dplyr::mutate_all(~replace(., is.na(.), 0))%>%
     dplyr::mutate(agg_tech = factor(agg_tech, levels = tech_order)) %>%
@@ -5515,7 +5515,7 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
     dplyr::mutate(cap_invest = cumsum(cap_invest)) %>%
     dplyr::ungroup()%>%
     dplyr::filter(Year >= start_year) %>%
-    dplyr::mutate(cap_invest=dplyr::if_else(Year==rdataviz::constants("GCAMbaseYear"),0,cap_invest))%>%
+    dplyr::mutate(cap_invest=dplyr::if_else(Year==argus::constants("GCAMbaseYear"),0,cap_invest))%>%
     tidyr::spread(Year, cap_invest) %>%
     dplyr::mutate_all(~replace(., is.na(.), 0))%>%
     dplyr::mutate(agg_tech = factor(agg_tech, levels = tech_order)) %>%
@@ -5556,7 +5556,7 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
     dplyr::ungroup() %>%
     dplyr::mutate(unrec_cap = unrec_cap * -1) %>%
     dplyr::filter(Year >= start_year) %>%
-    dplyr::mutate(unrec_cap=dplyr::if_else(Year==rdataviz::constants("GCAMbaseYear"),0,unrec_cap))%>%
+    dplyr::mutate(unrec_cap=dplyr::if_else(Year==argus::constants("GCAMbaseYear"),0,unrec_cap))%>%
     tidyr::spread(Year, unrec_cap) %>%
     dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
     dplyr::mutate(agg_tech = factor(agg_tech, levels = tech_order)) %>%
@@ -5573,7 +5573,7 @@ elecInvest <- function(elec_gen_vintage, world_regions, start_year=2010, end_yea
     dplyr::ungroup()%>%
     dplyr::mutate(unrec_cap = unrec_cap * -1) %>%
     dplyr::filter(Year >= start_year) %>%
-    dplyr::mutate(unrec_cap=dplyr::if_else(Year==rdataviz::constants("GCAMbaseYear"),0,unrec_cap))%>%
+    dplyr::mutate(unrec_cap=dplyr::if_else(Year==argus::constants("GCAMbaseYear"),0,unrec_cap))%>%
     tidyr::spread(Year, unrec_cap) %>%
     dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
     dplyr::mutate(agg_tech = factor(agg_tech, levels = tech_order)) %>%
@@ -5677,7 +5677,7 @@ hydroInvest <- function(addition_costs, start_year=2010){
 
   hydro_GW_inc <- hydro_energy_inc %>%
     tidyr::gather(key="year",value="value",-Units,-scenario,-region,-agg_tech) %>%
-    dplyr::mutate(value=value*rdataviz::constants("convEJ2GWh")*(1/(8760 *  rdataviz::constants("hydro_cap_fact"))),
+    dplyr::mutate(value=value*argus::constants("convEJ2GWh")*(1/(8760 *  argus::constants("hydro_cap_fact"))),
                   Units="GW")%>%
     tidyr::spread(key="year",value="value")%>%
     dplyr::ungroup(); hydro_GW_inc
@@ -5697,7 +5697,7 @@ hydroInvest <- function(addition_costs, start_year=2010){
   hydro_cost_inc <- hydro_GW_inc %>%
     tidyr::gather(key="year",value="value",-Units,-scenario,-region,-agg_tech) %>%
     dplyr::ungroup()%>%
-    dplyr::mutate(value=value*rdataviz::constants("hydro_cost_GW"),
+    dplyr::mutate(value=value*argus::constants("hydro_cost_GW"),
                   Units = 'billion 2010 USD',
                   value = dplyr::if_else(value<=0,0,value)) %>%
     tidyr::spread(key="year",value="value") %>%

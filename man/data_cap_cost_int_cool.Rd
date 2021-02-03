@@ -18,8 +18,8 @@ data_cap_cost_int_cool
 }
 \examples{
 \dontrun{
- library(rdataviz);
- rdataviz::data_cap_cost_int_cool
+ library(argus);
+ argus::data_cap_cost_int_cool
 }
 }
 \keyword{datasets}

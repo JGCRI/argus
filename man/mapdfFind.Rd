@@ -13,7 +13,7 @@ mapdfFind(dataTbl)
 dataframe with modified subRegions, subRegion shapefile and subRegion type
 }
 \description{
-Given a data.frame with a subRegion column, this function searches for an appropriate map from the pre-loaded rmap maps.
+Given a data.frame with a subRegion column, this function searches for an appropriate map from the pre-loaded argus maps.
 }
 \keyword{find}
 \keyword{map,}

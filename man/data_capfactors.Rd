@@ -18,8 +18,8 @@ data_capfactors
 }
 \examples{
 \dontrun{
- library(rdataviz);
- rdataviz::data_capfactors
+ library(argus);
+ argus::data_capfactors
 }
 }
 \keyword{datasets}

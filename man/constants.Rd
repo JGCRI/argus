@@ -13,7 +13,7 @@ constants(name = NULL)
 A list of constants
 }
 \description{
-This function holds the various constants used in the rdataviz package
+This function holds the various constants used in the argus package
 }
 \details{
 List of Constants
@@ -22,7 +22,7 @@ List of Constants
 }
 \examples{
 \dontrun{
-library(rdataviz)
+library(argus)
 constants()$chosenMix
 }
 }

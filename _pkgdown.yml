@@ -1,4 +1,4 @@
-title: rdataviz
+title: Argus
 
 navbar:
   type: inverse
@@ -7,7 +7,7 @@ navbar:
       href: index.html
     - text: "How-to"
       icon: fas fa-book
-      href: articles/vignette_rdataviz.html
+      href: articles/vignette_argus.html
     - icon: fa-file-code-o
       text: "Reference"
       href: reference/index.html

@@ -18,8 +18,8 @@ data_cap_cost_int_tech
 }
 \examples{
 \dontrun{
- library(rdataviz);
- rdataviz::data_cap_cost_int_tech
+ library(argus);
+ argus::data_cap_cost_int_tech
 }
 }
 \keyword{datasets}

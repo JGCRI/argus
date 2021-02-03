@@ -18,8 +18,8 @@ data_capac_fac_int
 }
 \examples{
 \dontrun{
- library(rdataviz);
- rdataviz::data_capac_fac_int
+ library(argus);
+ argus::data_capac_fac_int
 }
 }
 \keyword{datasets}

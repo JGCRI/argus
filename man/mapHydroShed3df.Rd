@@ -20,7 +20,7 @@ HydroSHEDS level 3
 }
 \examples{
 \dontrun{
- library(sp); library(rdataviz); library(ggplot2)
+ library(sp); library(argus); library(ggplot2)
  ggplot() +
  geom_polygon(data = mapHydroShed3df, aes(x = long, y = lat, group = group),
              colour = "black", fill = NA)

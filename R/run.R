@@ -7,12 +7,12 @@
 #' @return Shiny application object
 #'
 #' @examples \dontrun{
-#' library(rdataviz)
-#' rdataviz::run()
+#' library(argus)
+#' argus::run()
 #' }
 #'
 #' @import shiny
 
 run <- function() {
-  shiny::runApp(system.file('app', package='rdataviz'))
+  shiny::runApp(system.file('app', package='argus'))
 }
