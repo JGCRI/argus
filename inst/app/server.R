@@ -1193,13 +1193,13 @@ server <- function(input, output, session) {
         dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
         dplyr::group_by(subRegion) %>%
         dplyr::mutate(minLong = min(long),
-                      negLongLen = sum(long<1),
+                      negLongSum = sum(long[which(long<=0)], na.rm=T),
                       maxLong = max(long),
-                      posLongLen = sum(long>1),
-                      flip = case_when(minLong<0 & maxLong>0~1,
+                      posLongSum = sum(long[which(long>=0)], na.rm=T),
+                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
                                        TRUE~0),
-                      long = case_when((posLongLen > negLongLen) & (long < 0) ~ long+360,
-                                       (posLongLen < negLongLen) & (long > 0) ~ long-360,
+                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
                                        TRUE~long))%>%
         dplyr::ungroup()
 
@@ -1366,13 +1366,13 @@ server <- function(input, output, session) {
         dplyr::filter(subRegion!="South_Pacific_Islands")%>%
         dplyr::group_by(subRegion) %>%
         dplyr::mutate(minLong = min(long),
-                      negLongLen = sum(long<1),
+                      negLongSum = sum(long[which(long<=0)], na.rm=T),
                       maxLong = max(long),
-                      posLongLen = sum(long>1),
-                      flip = case_when(minLong<0 & maxLong>0~1,
+                      posLongSum = sum(long[which(long>=0)], na.rm=T),
+                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
                                        TRUE~0),
-                      long = case_when((posLongLen > negLongLen) & (long < 0) ~ long+360,
-                                       (posLongLen < negLongLen) & (long > 0) ~ long-360,
+                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
                                        TRUE~long))%>%
         dplyr::ungroup(); dataMapPlot %>% head()
 

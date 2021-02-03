@@ -10,13 +10,36 @@ library(lineprof)
 # Raw Map Data
 #dataMapx
 #regionsx = argus::constants("US52")
-regionsx = c("Argentina","Peru","Uruguay")
+#regionsx = unique(mapCountriesdf$subRegion)
+regionsx = c("USA","China")
 dataMap_raw <- tibble::tibble(
   subRegion=c(regionsx,regionsx),
   scenario=c(rep("scen1",length(regionsx)),(rep("scen2",length(regionsx)))),
   x=c(rep(2010,length(regionsx)),rep(2010,length(regionsx))),
   param=c(rep("ag",length(regionsx)),rep("ag",length(regionsx))),
   value=runif(length(regionsx)*2,0,1000)); dataMap_raw
+
+shpdf <-mapdfFind(dataMap_raw)
+a <- shpdf %>%
+  dplyr::inner_join(dataMap_raw, by="subRegion") %>%
+  #dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+  dplyr::group_by(subRegion) %>%
+  dplyr::mutate(minLong = min(long),
+                negLongSum = sum(long[which(long<=0)], na.rm=T),
+                maxLong = max(long),
+                posLongSum = sum(long[which(long>=0)], na.rm=T),
+                flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                                 TRUE~0),
+                long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                 (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                 TRUE~long))%>%
+  dplyr::ungroup()
+
+if(all(unique(a$flipType) %in% c(1,-1))){print("yes!")}
+
+ggplot()+ geom_polygon(data = a,
+                       aes(x = long, y = lat, group = group, fill = value),
+                       colour = "gray10", lwd=0.5)
 
 
 tm1 <- system.time(
@@ -161,13 +184,13 @@ dataMapPlot <- shp_df %>%
   dplyr::filter(subRegion!="South_Pacific_Islands")%>%
   dplyr::group_by(subRegion) %>%
   dplyr::mutate(minLong = min(long),
-                negLongLen = sum(long<1),
+                negLongSum = sum(long[which(long<=0)], na.rm=T),
                 maxLong = max(long),
-                posLongLen = sum(long>1),
-                flip = case_when(minLong<0 & maxLong>0~1,
+                posLongSum = sum(long[which(long>=0)], na.rm=T),
+                flip = case_when(minLong<-160 & maxLong>160 ~ 1,
                                  TRUE~0),
-                long = case_when((posLongLen > negLongLen) & (long < 0) ~ long+360,
-                                 (posLongLen < negLongLen) & (long > 0) ~ long-360,
+                long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                 (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
                                  TRUE~long))%>%
   dplyr::ungroup(); dataMapPlot %>% head()
 (dataMapPlot%>%filter(flip==1))$subRegion%>%unique()
@@ -257,9 +280,9 @@ tm2 <- system.time(
       breaks_n = 6
       legendType = "pretty"
       palAbsChosen <- "pal_hot"
-      yearsSelect <- 2075
-      #regionsSelect <- unique(dataMap_raw$subRegion)
-      regionsSelect <- c("Bay_of_Bengal_North_East_Coast","Southeast Asia")
+      yearsSelect <- 2010
+      regionsSelect <- unique(dataMap_raw$subRegion)
+      #regionsSelect <- c("Bay_of_Bengal_North_East_Coast","Southeast Asia")
       paramsSelect <- unique((dataMap_raw%>%
                                 dplyr::filter(subRegion %in% regionsSelect))$param)[1:3]
       paramsSelect <- paramsSelect[!is.na(paramsSelect)]; paramsSelect
@@ -340,7 +363,7 @@ tm2 <- system.time(
         # Create ggplot path from shapefile
 
         # Choose relevant shapefile and subset gridfile
-        shp <- argus::mapFind1(data_map)
+        shp <- argus::mapdfFind(data_map)
         subRegionCol <- unique(shp$subRegionType)
 
         if(subRegionCol=="US52" & US52Compact==T){
@@ -353,18 +376,24 @@ tm2 <- system.time(
 
         dataMapPlot <- shp_df %>%
           dplyr::inner_join(data_map, by="subRegion") %>%
-          dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+          #dplyr::filter(subRegion!="South_Pacific_Islands")%>%
           dplyr::group_by(subRegion) %>%
           dplyr::mutate(minLong = min(long),
-                        negLongLen = sum(long<1),
+                        negLongSum = sum(long[which(long<=0)], na.rm=T),
                         maxLong = max(long),
-                        posLongLen = sum(long>1),
-                        flip = case_when(minLong<0 & maxLong>0~1,
+                        posLongSum = sum(long[which(long>=0)], na.rm=T),
+                        flip = case_when(minLong<-160 & maxLong>160 ~ 1,
                                          TRUE~0),
-                        long = case_when((posLongLen > negLongLen) & (long < 0) ~ long+360,
-                                         (posLongLen < negLongLen) & (long > 0) ~ long-360,
+                        long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                         (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
                                          TRUE~long))%>%
           dplyr::ungroup(); dataMapPlot %>% head()
+
+        dataMapPlot%>%as.data.frame()%>%filter(long != lonOrig)%>%head()
+
+        ggplot()+ geom_polygon(data = dataMapPlot,
+                                    aes(x = long, y = lat, group = group, fill = as.factor(brks)),
+                                    colour = "gray10", lwd=0.5)
 
         prcntZoom <- 1
         longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
@@ -444,13 +473,13 @@ dataMapPlot <- argus::mapFind1(dataMap_raw_regions)%>%
   dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
   dplyr::group_by(subRegion) %>%
   dplyr::mutate(minLong = min(long),
-                negLongLen = sum(long<1),
+                negLongSum = sum(long[which(long<=0)], na.rm=T),
                 maxLong = max(long),
-                posLongLen = sum(long>1),
-                flip = case_when(minLong<0 & maxLong>0~1,
+                posLongSum = sum(long[which(long>=0)], na.rm=T),
+                flip = case_when(minLong<-160 & maxLong>160 ~ 1,
                                  TRUE~0),
-                long = case_when((posLongLen > negLongLen) & (long < 0) ~ long+360,
-                                 (posLongLen < negLongLen) & (long > 0) ~ long-360,
+                long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                 (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
                                  TRUE~long))%>%
   dplyr::ungroup()
 
