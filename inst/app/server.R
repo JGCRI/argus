@@ -421,6 +421,7 @@ server <- function(input, output, session) {
   rv$abs = 1;
   rv$percDiff = 0;
   rv$absDiff = 0;
+  rv$pcount = 1;
 
 
     # Observe File Inputs
@@ -1247,13 +1248,15 @@ server <- function(input, output, session) {
 
         plist[[pcount]] <- map
         pcount=pcount+1
+        rv$pcount <- pcount
       }
     }
-
+    rv$pcount <- pcount
+    print(rv$pcount)
     cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
 
   },
-  height=function(){1000*length(unique(dataMapx()$param))}
+  height=function(){500*(rv$pcount)}
   )
 
 
@@ -1425,9 +1428,8 @@ server <- function(input, output, session) {
       plist[[i]] <- map
     }
     cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
-
   },
-  height=function(){1000*length(unique(dataMapx()$param))}
+  height=function(){300*length(unique(dataMapx()$param))}
   )
 
 
