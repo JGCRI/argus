@@ -208,9 +208,7 @@ ui <- fluidPage(
                                                 br(),
                                                 fluidRow(
                                                   column(
-                                                    3, p(
-                                                  'Sum of Regions Selected'
-                                                    )),
+                                                    3),
                                                   column(
                                                     2,
                                                          div(
@@ -231,6 +229,7 @@ ui <- fluidPage(
                                                   br(),
                                                   div(
                                                     class="charts",
+
                                                     plotOutput(outputId = "plot", width = "100%", height="100%")),
                                        )#,
                                       # tabPanel("Compare Regions")
