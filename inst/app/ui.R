@@ -214,16 +214,16 @@ ui <- fluidPage(
                                                   column(
                                                     2,
                                                          div(
-                                                            actionButton(label="Absolute", inputId = "abs",width="100%", class="diff_button")
+                                                            actionButton(label="Absolute\nValue", inputId = "abs",width="100%", class="diff_button")
                                                             )
                                                          ),
                                                   column(
                                                     2,
-                                                         actionButton(label="Absolute Difference", inputId = "absDiff",width="100%", class="diff_button")
+                                                         actionButton(label="Absolute\nDifference", inputId = "absDiff",width="100%", class="diff_button")
                                                          ),
                                                   column(
                                                     2,
-                                                         actionButton(label="Percent Difference", inputId = "percDiff", width="100%", class="diff_button")
+                                                         actionButton(label="Percent\nDifference", inputId = "percDiff", width="100%", class="diff_button")
                                                          ),
                                                   column(
                                                     3, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png",  class = "download_button"), style = "float: right")
