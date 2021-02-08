@@ -1151,7 +1151,7 @@ server <- function(input, output, session) {
     chartPlot()
   },
   height=function(){300*length(unique(dataChartx()$param))},
-  width=function(){max(1500, 400*length(unique(data()$scenario)))}
+  width=function(){max(600, 400*length(unique(data()$scenario)))}
   )
 
   output$downloadPlotChart <- downloadHandler(
@@ -1433,7 +1433,7 @@ server <- function(input, output, session) {
     cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
   },
   height=function(){225*length(unique(dataMapx()$param))},
-  width=function(){max(1500, 400*length(unique(data()$scenario)))}
+  width=function(){max(600, 400*length(unique(data()$scenario)))}
   )
 
 
