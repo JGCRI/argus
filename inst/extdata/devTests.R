@@ -19,27 +19,27 @@ dataMap_raw <- tibble::tibble(
   param=c(rep("ag",length(regionsx)),rep("ag",length(regionsx))),
   value=runif(length(regionsx)*2,0,1000)); dataMap_raw
 
-shpdf <-mapdfFind(dataMap_raw)
-a <- shpdf %>%
-  dplyr::inner_join(dataMap_raw, by="subRegion") %>%
-  #dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-  dplyr::group_by(subRegion) %>%
-  dplyr::mutate(minLong = min(long),
-                negLongSum = sum(long[which(long<=0)], na.rm=T),
-                maxLong = max(long),
-                posLongSum = sum(long[which(long>=0)], na.rm=T),
-                flip = case_when(minLong<-160 & maxLong>160 ~ 1,
-                                 TRUE~0),
-                long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                 (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                 TRUE~long))%>%
-  dplyr::ungroup()
-
-if(all(unique(a$flipType) %in% c(1,-1))){print("yes!")}
-
-ggplot()+ geom_polygon(data = a,
-                       aes(x = long, y = lat, group = group, fill = value),
-                       colour = "gray10", lwd=0.5)
+# shpdf <-mapdfFind(dataMap_raw)
+# a <- shpdf %>%
+#   dplyr::inner_join(dataMap_raw, by="subRegion") %>%
+#   #dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+#   dplyr::group_by(subRegion) %>%
+#   dplyr::mutate(minLong = min(long),
+#                 negLongSum = sum(long[which(long<=0)], na.rm=T),
+#                 maxLong = max(long),
+#                 posLongSum = sum(long[which(long>=0)], na.rm=T),
+#                 flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+#                                  TRUE~0),
+#                 long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+#                                  (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+#                                  TRUE~long))%>%
+#   dplyr::ungroup()
+#
+# if(all(unique(a$flipType) %in% c(1,-1))){print("yes!")}
+#
+# ggplot()+ geom_polygon(data = a,
+#                        aes(x = long, y = lat, group = group, fill = value),
+#                        colour = "gray10", lwd=0.5)
 
 
 tm1 <- system.time(
@@ -531,3 +531,57 @@ pcount=pcount+1
 }
 
 cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+
+
+
+# Check Compare Regions
+
+dataChartPlot <-  read.csv("C:/Z/models/argus/inst/extdata/exampleDataEU.csv",header=T)%>%
+  tibble::as_tibble(); dataChartPlot; dataChartPlot$param%>%unique()
+
+# Aggregate across classes
+tblAggsums <-dataChartPlot %>%
+  #dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+  dplyr::mutate(scenario = as.character(scenario)) %>%
+  dplyr::filter(aggregate == "sum") %>%
+  dplyr::select(scenario, param, subRegion, x, value) %>%
+  dplyr::group_by_at(dplyr::vars(-value)) %>%
+  dplyr::summarize_at(c("value"), list( ~ sum(.)))
+tblAggmeans <- dataChartPlot %>%
+  #dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+  dplyr::select(-class) %>%
+  dplyr::mutate(scenario = as.character(scenario)) %>%
+  dplyr::filter(aggregate == "mean") %>%
+  dplyr::select(scenario, param, subRegion, x, value) %>%
+  dplyr::group_by_at(dplyr::vars(-value)) %>%
+  dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+dataMapx <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup(); dataMapx%>%as.data.frame()
+
+dataMapx <- dataMapx %>%
+  tidyr::complete(scenario,param,subRegion,x) %>%
+  dplyr::mutate(value=case_when(is.na(value)~0,
+                                TRUE~value)); dataMapx
+
+plist <- list()
+for(i in 1:length(unique(dataChartPlot$param))){
+
+  plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                   filter(param==unique(dataChartPlot$param)[i]),
+                                 aes(x=x,y=value,
+                                     group=scenario,
+                                     color=scenario)) +
+    ggplottheme +
+    ylab(NULL) + xlab(NULL) +
+    geom_line() +
+    scale_y_continuous(position = "right")+
+    facet_grid(param~subRegion, scales="free",switch="y",
+               labeller = labeller(param = label_wrap_gen(15))
+    )+
+    theme(legend.position="right",
+          legend.text=element_text(size=titletext),
+          legend.title = element_blank(),
+          plot.margin=margin(20,20,20,20,"pt"))}
+cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+}
+

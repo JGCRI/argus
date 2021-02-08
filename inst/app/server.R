@@ -583,7 +583,9 @@ server <- function(input, output, session) {
   #---------------------------
   output$selectMapYear = renderUI({
     sliderInput("mapYear", label = h3("Select Year"), min = min(dataMapx()$x),
-                max = max(dataMapx()$x), step = 5, value=2015, sep="")
+                max = max(dataMapx()$x), step = 5,
+                value=sort(unique(dataMapx()$x))[round(length(sort(unique(dataMapx()$x)))/2)], sep="",
+                animate =F)
   })
 
   #---------------------------
@@ -591,9 +593,9 @@ server <- function(input, output, session) {
   #---------------------------
   subsetRegionsx <- reactive({
     if (input$subsetRegions == "All" && length(input$subsetRegions) == 1) {
-      return(unique(dataMapx()$subRegion))
+      return(unique(regionsSelectedx()))
     } else if (is.null(input$subsetRegions)){
-      return(unique(dataMapx()$subRegion)[1:4])
+      return(unique(regionsSelectedx())[1:4])
     } else{
       return(input$subsetRegions)
     }
@@ -1256,7 +1258,7 @@ server <- function(input, output, session) {
     cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
 
   },
-  height=function(){500*(rv$pcount)}
+  height=function(){300*(rv$pcount)}
   )
 
 
