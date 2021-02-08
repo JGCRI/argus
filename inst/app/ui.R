@@ -156,9 +156,7 @@ ui <- fluidPage(
                                        tabPanel(
                                          "All",
                                          br(),
-                                         fluidRow(column(6, p(
-                                           'Sum of Regions Selected'
-                                         )),
+                                         fluidRow(column(6),
                                          column(
                                            6, div(
                                              downloadButton(
@@ -198,19 +196,21 @@ ui <- fluidPage(
                                                   plotOutput(outputId = "summaryReg"),
                                                 ),
                                                 width = "100%")
-                           )),
+                           ),
+                           br(),
+                           p("*Sum of Regions Selected", style="color:#cc0000")
+                           ),
                   #---------------------------
                   # Main Panel: Charts
                   #---------------------------
                   tabPanel("Charts",
+                           br(),
                            tabsetPanel(type = "pills",
                                        tabPanel("All",
                                                 br(),
                                                 fluidRow(
                                                   column(
-                                                    3, p(
-                                                  'Sum of Regions Selected'
-                                                    )),
+                                                    3),
                                                   column(
                                                     2,
                                                          div(
@@ -231,9 +231,11 @@ ui <- fluidPage(
                                                   br(),
                                                   div(
                                                     class="charts",
+
                                                     plotOutput(outputId = "plot", width = "100%", height="100%")),
-                                       )#,
-                                      # tabPanel("Compare Regions")
+                                       ),
+                                       br(),
+                                       p("*Sum of Regions Selected", style="color:#cc0000")
                            )
                   ),
                   #---------------------------
