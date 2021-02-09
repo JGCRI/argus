@@ -416,12 +416,19 @@ server <- function(input, output, session) {
   # Create your own reactive values that you can modify because input is read only
   rv <- reactiveValues()
 
-  #initializing abs, percDiff, and absDiff
 
-  rv$abs = 1;
-  rv$percDiff = 0;
-  rv$absDiff = 0;
   rv$pcount = 1;
+
+  # Charts initializing abs, percDiff, and absDiff
+  rv$absChart = 1;
+  rv$percDiffChart = 0;
+  rv$absDiffChart = 0;
+
+
+  # Maps initializing abs, percDiff, and absDiff
+  rv$absMap = 1;
+  rv$percDiffMap = 0;
+  rv$absDiffMap = 0;
 
 
     # Observe File Inputs
@@ -897,28 +904,197 @@ server <- function(input, output, session) {
     tbl_pd
   })
 
-  observeEvent(input$test, {
-    PrcntChartPlot()
-    print(input)
+  #---------------------------
+  # Pick between Absolute and Percent Diff
+  #---------------------------
+
+  observeEvent(input$absChart, {
+    rv$absChart = 1;
+    rv$percDiffChart = 0;
+    rv$absDiffChart = 0;
   })
 
-  observeEvent(input$abs, {
-    rv$abs = 1;
-    rv$percDiff = 0;
-    rv$absDiff = 0;
+  observeEvent(input$percDiffChart, {
+    rv$absChart = 0;
+    rv$percDiffChart = 1;
+    rv$absDiffChart = 0;
   })
 
-  observeEvent(input$percDiff, {
-    rv$abs = 0;
-    rv$percDiff = 1;
-    rv$absDiff = 0;
+  observeEvent(input$absDiffChart, {
+    rv$absChart = 0;
+    rv$percDiffChart = 0;
+    rv$absDiffChart = 1;
   })
 
-  observeEvent(input$absDiff, {
-    rv$abs = 0;
-    rv$percDiff = 0;
-    rv$absDiff = 1;
+  #---------------------------
+  # Data Map Absolute Diff
+  #---------------------------
+  dataDiffAbsx <- reactive({
+    diffText <- " Diff Abs"
+
+    if (is.null(input$scenarioRefSelected)) {
+      print(paste("No reference scenario provided", sep = ""))
+      print(paste(
+        "Using ",
+        unique(dataMapx()$scenario)[1],
+        " as reference",
+        sep = ""
+      ))
+      scenRef_i = unique(dataMapx()$scenario)[1]
+    } else{
+      if (!input$scenarioRefSelected %in% unique(dataMapx()$scenario)) {
+        print(paste(
+          "scenario ",
+          input$scenarioRefSelected,
+          " not in scenarios",
+          sep = ""
+        ))
+        print(paste(
+          "Using ",
+          unique(dataMapx()$scenario)[1],
+          " as reference",
+          sep = ""
+        ))
+        scenRef_i = unique(dataMapx()$scenario)[1]
+      } else{
+        scenRef_i <- input$scenarioRefSelected
+        print(scenRef_i)
+      }
+    } # Check if Ref Scenario Chosen
+
+    # Calculate Diff Values
+    tbl_pd <- dataMapx() %>%
+      dplyr::filter(scenario == scenRef_i)
+    for (k in unique(dataMapx()$scenario)[unique(dataMapx()$scenario) !=
+                                            scenRef_i]) {
+      tbl_temp <- dataMapx() %>%
+        dplyr::filter(scenario %in% c(scenRef_i, k))
+      # print("tbl_temp")
+      # print(tbl_temp)
+      # print("tbl_temp$value")
+      # print(tbl_temp$value)
+      tbl_temp <- tbl_temp %>%
+        tidyr::spread(scenario, value)
+      # print("tbl_temp post spread")
+      # print(tbl_temp)
+
+      tbl_temp[is.na(tbl_temp)] <- 0
+
+      tbl_temp <- tbl_temp %>%
+        dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
+        dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
+      # print("tbl temp post mute")
+      # print(tbl_temp)
+      tbl_temp <- tbl_temp %>%
+        tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
+      # print("tidyr")
+      # print(tbl_temp)
+      tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
+      # print("bind_rows")
+      # print(tbl_pd)
+    }
+
+    tbl_pd <- tbl_pd %>%
+      dplyr::mutate(scenario = factor(scenario,
+                                      levels = c(scenRef_i,
+                                                 unique(
+                                                   tbl_pd$scenario
+                                                 )[unique(tbl_pd$scenario) != scenRef_i])))
+    # print(tbl_pd)
+    tbl_pd
   })
+
+  #---------------------------
+  # Data Map Absolute Diff
+  #---------------------------
+  dataPrcntAbsx <- reactive({
+    diffText <- " Prcent Abs"
+
+    if (is.null(input$scenarioRefSelected)) {
+      print(paste("No reference scenario provided", sep = ""))
+      print(paste(
+        "Using ",
+        unique(dataMapx()$scenario)[1],
+        " as reference",
+        sep = ""
+      ))
+      scenRef_i = unique(dataMapx()$scenario)[1]
+    } else{
+      if (!input$scenarioRefSelected %in% unique(dataMapx()$scenario)) {
+        print(paste(
+          "scenario ",
+          input$scenarioRefSelected,
+          " not in scenarios",
+          sep = ""
+        ))
+        print(paste(
+          "Using ",
+          unique(dataMapx()$scenario)[1],
+          " as reference",
+          sep = ""
+        ))
+        scenRef_i = unique(dataMapx()$scenario)[1]
+      } else{
+        scenRef_i <- input$scenarioRefSelected
+        print(scenRef_i)
+      }
+    } # Check if Ref Scenario Chosen
+
+    # Calculate Diff Values
+    tbl_pd <- dataMapx() %>%
+      dplyr::filter(scenario == scenRef_i)
+    for (k in unique(dataMapx()$scenario)[unique(dataMapx()$scenario) !=
+                                            scenRef_i]) {
+      print(k)
+      tbl_temp <- dataMapx() %>%
+        dplyr::filter(scenario %in% c(scenRef_i, k))
+      tbl_temp <- tbl_temp %>%
+        tidyr::spread(scenario, value)
+
+      tbl_temp[is.na(tbl_temp)] <- 0
+
+      #Important Code
+
+      tbl_temp <- tbl_temp %>%
+        dplyr::mutate(!!paste(k, diffText, sep = "") := 100*((get(k)/get(scenRef_i))-1)) %>%
+        dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
+      tbl_temp <- tbl_temp %>%
+        tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
+      tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
+    }
+
+    tbl_pd <- tbl_pd %>%
+      dplyr::mutate(scenario = factor(scenario,
+                                      levels = c(scenRef_i,
+                                                 unique(
+                                                   tbl_pd$scenario
+                                                 )[unique(tbl_pd$scenario) != scenRef_i])))
+    print(dplyr::filter(tbl_pd, scenario %in% c(paste(k, diffText, sep = ""))))
+    tbl_pd
+  })
+
+  #---------------------------
+  # Pick between Absolute and Percent Diff
+  #---------------------------
+
+  observeEvent(input$absMap, {
+    rv$absMap = 1;
+    rv$percDiffMap = 0;
+    rv$absDiffMap = 0;
+  })
+
+  observeEvent(input$percDiffMap, {
+    rv$absMap = 0;
+    rv$percDiffMap = 1;
+    rv$absDiffMap = 0;
+  })
+
+  observeEvent(input$absDiffMap, {
+    rv$absMap = 0;
+    rv$percDiffMap = 0;
+    rv$absDiffMap = 1;
+  })
+
 
   #---------------------------
   # Summary Plot
@@ -1033,18 +1209,18 @@ server <- function(input, output, session) {
   #---------------------------
   chartPlot <- function(){
     print(rv)
-    print(rv$abs)
-    print(rv$percDiff)
-    print(rv$absDiff)
+    print(rv$absChart)
+    print(rv$percDiffChart)
+    print(rv$absDiffChart)
     g <- 2
-    if(rv$abs == 1){
+    if(rv$absChart == 1){
       print("abs")
       g <- 1
       dataChartPlot <- dataChartx()
-    }else if(rv$percDiff == 1){
+    }else if(rv$percDiffChart == 1){
       print("perc diff")
       dataChartPlot <- dataPrcntAbsx()
-    }else if(rv$absDiff == 1){
+    }else if(rv$absDiffChart == 1){
       print("abs diff")
       dataChartPlot <- dataDiffAbsx()
     }
@@ -1069,7 +1245,7 @@ server <- function(input, output, session) {
       chartz <- dataChartPlot %>%
         filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)
       z<-x
-      if(rv$percDiff == 1){
+      if(rv$percDiffChart == 1){
         plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
                                            filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
                                            droplevels(),
@@ -1094,7 +1270,7 @@ server <- function(input, output, session) {
                 text = element_text(size = 12.5),
                 plot.margin=margin(20,20,20,0,"pt"))
         x = x+2
-      }else if(rv$absDiff == 1){
+      }else if(rv$absDiffChart == 1){
         plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
                                            filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
                                            droplevels(),
