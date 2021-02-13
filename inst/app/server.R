@@ -1518,8 +1518,33 @@ server <- function(input, output, session) {
 
     data_map%>%head()
 
+    shp <- argus::mapdfFind(data_map)
+    subRegionCol <- unique(shp$subRegionType)
+
+    if(subRegionCol=="US52" & US52Compact==T){
+      shp <- argus::mapUS52Compactdf
+      subRegionCol <- "US52Compact"
+    }
+
+    # https://rpubs.com/huanfaChen/ggplotShapefile
+    shp_df <- shp
+
+    dataMapPlot <- shp_df %>%
+      dplyr::inner_join(data_map, by="subRegion") %>%
+      dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+      dplyr::group_by(subRegion) %>%
+      dplyr::mutate(minLong = min(long),
+                    negLongSum = sum(long[which(long<=0)], na.rm=T),
+                    maxLong = max(long),
+                    posLongSum = sum(long[which(long>=0)], na.rm=T),
+                    flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                                     TRUE~0),
+                    long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                     (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                     TRUE~long))%>%
+      dplyr::ungroup(); dataMapPlot %>% head()
     # data_map%>%head()
-    return(list(data_map, paletteDiff, paletteAbs))
+    return(list(shp_df, dataMapPlot, paletteAbs, paletteDiff))
     }
 
 
@@ -1563,126 +1588,31 @@ server <- function(input, output, session) {
     plist <- list()
     for(i in paramsSelect[!is.na(paramsSelect)]){
 
+      print(i)
 
-#       dataMap_raw_param <- dataMap_raw %>%
-#         dplyr::filter(x==yearsSelect,
-#                       param == i); dataMap_raw_param
-#       #
-# #       Set Breaks
-#       breaks_pretty <- scales::pretty_breaks(n=breaks_n)(dataMap_raw_param$value); breaks_pretty
-#       breaks_kmean <- sort(as.vector((stats::kmeans(dataMap_raw_param$value,
-#                                                     centers=max(1,
-#                                                                 min(length(unique(dataMap_raw_param$value))-1,
-#                                                                     (breaks_n-1)))))$centers[,1]));breaks_kmean
-#       if((max(range(dataMap_raw_param$value))-min(range(dataMap_raw_param$value)))<1E-10 &
-#          (max(range(dataMap_raw_param$value))-min(range(dataMap_raw_param$value)))>-1E-10){valueRange=floor(min(dataMap_raw_param$value))}else{
-#            valueRange=range(dataMap_raw_param$value)
-#          }
-#       breaks_kmean
-#
-#       if(abs(min(valueRange,na.rm = T))==abs(max(valueRange,na.rm = T))){valueRange=abs(min(valueRange,na.rm = T))}
-#       if(mean(valueRange,na.rm = T)<0.01 & mean(valueRange,na.rm = T)>(-0.01)){animLegendDigits<-5}else{
-#         if(mean(valueRange,na.rm = T)<0.1 & mean(valueRange,na.rm = T)>(-0.1)){animLegendDigits<-4}else{
-#           if(mean(valueRange,na.rm = T)<1 & mean(valueRange,na.rm = T)>(-1)){animLegendDigits<-3}else{
-#             if(mean(valueRange,na.rm = T)<10 & mean(valueRange,na.rm = T)>(-10)){animLegendDigits<-2}else{animLegendDigits<-2}}}}
-#       animLegendDigits
-#       breaks_kmean <- signif(breaks_kmean,animLegendDigits); breaks_kmean
-#
-#       if(!min(dataMap_raw_param$value) %in% breaks_kmean){
-#         breaks_kmean[breaks_kmean==min(breaks_kmean,na.rm=T)] <- signif(floor(min(dataMap_raw_param$value)),animLegendDigits)};breaks_kmean
-#       if(!max(dataMap_raw_param$value) %in% breaks_kmean){
-#         breaks_kmean[breaks_kmean==max(breaks_kmean,na.rm=T)] <- signif(ceiling(max(dataMap_raw_param$value)),animLegendDigits)};breaks_kmean
-#
-#
-#       if(legendType=="kmean"){breaks_map = breaks_kmean}else if(
-#         legendType=="pretty"){breaks_map = breaks_pretty}
-#
-#       # breaks_map <- breaks_map %>%
-#       #   format(big.mark=",", scientific=F);
-#       breaks_map <- breaks_map%>%unique()
-#       if(length(breaks_map)==1){
-#         data_map <- dataMap_raw_param %>%
-#           dplyr::mutate(brks = format(unique(dataMap_raw_param$value), nsmall=2, digits=2, big.mark = ","))
-#         paletteAbs = "red"
-#         if(length(unique(format(unique(dataMap_raw_param$value), nsmall=2, digits=2, big.mark = ",")))!=1){
-#           breaks_map = format(unique(dataMap_raw_param$value), nsmall=2, digits=2, big.mark = ",")
-#           paletteAbs <- grDevices::colorRampPalette(palAbsChosen)(length(breaks_map)); paletteAbs
-#           data_map <- data_map %>%
-#             dplyr::mutate(brks = factor(brks,levels=breaks_map))
-#         }
-#
-#       } else {
-#         breaks_map_levels <- gsub(","," to ",
-#                                   gsub("\\(|\\]","",
-#                                        levels(cut(breaks_map,breaks=breaks_map)))); breaks_map_levels
-#
-#         data_map <- dataMap_raw_param %>%
-#           dplyr::mutate(brks = cut(value,breaks=breaks_map),
-#                         brks = gsub("\\(|\\]","",brks),
-#                         brks = gsub(","," to ",brks),
-#                         brks = factor(brks,levels=breaks_map_levels))
-#
-#         # Select Palettes
-#         paletteAbs <- grDevices::colorRampPalette(palAbsChosen)(length(breaks_map_levels)); paletteAbs
-#         paletteDiff <- "BrBG"
-#       }
-#
-#       data_map%>%head()
-
-      # data_map, paletteDiff, paletteAbs
       proc <- process_map(dataMap_raw, i)
-      data_map <- proc[[1]]
-      paletteDiff <- proc[[2]]
+      shp_df <- proc[[1]]
+      dataMapPlot <- proc[[2]]
       paletteAbs <- proc[[3]]
-      # Create ggplot path from shapefile
-
-      # Choose relevant shapefile and subset gridfile
-      shp <- argus::mapdfFind(data_map)
-      subRegionCol <- unique(shp$subRegionType)
-
-      if(subRegionCol=="US52" & US52Compact==T){
-        shp <- argus::mapUS52Compactdf
-        subRegionCol <- "US52Compact"
-      }
-
-      # https://rpubs.com/huanfaChen/ggplotShapefile
-      shp_df <- shp
-
-      dataMapPlot <- shp_df %>%
-        dplyr::inner_join(data_map, by="subRegion") %>%
-        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-        dplyr::group_by(subRegion) %>%
-        dplyr::mutate(minLong = min(long),
-                      negLongSum = sum(long[which(long<=0)], na.rm=T),
-                      maxLong = max(long),
-                      posLongSum = sum(long[which(long>=0)], na.rm=T),
-                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
-                                       TRUE~0),
-                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                       TRUE~long))%>%
-        dplyr::ungroup(); dataMapPlot %>% head()
+      paletteDiff <- proc[[3]]
 
       prcntZoom <- 1
       longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
       longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
       latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
       latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
-
       prcntZoom <- 0.1
       longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
       longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
       latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
       latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
 
-
       shp_bg <- argus::mapCountriesdf%>%
         dplyr::filter(long > longLimMinbg,
                       long < longLimMaxbg,
                       lat > latLimMinbg,
                       lat < latLimMaxbg);
-
-      #plotting datamaplot, shp_bg
+      # data_map, paletteDiff, paletteAbs
 
 
       if(T){
