@@ -285,6 +285,7 @@ ui <- fluidPage(
                                                     2,
                                                     actionButton(label="Percent\nDifference", inputId = "percDiffMap", width="100%", class="diff_button")
                                                   )),
+                                                br(),
                                                 div(
                                                   class="charts",
                                                   plotOutput(outputId = "map", width = "100%", height="100%"))
