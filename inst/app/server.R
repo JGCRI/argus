@@ -1621,11 +1621,7 @@ server <- function(input, output, session) {
           if(!US52Compact){
             map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
           #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
-          map <- map + geom_polygon(data = dataMapx() %>% dplyr::ungroup() %>%
-                                      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-                                      dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                                                        TRUE~subRegion)) %>%
-                                      dplyr::select(-subRegionMap) %>% dplyr::filter(scenario == input$scenarioRefSelected),
+          map <- map + geom_polygon(data = dataMapPlot %>% dplyr::filter(scenario == input$scenarioRefSelected),
                                     aes(x = long, y = lat, group = group, fill = as.factor(brks)),
                                     colour = "gray10", lwd=0.5) +
             scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
@@ -1649,6 +1645,8 @@ server <- function(input, output, session) {
 
         plist[[z]] <- map
         z = z+1
+
+
         proc <- process_map(dataMap_raw, i)
         shp_df <- proc[[1]]
         dataMapPlot <- proc[[2]]
@@ -1677,7 +1675,7 @@ server <- function(input, output, session) {
           if(!US52Compact){
             map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
           #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
-          map <- map + geom_polygon(data = dataMap_raw %>% dplyr::filter(scenario != input$scenarioRefSelected),
+          map <- map + geom_polygon(data = dataMapPlot %>% dplyr::filter(scenario != input$scenarioRefSelected),
                                     aes(x = long, y = lat, group = group, fill = as.factor(brks)),
                                     colour = "gray10", lwd=0.5) +
             scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
@@ -1733,11 +1731,7 @@ server <- function(input, output, session) {
           if(!US52Compact){
             map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
           #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
-          map <- map + geom_polygon(data = dataMapx() %>% dplyr::ungroup() %>%
-                                      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-                                      dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                                                        TRUE~subRegion)) %>%
-                                      dplyr::select(-subRegionMap),
+          map <- map + geom_polygon(data =  dataMapPlot,
                                     aes(x = long, y = lat, group = group, fill = as.factor(brks)),
                                     colour = "gray10", lwd=0.5) +
             scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
@@ -1762,6 +1756,7 @@ server <- function(input, output, session) {
         plist[[i]] <- map
       }
     }
+
     cowplot::plot_grid(plotlist=plist,ncol=gas,align = "v")
   },
   height=function(){225*length(unique(dataMapx()$param))},
