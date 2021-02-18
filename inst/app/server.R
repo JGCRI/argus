@@ -1445,19 +1445,7 @@ server <- function(input, output, session) {
   #---------------------------
 
 
-  process_map <- function(dataMap_raw, i){
-    US52Compact=F
-    naColor = "green"
-    breaks_n = 6
-    legendType = input$mapLegend
-    palAbsChosen <- c("yellow2","goldenrod","darkred")
-    yearsSelect <- input$mapYear
-    paramsSelect <- unique(dataMap_raw$param)
-
-    dataMap_raw_param <- dataMap_raw %>%
-      dplyr::filter(x==yearsSelect,
-                    param == i); dataMap_raw_param
-    # Set Breaks
+  breaks <- function(dataMap_raw_param, breaks_n){
     breaks_pretty <- scales::pretty_breaks(n=breaks_n)(dataMap_raw_param$value); breaks_pretty
     breaks_kmean <- sort(as.vector((stats::kmeans(dataMap_raw_param$value,
                                                   centers=max(1,
@@ -1482,8 +1470,54 @@ server <- function(input, output, session) {
     if(!max(dataMap_raw_param$value) %in% breaks_kmean){
       breaks_kmean[breaks_kmean==max(breaks_kmean,na.rm=T)] <- signif(ceiling(max(dataMap_raw_param$value)),animLegendDigits)};breaks_kmean
 
-    if(legendType=="kmean"){breaks_map = breaks_kmean}else if(
-      legendType=="pretty"){breaks_map = breaks_pretty}
+    return(list(breaks_kmean, breaks_pretty))
+
+  }
+
+
+  process_map <- function(dataMap_raw, i){
+    US52Compact=F
+    naColor = "green"
+    breaks_n = 6
+    legendType = input$mapLegend
+    palAbsChosen <- c("yellow2","goldenrod","darkred")
+    yearsSelect <- input$mapYear
+    paramsSelect <- unique(dataMap_raw$param)
+
+    dataMap_raw_param <- dataMap_raw %>%
+      dplyr::filter(x==yearsSelect,
+                    param == i); dataMap_raw_param
+    # Set Breaks
+    # breaks_pretty <- scales::pretty_breaks(n=breaks_n)(dataMap_raw_param$value); breaks_pretty
+    # breaks_kmean <- sort(as.vector((stats::kmeans(dataMap_raw_param$value,
+    #                                               centers=max(1,
+    #                                                           min(length(unique(dataMap_raw_param$value))-1,
+    #                                                               (breaks_n-1)))))$centers[,1]));breaks_kmean
+    # if((max(range(dataMap_raw_param$value))-min(range(dataMap_raw_param$value)))<1E-10 &
+    #    (max(range(dataMap_raw_param$value))-min(range(dataMap_raw_param$value)))>-1E-10){valueRange=floor(min(dataMap_raw_param$value))}else{
+    #      valueRange=range(dataMap_raw_param$value)
+    #    }
+    # breaks_kmean
+    #
+    # if(abs(min(valueRange,na.rm = T))==abs(max(valueRange,na.rm = T))){valueRange=abs(min(valueRange,na.rm = T))}
+    # if(mean(valueRange,na.rm = T)<0.01 & mean(valueRange,na.rm = T)>(-0.01)){animLegendDigits<-5}else{
+    #   if(mean(valueRange,na.rm = T)<0.1 & mean(valueRange,na.rm = T)>(-0.1)){animLegendDigits<-4}else{
+    #     if(mean(valueRange,na.rm = T)<1 & mean(valueRange,na.rm = T)>(-1)){animLegendDigits<-3}else{
+    #       if(mean(valueRange,na.rm = T)<10 & mean(valueRange,na.rm = T)>(-10)){animLegendDigits<-2}else{animLegendDigits<-2}}}}
+    # animLegendDigits
+    # breaks_kmean <- signif(breaks_kmean,animLegendDigits); breaks_kmean
+    #
+    # if(!min(dataMap_raw_param$value) %in% breaks_kmean){
+    #   breaks_kmean[breaks_kmean==min(breaks_kmean,na.rm=T)] <- signif(floor(min(dataMap_raw_param$value)),animLegendDigits)};breaks_kmean
+    # if(!max(dataMap_raw_param$value) %in% breaks_kmean){
+    #   breaks_kmean[breaks_kmean==max(breaks_kmean,na.rm=T)] <- signif(ceiling(max(dataMap_raw_param$value)),animLegendDigits)};breaks_kmean
+    #
+    # return(list(breaks_kmean, breaks_pretty))
+
+    breaks<- breaks(dataMap_raw_param, breaks_n)
+
+    if(legendType=="kmean"){breaks_map = breaks[[1]]}else if(
+      legendType=="pretty"){breaks_map = breaks[[2]]}
 
     # breaks_map <- breaks_map %>%
     #   format(big.mark=",", scientific=F);
@@ -1699,7 +1733,7 @@ server <- function(input, output, session) {
                   plot.margin=margin(0,0,0,0,"pt"),
                   strip.text.y = element_blank(),
                   axis.title=element_blank(),
-                  axis.text=element_blank(10),
+                  axis.text=element_blank(),
                   axis.ticks=element_blank())
           if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
         }; map
