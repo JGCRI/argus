@@ -1587,7 +1587,8 @@ server <- function(input, output, session) {
     z <- 1
     plist <- list()
     for(i in paramsSelect[!is.na(paramsSelect)]){
-
+      print(i)
+      print("++++++++++++++++=")
       if ((rv$absDiffMap == 1)||(rv$percDiffMap == 1)){
         proc <- process_map(dataMapx() %>% dplyr::ungroup() %>%
                               dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
@@ -1625,19 +1626,22 @@ server <- function(input, output, session) {
                                     aes(x = long, y = lat, group = group, fill = as.factor(brks)),
                                     colour = "gray10", lwd=0.5) +
             scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
+            ylab("hello") +
             coord_fixed(ratio = 1.0,
                         ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
             theme(panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank()
             )+
-            scale_y_continuous(position = "right")+
+            scale_y_continuous(position = "left")+
             facet_grid(param~scenario, switch="y",
                        labeller = labeller(param = label_wrap_gen(15))
             ) +
-            theme(legend.position="right",
+            ylab(i) +
+            theme(legend.position="bottom",
                   legend.title = element_blank(),
+                  strip.text.y = element_blank(),
                   plot.margin=margin(0,0,0,0,"pt"),
-                  axis.title=element_blank(),
+                  axis.title=element_text(10),
                   axis.text=element_blank(),
                   axis.ticks=element_blank())
           if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
@@ -1679,6 +1683,8 @@ server <- function(input, output, session) {
                                     aes(x = long, y = lat, group = group, fill = as.factor(brks)),
                                     colour = "gray10", lwd=0.5) +
             scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
+            xlab(NULL) +
+            ylab("hello") +
             coord_fixed(ratio = 1.0,
                         ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
             theme(panel.grid.major = element_blank(),
@@ -1688,11 +1694,12 @@ server <- function(input, output, session) {
             facet_grid(param~scenario, switch="y",
                        labeller = labeller(param = label_wrap_gen(15))
             ) +
-            theme(legend.position="right",
+            theme(legend.position="bottom",
                   legend.title = element_blank(),
                   plot.margin=margin(0,0,0,0,"pt"),
+                  strip.text.y = element_blank(),
                   axis.title=element_blank(),
-                  axis.text=element_blank(),
+                  axis.text=element_blank(10),
                   axis.ticks=element_blank())
           if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
         }; map
@@ -1731,7 +1738,7 @@ server <- function(input, output, session) {
           if(!US52Compact){
             map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
           #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
-          map <- map + geom_polygon(data =  dataMapPlot,
+          map <- map +geom_polygon(data =  dataMapPlot,
                                     aes(x = long, y = lat, group = group, fill = as.factor(brks)),
                                     colour = "gray10", lwd=0.5) +
             scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
@@ -1740,14 +1747,16 @@ server <- function(input, output, session) {
             theme(panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank()
             )+
-            scale_y_continuous(position = "right")+
+            scale_y_continuous(position = "left")+
             facet_grid(param~scenario, switch="y",
                        labeller = labeller(param = label_wrap_gen(15))
             ) +
-            theme(legend.position="right",
+            ylab(i) +
+            theme(legend.position="bottom",
                   legend.title = element_blank(),
+                  strip.text.y = element_blank(),
                   plot.margin=margin(0,0,0,0,"pt"),
-                  axis.title=element_blank(),
+                  axis.title=element_text(10),
                   axis.text=element_blank(),
                   axis.ticks=element_blank())
           if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
@@ -1759,7 +1768,7 @@ server <- function(input, output, session) {
 
     cowplot::plot_grid(plotlist=plist,ncol=gas,align = "v")
   },
-  height=function(){225*length(unique(dataMapx()$param))},
+  height=function(){300*length(unique(dataMapx()$param))},
   width=function(){max(600, 400*length(unique(data()$scenario)))}
   )
 
