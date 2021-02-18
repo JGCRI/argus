@@ -1800,7 +1800,7 @@ server <- function(input, output, session) {
       }
     }
 
-    cowplot::plot_grid(plotlist=plist,ncol=gas,align = "v")
+    cowplot::plot_grid(plotlist=plist,ncol=gas,align = "h", rel_widths = c(1, length(unique(data()$scenario))-1))
   },
   height=function(){300*length(unique(dataMapx()$param))},
   width=function(){max(600, 400*length(unique(data()$scenario)))}
