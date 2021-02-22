@@ -19,6 +19,50 @@ dataMap_raw <- tibble::tibble(
   param=c(rep("ag",length(regionsx)),rep("ag",length(regionsx))),
   value=runif(length(regionsx)*2,0,1000)); dataMap_raw
 
+diffText = "Abs Diff"
+  scenRef_i = unique(dataMap_raw$scenario)[1]; scenRef_i
+
+  # Calculate Diff Values
+  tbl_pd <-dataMap_raw %>%
+    dplyr::filter(scenario == scenRef_i)
+  for (k in unique(dataMap_raw$scenario)[unique(dataMap_raw$scenario) !=
+                                          scenRef_i]) {
+    tbl_temp <- dataMap_raw %>%
+      dplyr::filter(scenario %in% c(scenRef_i, k))
+    # print("tbl_temp")
+    # print(tbl_temp)
+    # print("tbl_temp$value")
+    # print(tbl_temp$value)
+    tbl_temp <- tbl_temp %>%
+      tidyr::spread(scenario, value)
+    # print("tbl_temp post spread")
+    # print(tbl_temp)
+
+    tbl_temp[is.na(tbl_temp)] <- 0
+
+    tbl_temp <- tbl_temp %>%
+      dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
+      dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
+    # print("tbl temp post mute")
+    # print(tbl_temp)
+    tbl_temp <- tbl_temp %>%
+      tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
+    # print("tidyr")
+    # print(tbl_temp)
+    tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
+    # print("bind_rows")
+    # print(tbl_pd)
+
+
+  tbl_pd <- tbl_pd %>%
+    dplyr::mutate(scenario = factor(scenario,
+                                    levels = c(scenRef_i,
+                                               unique(
+                                                 tbl_pd$scenario
+                                               )[unique(tbl_pd$scenario) != scenRef_i])))
+  # print(tbl_pd)
+  tbl_pd}
+
 # shpdf <-mapdfFind(dataMap_raw)
 # a <- shpdf %>%
 #   dplyr::inner_join(dataMap_raw, by="subRegion") %>%

@@ -214,16 +214,16 @@ ui <- fluidPage(
                                                   column(
                                                     2,
                                                          div(
-                                                            actionButton(label="Absolute\nValue", inputId = "abs",width="100%", class="diff_button")
+                                                            actionButton(label="Absolute\nValue", inputId = "absChart",width="100%", class="diff_button")
                                                             )
                                                          ),
                                                   column(
                                                     2,
-                                                         actionButton(label="Absolute\nDifference", inputId = "absDiff",width="100%", class="diff_button")
+                                                         actionButton(label="Absolute\nDifference", inputId = "absDiffChart",width="100%", class="diff_button")
                                                          ),
                                                   column(
                                                     2,
-                                                         actionButton(label="Percent\nDifference", inputId = "percDiff", width="100%", class="diff_button")
+                                                         actionButton(label="Percent\nDifference", inputId = "percDiffChart", width="100%", class="diff_button")
                                                          ),
                                                   column(
                                                     3, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png",  class = "download_button"), style = "float: right")
@@ -268,6 +268,24 @@ ui <- fluidPage(
                                                   selected = "kmean",
                                                   multiple = F)),
                                                 style = "float: right")),
+                                                fluidRow(
+                                                  column(
+                                                    3),
+                                                  column(
+                                                    2,
+                                                    div(
+                                                      actionButton(label="Absolute\nValue", inputId = "absMap",width="100%", class="diff_button")
+                                                    )
+                                                  ),
+                                                  column(
+                                                    2,
+                                                    actionButton(label="Absolute\nDifference", inputId = "absDiffMap",width="100%", class="diff_button")
+                                                  ),
+                                                  column(
+                                                    2,
+                                                    actionButton(label="Percent\nDifference", inputId = "percDiffMap", width="100%", class="diff_button")
+                                                  )),
+                                                br(),
                                                 div(
                                                   class="charts",
                                                   plotOutput(outputId = "map", width = "100%", height="100%"))
