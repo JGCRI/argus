@@ -1142,7 +1142,7 @@ server <- function(input, output, session) {
 
   output$downloadPlotSum <- downloadHandler(
     filename = "summaryChart.png",
-    content = function(file) {
+    content = function(filename) {
       ggsave(
         file,
         plot=summaryPlot(0.75, 10, 10),
@@ -1197,7 +1197,7 @@ server <- function(input, output, session) {
 
   output$downloadPlotSumReg <- downloadHandler(
     filename = "summaryChartReg.png",
-    content = function(file) {
+    content = function(filename) {
       ggsave(file,plot=summaryPlotReg(10),
              height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
              width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
@@ -1332,7 +1332,7 @@ server <- function(input, output, session) {
   )
 
   output$downloadPlotChart <- downloadHandler(
-    filename = "barChart.png",
+    file = "barChart.png",
     content = function(file) {
       ggsave(file,plot=chartPlot(),
              width=argus::exportWidth(49, length(unique(dataChartx()$param)), 5),
@@ -1351,14 +1351,14 @@ server <- function(input, output, session) {
   # Map Analysis by Base Map
   #---------------------------
 
-  output$downloaddMapBase <- downloadHandler(
-    filename = "mapBase.png",
+  output$downloadMapBase <- downloadHandler(
+    file = "mapBase.png",
     content = function(file) {
       ggsave(
         file,
         plot=mapBase(),
-        height = argus::exportHeight(3, 49, rv$pcount, 3),
-        width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+        height = argus::exportHeight(1, 49, rv$pcount, 5),
+        width=argus::exportWidth(49, 1, 10),
         units="in"
       )
     })
@@ -1436,7 +1436,7 @@ server <- function(input, output, session) {
         theme(panel.grid.major = element_blank(),
               panel.grid.minor = element_blank()
         )+
-        theme(plot.margin=margin(20,20,20,20,"pt"),
+        theme(plot.margin=margin(10,10,10,10,"pt"),
               axis.title=element_blank(),
               axis.text=element_blank(),
               axis.ticks=element_blank())
@@ -1459,13 +1459,13 @@ server <- function(input, output, session) {
   #---------------------------
 
   output$downloadMap <- downloadHandler(
-    filename = "map.png",
+    file = "map.png",
     content = function(file) {
       ggsave(
         file,
         plot=map(),
-        # height = argus::exportHeight(3, 49, rv$pcount, 3),
-        # width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+        height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 5),
+        width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
         units="in"
       )
     })
@@ -1636,10 +1636,12 @@ server <- function(input, output, session) {
                 axis.ticks=element_blank())
         if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
       }; map
-
       plist[[i]] <- map
+
     }
-    return(cowplot::plot_grid(plotlist=plist,ncol=1,align = "v"))
+    temp <- cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+    # ggsave("~/Desktop/mapz.png",temp)
+    return(temp)
   }
 
 
@@ -1709,3 +1711,4 @@ server <- function(input, output, session) {
     }
   )
 }
+
