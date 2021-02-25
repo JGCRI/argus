@@ -1476,7 +1476,7 @@ server <- function(input, output, session) {
     map()
   },
   height=function(){225*length(unique(dataMapx()$param))},
-  width=function(){max(600, 400*length(unique(data()$scenario)))}
+  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
   )
 
   breaks <- function(dataMap_raw_param, breaks_n){
@@ -1683,7 +1683,7 @@ server <- function(input, output, session) {
             theme(legend.position="bottom",
                   legend.title = element_blank(),
                   strip.text.y = element_blank(),
-                  plot.margin=margin(0,-30,0,0,"pt"),
+                  plot.margin=margin(0,0,0,0,"pt"),
                   axis.title=element_text(10),
                   axis.text=element_blank(),
                   axis.ticks=element_blank())
@@ -1739,7 +1739,7 @@ server <- function(input, output, session) {
             ) +
             theme(legend.position="bottom",
                   legend.title = element_blank(),
-                  plot.margin=margin(0,0,0,-30,"pt"),
+                  plot.margin=margin(0,0,0,0,"pt"),
                   strip.text.y = element_blank(),
                   axis.title=element_blank(),
                   axis.text=element_blank(),
@@ -1810,7 +1810,7 @@ server <- function(input, output, session) {
       }
     }
     # temp <- cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
-    temp <- cowplot::plot_grid(plotlist=plist,ncol=gas,align = "v", rel_widths = c(1, length(unique(data()$scenario))-1))
+    temp <- cowplot::plot_grid(plotlist=plist,ncol=gas,align = "v", rel_widths = c(1, length(unique(dataMapx()$scenario))-1))
     # ggsave("~/Desktop/mapz.png",temp)
     return(temp)
   }
