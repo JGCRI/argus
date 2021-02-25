@@ -1679,10 +1679,11 @@ server <- function(input, output, session) {
                        labeller = labeller(param = label_wrap_gen(15))
             ) +
             ylab(i) +
+            xlab(NULL) +
             theme(legend.position="bottom",
                   legend.title = element_blank(),
                   strip.text.y = element_blank(),
-                  plot.margin=margin(20,-30,20,20,"pt"),
+                  plot.margin=margin(0,-30,0,0,"pt"),
                   axis.title=element_text(10),
                   axis.text=element_blank(),
                   axis.ticks=element_blank())
@@ -1726,7 +1727,7 @@ server <- function(input, output, session) {
                                     colour = "gray10", lwd=0.5) +
             scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
             xlab(NULL) +
-            ylab("hello") +
+            ylab(NULL) +
             coord_fixed(ratio = 1.0,
                         ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
             theme(panel.grid.major = element_blank(),
@@ -1738,7 +1739,7 @@ server <- function(input, output, session) {
             ) +
             theme(legend.position="bottom",
                   legend.title = element_blank(),
-                  plot.margin=margin(20,20,20,-30,"pt"),
+                  plot.margin=margin(0,0,0,-30,"pt"),
                   strip.text.y = element_blank(),
                   axis.title=element_blank(),
                   axis.text=element_blank(),
@@ -1794,6 +1795,7 @@ server <- function(input, output, session) {
                        labeller = labeller(param = label_wrap_gen(15))
             ) +
             ylab(i) +
+            xlab(NULL) +
             theme(legend.position="bottom",
                   legend.title = element_blank(),
                   strip.text.y = element_blank(),
@@ -1807,7 +1809,8 @@ server <- function(input, output, session) {
         plist[[i]] <- map
       }
     }
-    temp <- cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+    # temp <- cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+    temp <- cowplot::plot_grid(plotlist=plist,ncol=gas,align = "v", rel_widths = c(1, length(unique(data()$scenario))-1))
     # ggsave("~/Desktop/mapz.png",temp)
     return(temp)
   }
