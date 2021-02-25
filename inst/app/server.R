@@ -1412,7 +1412,7 @@ server <- function(input, output, session) {
     }
     rv$pcount <- pcount
     print(rv$pcount)
-    cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+    return(cowplot::plot_grid(plotlist=plist,ncol=1,align = "v"))
 
   },
   height=function(){300*(rv$pcount)}
