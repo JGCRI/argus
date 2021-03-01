@@ -1097,9 +1097,10 @@ server <- function(input, output, session) {
     }
     }
   )
+
   output$downloadPlotSum <- downloadHandler(
     filename = "summaryChart.png",
-    content = function(file) {
+    content = function(filename) {
       ggsave(
         file,
         plot=summaryPlot(0.75, 10, 10),
@@ -1154,7 +1155,7 @@ server <- function(input, output, session) {
 
   output$downloadPlotSumReg <- downloadHandler(
     filename = "summaryChartReg.png",
-    content = function(file) {
+    content = function(filename) {
       ggsave(file,plot=summaryPlotReg(10),
              height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
              width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
@@ -1311,7 +1312,7 @@ server <- function(input, output, session) {
   )
 
   output$downloadPlotChart <- downloadHandler(
-    filename = "barChart.png",
+    file = "barChart.png",
     content = function(file) {
       ggsave(file,plot=chartPlot(),
              width=argus::exportWidth(49, length(unique(dataChartx()$param)), 5),
@@ -1330,93 +1331,108 @@ server <- function(input, output, session) {
   # Map Analysis by Base Map
   #---------------------------
 
+  output$downloadMapBase <- downloadHandler(
+    file = "mapBase.png",
+    content = function(file) {
+      ggsave(
+        file,
+        plot=mapBase(),
+        height = argus::exportHeight(1, 49, rv$pcount, 5),
+        width=argus::exportWidth(49, 1, 10),
+        units="in"
+      )
+    })
+
   output$mapBase <- renderPlot({
-
-    dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
-      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-      dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                        TRUE~subRegion)) %>%
-      dplyr::select(-subRegionMap)
-
-    plist <- list()
-    pcount = 1
-    subRegTypelist <- c()
-    for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
-
-      dataMap_raw_regions <- dataMap_raw %>%
-        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-        dplyr::filter(param == i) %>%
-        dplyr::select(subRegion) %>%
-        unique(); dataMap_raw_regions
-
-      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
-        dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
-        dplyr::group_by(subRegion) %>%
-        dplyr::mutate(minLong = min(long),
-                      negLongSum = sum(long[which(long<=0)], na.rm=T),
-                      maxLong = max(long),
-                      posLongSum = sum(long[which(long>=0)], na.rm=T),
-                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
-                                       TRUE~0),
-                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                       TRUE~long))%>%
-        dplyr::ungroup()
-
-
-      if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
-
-        subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
-
-        prcntZoom <- 1
-        longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
-        longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
-        latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
-        latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
-
-        prcntZoom <- 0.1
-        longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
-        longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
-        latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
-        latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
-
-
-        shp_bg <- argus::mapCountriesdf%>%
-          dplyr::filter(long > longLimMinbg,
-                        long < longLimMaxbg,
-                        lat > latLimMinbg,
-                        lat < latLimMaxbg);
-
-        cnames <- aggregate(cbind(long, lat) ~ subRegion, data=dataMapPlot, FUN=mean)
-
-        map <- ggplot() + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)
-        map <- map + geom_polygon(data = dataMapPlot,
-                                  aes(x = long, y = lat, group = group, fill=subRegion),
-                                  colour = "gray10", lwd=0.5, show.legend = F) +
-          coord_fixed(ratio = 1.0,ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
-          theme(panel.grid.major = element_blank(),
-                panel.grid.minor = element_blank()
-          )+
-          theme(plot.margin=margin(20,20,20,20,"pt"),
-                axis.title=element_blank(),
-                axis.text=element_blank(),
-                axis.ticks=element_blank())
-        map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = subRegion),color="black", size = 4)
-        map <- map + theme(panel.background = element_rect(fill="lightblue1")) + ggtitle(unique(dataMapPlot$subRegionType))
-        map
-
-        plist[[pcount]] <- map
-        pcount=pcount+1
-        rv$pcount <- pcount
-      }
-    }
-    rv$pcount <- pcount
-    print(rv$pcount)
-    return(cowplot::plot_grid(plotlist=plist,ncol=1,align = "v"))
-
-  },
-  height=function(){300*(rv$pcount)}
+      mapBase()
+    },
+    height=function(){300*(rv$pcount)}
   )
+
+  mapBase<- function(){
+
+  dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
+    dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
+    dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
+                                      TRUE~subRegion)) %>%
+    dplyr::select(-subRegionMap)
+
+  plist <- list()
+  pcount = 1
+  subRegTypelist <- c()
+  for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
+
+    dataMap_raw_regions <- dataMap_raw %>%
+      dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+      dplyr::filter(param == i) %>%
+      dplyr::select(subRegion) %>%
+      unique(); dataMap_raw_regions
+
+    dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
+      dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
+      dplyr::group_by(subRegion) %>%
+      dplyr::mutate(minLong = min(long),
+                    negLongSum = sum(long[which(long<=0)], na.rm=T),
+                    maxLong = max(long),
+                    posLongSum = sum(long[which(long>=0)], na.rm=T),
+                    flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                                     TRUE~0),
+                    long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                     (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                     TRUE~long))%>%
+      dplyr::ungroup()
+
+
+    if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
+
+      subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
+
+      prcntZoom <- 1
+      longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
+      longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
+      latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
+      latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
+
+      prcntZoom <- 0.1
+      longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
+      longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
+      latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
+      latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
+
+
+      shp_bg <- argus::mapCountriesdf%>%
+        dplyr::filter(long > longLimMinbg,
+                      long < longLimMaxbg,
+                      lat > latLimMinbg,
+                      lat < latLimMaxbg);
+
+      cnames <- aggregate(cbind(long, lat) ~ subRegion, data=dataMapPlot, FUN=mean)
+
+      map <- ggplot() + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)
+      map <- map + geom_polygon(data = dataMapPlot,
+                                aes(x = long, y = lat, group = group, fill=subRegion),
+                                colour = "gray10", lwd=0.5, show.legend = F) +
+        coord_fixed(ratio = 1.0,ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
+        theme(panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank()
+        )+
+        theme(plot.margin=margin(10,10,10,10,"pt"),
+              axis.title=element_blank(),
+              axis.text=element_blank(),
+              axis.ticks=element_blank())
+      map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = subRegion),color="black", size = 4)
+      map <- map + theme(panel.background = element_rect(fill="lightblue1")) + ggtitle(unique(dataMapPlot$subRegionType))
+      map
+
+      plist[[pcount]] <- map
+      pcount=pcount+1
+      rv$pcount <- pcount
+    }
+  }
+  rv$pcount <- pcount
+  print(rv$pcount)
+  return(cowplot::plot_grid(plotlist=plist,ncol=1,align = "v"))
+  }
 
   #---------------------------
   # Pick between Absolute and Percent Diff
@@ -1444,6 +1460,24 @@ server <- function(input, output, session) {
   # Map Analysis by Scenario x Param
   #---------------------------
 
+  output$downloadMap <- downloadHandler(
+    file = "map.png",
+    content = function(file) {
+      ggsave(
+        file,
+        plot=map(),
+        height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 7),
+        width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
+        units="in"
+      )
+    })
+
+  output$map <- renderPlot({
+    map()
+  },
+  height=function(){225*length(unique(dataMapx()$param))},
+  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
+  )
 
   breaks <- function(dataMap_raw_param, breaks_n){
     breaks_pretty <- scales::pretty_breaks(n=breaks_n)(dataMap_raw_param$value); breaks_pretty
@@ -1556,7 +1590,7 @@ server <- function(input, output, session) {
     }
 
 
-  output$map <- renderPlot({
+  map<- function(){
     gas <- 2
     if (rv$absDiffMap == 1){
       dataMap_raw <- dataDiffAbsMapx() %>% dplyr::ungroup() %>%
@@ -1645,10 +1679,11 @@ server <- function(input, output, session) {
                        labeller = labeller(param = label_wrap_gen(15))
             ) +
             ylab(i) +
+            xlab(NULL) +
             theme(legend.position="bottom",
                   legend.title = element_blank(),
                   strip.text.y = element_blank(),
-                  plot.margin=margin(0,-30,0,0,"pt"),
+                  plot.margin=margin(0,0,0,0,"pt"),
                   axis.title=element_text(10),
                   axis.text=element_blank(),
                   axis.ticks=element_blank())
@@ -1692,7 +1727,7 @@ server <- function(input, output, session) {
                                     colour = "gray10", lwd=0.5) +
             scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
             xlab(NULL) +
-            ylab("hello") +
+            ylab(NULL) +
             coord_fixed(ratio = 1.0,
                         ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
             theme(panel.grid.major = element_blank(),
@@ -1704,7 +1739,7 @@ server <- function(input, output, session) {
             ) +
             theme(legend.position="bottom",
                   legend.title = element_blank(),
-                  plot.margin=margin(0,0,0,-30,"pt"),
+                  plot.margin=margin(0,0,0,0,"pt"),
                   strip.text.y = element_blank(),
                   axis.title=element_blank(),
                   axis.text=element_blank(),
@@ -1760,6 +1795,7 @@ server <- function(input, output, session) {
                        labeller = labeller(param = label_wrap_gen(15))
             ) +
             ylab(i) +
+            xlab(NULL) +
             theme(legend.position="bottom",
                   legend.title = element_blank(),
                   strip.text.y = element_blank(),
@@ -1773,12 +1809,11 @@ server <- function(input, output, session) {
         plist[[i]] <- map
       }
     }
-
-    cowplot::plot_grid(plotlist=plist,ncol=gas,align = "h", rel_widths = c(1, length(unique(data()$scenario))-1))
-  },
-  height=function(){300*length(unique(dataMapx()$param))},
-  width=function(){max(600, 400*length(unique(data()$scenario)))}
-  )
+    # temp <- cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+    temp <- cowplot::plot_grid(plotlist=plist,ncol=gas,align = "v", rel_widths = c(1, length(unique(dataMapx()$scenario))-1))
+    # ggsave("~/Desktop/mapz.png",temp)
+    return(temp)
+  }
 
 
 
@@ -1810,7 +1845,9 @@ server <- function(input, output, session) {
       fs <- c("table.csv",
               "summaryChart.png",
               "barCharts.png",
-              "summaryChartReg.png"
+              "summaryChartReg.png",
+              "map.png",
+              "mapBase.png"
               )
       write.csv(data(), "table.csv")
       ggsave("summaryChart.png", plot=summaryPlot(0.75, 10, 10),
@@ -1829,8 +1866,20 @@ server <- function(input, output, session) {
              width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
              units = "in"
              )
+      ggsave("map.png",plot=map(),
+              height = argus::exportHeight(3, 49, rv$pcount, 3),
+              width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+              units="in"
+              )
+      ggsave("mapBase.png", plot=mapBase(),
+              height = argus::exportHeight(3, 49, rv$pcount, 3),
+              width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+              units="in"
+            )
+
       print(fs)
       zip::zip(zipfile=file, files=fs)
     }
   )
 }
+
