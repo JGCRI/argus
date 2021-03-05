@@ -286,23 +286,46 @@ ui <- fluidPage(
                                                         selected = "kmean",
                                                         multiple = F)),
                                                     style = "float: right")),
-                                                fluidRow(
-                                                  column(
-                                                    3),
-                                                  column(
-                                                    2,
-                                                    div(
-                                                      actionButton(label="Absolute\nValue", inputId = "absMap",width="100%", class="diff_button")
+                                                div(
+                                                  id = "testz",
+                                                  tabsetPanel(
+                                                    type="pills",
+                                                    tabPanel("Absolute Value",
+                                                             div(
+                                                               class="charts",
+                                                               plotOutput(outputId = "mapAbs", width = "100%", height="100%"))
+                                                    ),
+                                                    tabPanel("Absolute Difference",
+                                                             div(
+                                                               class="charts",
+
+                                                               plotOutput(outputId = "mapDiff", width = "100%", height="100%"))
+                                                    ),
+                                                    tabPanel("Percent Difference",
+                                                             div(
+                                                               class="charts",
+
+                                                               plotOutput(outputId = "mapPerc", width = "100%", height="100%"))
                                                     )
-                                                  ),
-                                                  column(
-                                                    2,
-                                                    actionButton(label="Absolute\nDifference", inputId = "absDiffMap",width="100%", class="diff_button")
-                                                  ),
-                                                  column(
-                                                    2,
-                                                    actionButton(label="Percent\nDifference", inputId = "percDiffMap", width="100%", class="diff_button")
-                                                  )),
+                                                  )
+                                                ),
+                                                # fluidRow(
+                                                #   column(
+                                                #     3),
+                                                #   column(
+                                                #     2,
+                                                #     div(
+                                                #       actionButton(label="Absolute\nValue", inputId = "absMap",width="100%", class="diff_button")
+                                                #     )
+                                                #   ),
+                                                #   column(
+                                                #     2,
+                                                #     actionButton(label="Absolute\nDifference", inputId = "absDiffMap",width="100%", class="diff_button")
+                                                #   ),
+                                                #   column(
+                                                #     2,
+                                                #     actionButton(label="Percent\nDifference", inputId = "percDiffMap", width="100%", class="diff_button")
+                                                #   )),
                                                 br(),
                                                 div(
                                                   class="charts",

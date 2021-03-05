@@ -1581,12 +1581,6 @@ server <- function(input, output, session) {
       )
     })
 
-  output$map <- renderPlot({
-    map()
-  },
-  height=function(){225*length(unique(dataMapx()$param))},
-  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
-  )
 
   breaks <- function(dataMap_raw_param, breaks_n){
     breaks_pretty <- scales::pretty_breaks(n=breaks_n)(dataMap_raw_param$value); breaks_pretty
@@ -1699,15 +1693,36 @@ server <- function(input, output, session) {
     }
 
 
-  map<- function(){
+  output$mapAbs <- renderPlot({
+    map(1)
+  },
+  height=function(){225*length(unique(dataMapx()$param))},
+  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
+  )
+
+  output$mapPerc <- renderPlot({
+    map(2)
+  },
+  height=function(){225*length(unique(dataMapx()$param))},
+  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
+  )
+
+  output$mapDiff <- renderPlot({
+    map(3)
+  },
+  height=function(){225*length(unique(dataMapx()$param))},
+  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
+  )
+
+  map<- function(flag){
     gas <- 2
-    if (rv$absDiffMap == 1){
+    if (flag == 1){
       dataMap_raw <- dataDiffAbsMapx() %>% dplyr::ungroup() %>%
         dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
         dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
                                           TRUE~subRegion)) %>%
         dplyr::select(-subRegionMap)
-    }else if (rv$percDiffMap == 1){
+    }else if (flag == 2){
       dataMap_raw <- dataPrcntAbsMapx() %>% dplyr::ungroup() %>%
         dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
         dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
