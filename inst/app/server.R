@@ -1491,6 +1491,19 @@ server <- function(input, output, session) {
                                      TRUE~long))%>%
       dplyr::ungroup()
 
+    dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
+      dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
+      dplyr::group_by(subRegion) %>%
+      dplyr::mutate(minLong = min(long),
+                    negLongSum = sum(long[which(long<=0)], na.rm=T),
+                    maxLong = max(long),
+                    posLongSum = sum(long[which(long>=0)], na.rm=T),
+                    flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                                     TRUE~0),
+                    long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                     (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                     TRUE~long))%>%
+      dplyr::ungroup()
 
     if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
 
@@ -1507,7 +1520,6 @@ server <- function(input, output, session) {
       longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
       latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
       latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
-
 
       shp_bg <- argus::mapCountriesdf%>%
         dplyr::filter(long > longLimMinbg,
@@ -1692,7 +1704,6 @@ server <- function(input, output, session) {
     return(list(shp_df, dataMapPlot, paletteAbs, paletteDiff))
     }
 
-
   output$mapAbs <- renderPlot({
     map(1)
   },
@@ -1715,6 +1726,8 @@ server <- function(input, output, session) {
   )
 
   map<- function(flag){
+
+    
     gas <- 2
     if (flag == 1){
       dataMap_raw <- dataDiffAbsMapx() %>% dplyr::ungroup() %>%

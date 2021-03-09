@@ -263,6 +263,19 @@ ui <- fluidPage(
                            br(),
                            tabsetPanel(type = "pills",
                                        tabPanel("Base Map",
+                                                br(),
+                                                fluidRow(
+                                                  column(
+                                                    12, div(
+                                                      downloadButton(
+                                                        'downloadMapBase',
+                                                        NULL,
+                                                        download = "mapBase.png",
+                                                        class = "download_button"
+                                                      ),
+                                                      style="float:right"
+                                                    ))
+                                                ),
                                                 div(
                                                   class="charts",
                                                   plotOutput(outputId = "mapBase", width = "100%", height="100%"))
@@ -272,8 +285,36 @@ ui <- fluidPage(
                                                   column(
                                                     6,
                                                     div(
-                                                      uiOutput('selectMapYear')),
-                                                    style = "float: left"),
+                                                uiOutput('selectMapYear')),
+                                                style = "float: left"),
+                                                column(
+                                                  5,
+                                                  div(
+                                                  br(),
+                                                  br(),
+                                                  br(),
+                                                pickerInput(
+                                                  inputId = "mapLegend",
+                                                  label = "Legend Type",
+                                                  choices = c("kmean","pretty"),
+                                                  selected = "kmean",
+                                                  multiple = F)))
+                                                ,column(
+                                                  1, div(
+                                                    br(),
+                                                    br(),
+                                                    br(),
+                                                    br(),
+                                                    downloadButton(
+                                                      'downloadMap',
+                                                      NULL,
+                                                      download = "map.png",
+                                                      class = "download_button"
+                                                    ),
+                                                    style="float:right"
+                                                  ))
+                                                ),
+                                                fluidRow(
                                                   column(
                                                     3,
                                                     div(
@@ -355,3 +396,4 @@ ui <- fluidPage(
     )
   )
 )
+
