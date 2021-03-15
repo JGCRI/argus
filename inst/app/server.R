@@ -89,6 +89,10 @@ server <- function(input, output, session) {
   })
 
 
+  observeEvent(input$help,{
+    session$sendCustomMessage("handler1", unique(data()$subRegion))
+  })
+
   # Download Settings
   output$downloadSettings <- downloadHandler(
     filename = "settings.csv",

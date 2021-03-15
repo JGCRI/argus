@@ -28,6 +28,19 @@ ui <- fluidPage(
   ),
 
   useShinyalert(),
+
+  #     <script async defer
+  # 			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5aevdcRxbI2nBJ8UGTh_m7kESdN0AVqA&callback=initMap">
+  # 		</script>
+
+  tags$script(src = "script.js"),
+  tags$div(
+    HTML('
+      <script src="https://api.mqcdn.com/sdk/mapquest-js/v1.3.2/mapquest.js"></script>
+      <link type="text/css" rel="stylesheet" href="https://api.mqcdn.com/sdk/mapquest-js/v1.3.2/mapquest.css"/>
+    ')
+  ),
+
   #---------------------------
   # Initial Settings/Theme
   #---------------------------
@@ -101,8 +114,8 @@ ui <- fluidPage(
       # Params
       uiOutput('selectParams'),
       # Regions
-      uiOutput('selectRegions')
-
+      uiOutput('selectRegions'),
+      div(id="map", class="maps")
     ),
 
 

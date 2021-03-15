@@ -23,6 +23,12 @@
   widht:70vh;
   position:relative;
 }
+
+.maps{
+  overflow:auto;
+  height:30vh;
+  position:relative;
+}
 /*
 #selectScenarios  div  div  button{
   font-size: 90%;
