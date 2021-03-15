@@ -1367,7 +1367,6 @@ server <- function(input, output, session) {
                                        TRUE~long))%>%
         dplyr::ungroup()
 
-
       if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
 
         subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
@@ -1383,7 +1382,6 @@ server <- function(input, output, session) {
         longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
         latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
         latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
-
 
         shp_bg <- argus::mapCountriesdf%>%
           dplyr::filter(long > longLimMinbg,
