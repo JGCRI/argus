@@ -314,19 +314,6 @@ ui <- fluidPage(
                                                     style="float:right"
                                                   ))
                                                 ),
-                                                fluidRow(
-                                                  column(
-                                                    3,
-                                                    div(
-                                                      br(),
-                                                      br(),
-                                                      pickerInput(
-                                                        inputId = "mapLegend",
-                                                        label = "Legend Type",
-                                                        choices = c("kmean","pretty"),
-                                                        selected = "kmean",
-                                                        multiple = F)),
-                                                    style = "float: right")),
                                                 div(
                                                   id = "testz",
                                                   tabsetPanel(

@@ -1,5 +1,5 @@
 Package: argus
-Title: Interactive data visualizationa
+Title: Interactive data visualizations
 Version: 0.1.0
 Authors@R: c(person("Zarrar", "Khan", email = "zarrar.khan@pnnl.gov", role = c("aut", "cre"),
 		   comment = c(ORCID ="0000-0002-8147-8553")),
@@ -24,7 +24,10 @@ Imports:
     XML,
     stringr,
     tibble,
-    tidyr
+    tidyr,
+	cowplot,
+	ggplot2,
+	xfun
 Remotes: github::JGCRI/rgcam
 VignetteBuilder: 
     knitr

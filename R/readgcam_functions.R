@@ -184,6 +184,7 @@
     # Read in xmlFile
     XML::saveXML(argus::xmlQueries, file=paste(dirOutputs, "/", folderName,"/readGCAM/xmlQueries.xml", sep = ""))
     queryFile <- paste(dirOutputs, "/", folderName,"/readGCAM/xmlQueries.xml", sep = "")
+    xfun::gsub_file(queryFile,"&apos;","'")
     queryPath <- gsub("[^/]+$","",queryFile)
     queryxml <- basename(queryFile)
 
@@ -325,6 +326,7 @@
 
     if(!file.exists(gsub("//","/",paste(queryPath, "/subSetQueries.xml", sep = "")))){
       stop(gsub("//","/",paste("query file: ", queryPath,"/subSetQueries.xml is incorrect or doesn't exist.",sep="")))}else{
+        xfun::gsub_file(paste(queryPath, "/subSetQueries.xml", sep = ""),"&apos;","'")
         print(gsub("//","/",paste("Reading queries from queryFile created: ", queryPath,"/subSetQueries.xml.",sep="")))
       }
 

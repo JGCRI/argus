@@ -174,3 +174,53 @@ exportHeight<-function(chartsperrow,
 exportWidth<-function(max_width_in, numelement, lenperchart){
   return(min(max_width_in, (numelement)*lenperchart))
 }
+
+
+
+#' summaryPlotReg
+#'
+#' generate summary plot
+#' @param titletext plot title
+#' @param dataMapx Input map dataframe
+#' @param ggplottheme ggplot theme to use
+#' @param subsetRegionsx Subset of regions
+#' @importFrom magrittr %>%
+#' @import ggplot2
+#' @export
+
+summaryPlotReg <- function(titletext,
+                           dataMapx,
+                           ggplottheme,
+                           subsetRegionsx){
+
+  # Initialize
+ NULL-> param->scenario->subRegion->value->x
+
+  dataChartPlot <- # All regions
+    dataMapx %>% tidyr::complete(scenario,param,subRegion,x) %>%
+    dplyr::mutate(value= dplyr::case_when(is.na(value)~0,
+                                          TRUE~value)) %>%
+    dplyr::filter(subRegion %in% subsetRegionsx)
+
+  plist <- list()
+  for(i in 1:length(unique(dataChartPlot$param))){
+
+    plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                     dplyr::filter(param==unique(dataChartPlot$param)[i]),
+                                   aes(x=x,y=value,
+                                       group=scenario,
+                                       color=scenario)) +
+      ggplottheme +
+      ylab(NULL) + xlab(NULL) +
+      geom_line() +
+      scale_y_continuous(position = "right")+
+      facet_grid(param~subRegion, scales="free",switch="y",
+                 labeller = labeller(param = label_wrap_gen(15))
+      )+
+      theme(legend.position="right",
+            legend.text=element_text(size=titletext),
+            legend.title = element_blank(),
+            plot.margin=margin(20,20,20,20,"pt"))}
+
+  cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
+}
