@@ -115,7 +115,8 @@ ui <- fluidPage(
       uiOutput('selectParams'),
       # Regions
       uiOutput('selectRegions'),
-      div(id="map", class="maps")
+      # div(id="map", class="maps")
+      leafletOutput(outputId = "mymap")
     ),
 
 
