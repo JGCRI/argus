@@ -29,6 +29,12 @@ ui <- fluidPage(
 
   useShinyalert(),
 
+  tags$script("
+    Shiny.addCustomMessageHandler('regionsSeleced', function(value) {
+    Shiny.setInputValue('regionsSelected', value);
+    });
+  "),
+
   #     <script async defer
   # 			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5aevdcRxbI2nBJ8UGTh_m7kESdN0AVqA&callback=initMap">
   # 		</script>
@@ -116,7 +122,7 @@ ui <- fluidPage(
       # Regions
       uiOutput('selectRegions'),
       # div(id="map", class="maps")
-      leafletOutput(outputId = "mymap")
+      # leafletOutput(outputId = "mymap")
     ),
 
 
@@ -303,11 +309,12 @@ ui <- fluidPage(
                                                 div(
                                                   class="charts",
                                                   plotOutput(outputId = "map", width = "100%", height="100%"))
-                                       )#,
+                                       )
                                        #tabPanel("Compare Years"),
                                        #tabPanel("Class"),
                                        #tabPanel("Class Compare years")
-                           )
+                           ),
+                           leafletOutput(outputId = "mymap")
                   ),
                   #---------------------------
                   # Main Panel: Table Tab

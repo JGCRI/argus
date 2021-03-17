@@ -231,6 +231,8 @@ server <- function(input, output, session) {
   }
   })
 
+
+
   # Attempt to read settings if selected
   observeEvent(input$settingdata,
                if(!is.null(input$settingdata)){
@@ -256,6 +258,7 @@ server <- function(input, output, session) {
     # Update input File to Default (NULL)
     #---------------------------
     rv$filedatax <- NULL
+    rv$selectedx <- NULL
 
     #---------------------------
     # Scenarios Select
@@ -572,51 +575,57 @@ server <- function(input, output, session) {
 
   output$mymap <- renderLeaflet({
 
+
     dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
       dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
       dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
                                         TRUE~subRegion)) %>%
       dplyr::select(-subRegionMap)
 
+    plist <- list()
+    pcount = 1
+    subRegTypelist <- c()
+    for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
 
-    dataMap_raw_regions <- dataMap_raw %>%
-      dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-      dplyr::filter(param == i) %>%
-      dplyr::select(subRegion) %>%
-      unique(); dataMap_raw_regions
+      dataMap_raw_regions <- dataMap_raw %>%
+        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+        dplyr::filter(param == i) %>%
+        dplyr::select(subRegion) %>%
+        unique(); dataMap_raw_regions
 
+      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
+        dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
+        dplyr::group_by(subRegion) %>%
+        dplyr::mutate(minLong = min(long),
+                      negLongSum = sum(long[which(long<=0)], na.rm=T),
+                      maxLong = max(long),
+                      posLongSum = sum(long[which(long>=0)], na.rm=T),
+                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                                       TRUE~0),
+                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                       TRUE~long))%>%
+        dplyr::ungroup()
+       a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
+      base <- a[[1]]
+      base <- base %>% mutate(id = subRegion)
+      z <- leaflet() %>% addTiles()
+      z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+      for (i in 2:length(a)){
+        z <- z %>% addPolygons(data=a[[i]], group =unique(a[[i]]$subRegion), lat=~lat, lng=~long, color = "#4287f5", stroke=TRUE)
+      }
+      for (i in 2:length(a)){#group =unique(a[[i]]$subRegion),
+        z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$subRegion), group="a", layerId = ~group, lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+        #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
+      }
 
-    dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
-      dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
-      dplyr::group_by(subRegion) %>%
-      dplyr::mutate(minLong = min(long),
-                    negLongSum = sum(long[which(long<=0)], na.rm=T),
-                    maxLong = max(long),
-                    posLongSum = sum(long[which(long>=0)], na.rm=T),
-                    flip = case_when(minLong<-160 & maxLong>160 ~ 1,
-                                     TRUE~0),
-                    long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                     (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                     TRUE~long))%>%
-      dplyr::ungroup()
-    a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
-    base <- a[[1]]
-    base <- base %>% mutate(id = subRegion)
-    z <- leaflet() %>% addTiles()
-    z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-    for (i in 2:length(a)){
-      z <- z %>% addPolygons(data=a[[i]], group =unique(a[[i]]$subRegion), lat=~lat, lng=~long, color = "#4287f5", stroke=TRUE)
+      z <- z%>%
+        addLayersControl(
+          overlayGroups = unique(oof$group),
+          options = layersControlOptions(collapsed = FALSE)
+        )
+      break
     }
-    for (i in 2:length(a)){#group =unique(a[[i]]$subRegion),
-      z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$subRegion), group="a", layerId = ~group, lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-      #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
-    }
-
-    z <- z%>%
-      addLayersControl(
-        overlayGroups = unique(oof$group),
-        options = layersControlOptions(collapsed = FALSE)
-      )
     #z<-leaflet() %>% addTiles() %>% addPolygons(data=base, layerId = ~group, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
     return(z)
   })
@@ -626,16 +635,22 @@ server <- function(input, output, session) {
     print(input$regionsSelected)
     l <- gsub('\\.', '', gsub('\\d', '', input$mymap_shape_click$id))
     print(l)
-    selectedx <- xchange()
-    if (l %in% input$regionsSelected){
+    selectedx <- reactiveValuesToList(input)$regionsSelected
+    print(selectedx)
+    print (l %in% selectedx)
+    if (l %in% selectedx){
+      print('oof')
       leafletProxy("mymap") %>% hideGroup(l)
+      selectedx =  selectedx[!(selectedx %in% l)]
     }else{
-      print(l)
+      print('oofx')
+      #print(l)
       leafletProxy("mymap") %>% showGroup(l)
       leafletProxy("mymap") %>% hideGroup("a")
       leafletProxy("mymap") %>% showGroup("a")
+      selectedx =  append(selectedx, l)
     }
-    xchange(selectedx)
+    session$sendCustomMessage("rhm_clic", selectedx)
   })
 
   #---------------------------
