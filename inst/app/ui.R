@@ -305,16 +305,20 @@ ui <- fluidPage(
                                                     2,
                                                     actionButton(label="Percent\nDifference", inputId = "percDiffMap", width="100%", class="diff_button")
                                                   )),
-                                                br(),
-                                                div(
-                                                  class="charts",
-                                                  plotOutput(outputId = "map", width = "100%", height="100%"))
+                                                br()
+                                                #,div(
+                                                #  class="charts",
+                                                #  plotOutput(outputId = "map", width = "100%", height="100%"))
                                        )
                                        #tabPanel("Compare Years"),
                                        #tabPanel("Class"),
                                        #tabPanel("Class Compare years")
                            ),
-                           leafletOutput(outputId = "mymap")
+                           div(
+                              class="charts",
+                              leafletOutput(outputId = "mymap")
+                           )
+
                   ),
                   #---------------------------
                   # Main Panel: Table Tab

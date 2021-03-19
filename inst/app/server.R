@@ -16,7 +16,7 @@ library(tmap)
 library(leaflet)
 library(leafsync)
 library(rgcam)
-library(plyr)
+#library(plyr)
 library(broom)
 
 #---------------------------
@@ -585,8 +585,9 @@ server <- function(input, output, session) {
     plist <- list()
     pcount = 1
     subRegTypelist <- c()
+    z <- leaflet() %>% addTiles()
+    print("===============================================")
     for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
-
       dataMap_raw_regions <- dataMap_raw %>%
         dplyr::filter(subRegion!="South_Pacific_Islands")%>%
         dplyr::filter(param == i) %>%
@@ -606,27 +607,33 @@ server <- function(input, output, session) {
                                        (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
                                        TRUE~long))%>%
         dplyr::ungroup()
-       a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
-      base <- a[[1]]
-      base <- base %>% mutate(id = subRegion)
-      z <- leaflet() %>% addTiles()
-      z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-      for (i in 2:length(a)){
-        z <- z %>% addPolygons(data=a[[i]], group =unique(a[[i]]$subRegion), lat=~lat, lng=~long, color = "#4287f5", stroke=TRUE)
-      }
-      for (i in 2:length(a)){#group =unique(a[[i]]$subRegion),
-        z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$subRegion), group="a", layerId = ~group, lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-        #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
-      }
-
-      z <- z%>%
-        addLayersControl(
-          overlayGroups = unique(oof$group),
-          options = layersControlOptions(collapsed = FALSE)
-        )
-      break
+      if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
+          print(dataMapPlot)
+          subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
+          pcount = pcount+1
+          a<-  dataMapPlot %>% group_by(subRegion) %>% group_split()
+          #a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
+          print(a)
+          base <- a[[1]]
+          base <- base %>% mutate(id = subRegion)
+          z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+          for (i in 2:length(a)){
+            z <- z %>% addPolygons(data=a[[i]], group =unique(a[[i]]$subRegion), lat=~lat, lng=~long, color = "#4287f5", stroke=TRUE)
+          }
+          for (i in 2:length(a)){#group =unique(a[[i]]$subRegion),
+            z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$subRegion), group="a", layerId = ~group, lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+            #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
+          } 
+        }
+      #z <- z%>%
+      #  addLayersControl(
+      #    overlayGroups = unique(oof$group),
+      #    options = layersControlOptions(collapsed = FALSE)
+      #  )
     }
+    print("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
     #z<-leaflet() %>% addTiles() %>% addPolygons(data=base, layerId = ~group, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+    print(z)
     return(z)
   })
 
