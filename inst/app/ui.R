@@ -265,9 +265,13 @@ ui <- fluidPage(
                            br(),
                            tabsetPanel(type = "pills",
                                        tabPanel("Base Map",
-                                                div(
-                                                  class="charts",
-                                                  plotOutput(outputId = "mapBase", width = "100%", height="100%"))
+                                              div(
+                                                class="charts",
+                                                leafletOutput(outputId = "mymapBase")
+                                                )                                      
+                                                #div(
+                                                #  class="charts",
+                                                #  plotOutput(outputId = "mapBase", width = "100%", height="100%"))
                                                 ),
                                        tabPanel("Summary",
                                                 fluidRow(
