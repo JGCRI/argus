@@ -620,7 +620,6 @@ server <- function(input, output, session) {
             #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
               } 
             }
-
         }
     }
     print("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
