@@ -9,9 +9,9 @@ map(flag, mapLegend, mapYear, scenarioRefSelected, dataMapx, dataMapz)
 \arguments{
 \item{flag}{indicates which type of map plot to return; 1 for abs val, 2 for abs prcnt val, 3 for abs ref scen}
 
-\item{mapLegend}{map legend text;}
+\item{mapLegend}{map legend text}
 
-\item{mapYear}{year of map;}
+\item{mapYear}{year of map}
 
 \item{scenarioRefSelected}{selected reference scenario}
 

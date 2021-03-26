@@ -9,7 +9,11 @@ process_map(dataMap_raw, i, mapLegend, mapYear)
 \arguments{
 \item{dataMap_raw}{input dataframe}
 
-\item{i}{parameter/category for dataframe}
+\item{i}{the}
+
+\item{mapLegend}{map legend text}
+
+\item{mapYear}{the year of the map}
 }
 \description{
 returns map

@@ -72,6 +72,7 @@ addMissing<-function(data){
 #' @importFrom magrittr %>%
 #' @export
 parse_zip <- function(file){
+
   tmpdir <- tempdir()
   setwd(tmpdir)
   zip::unzip(
@@ -87,33 +88,33 @@ parse_zip <- function(file){
 #' parse_remote
 #'
 #' parse remote files
-#' @param input reactive remote file link to parse
+#' @param urlfiledata remote file link to parse
 #' @importFrom magrittr %>%
 #' @export
-parse_remote <- function(input){
-  if (tools::file_ext(input$urlfiledata) == ""){
-    if (grepl("./$",input$urlfiledata)){
+parse_remote <- function(urlfiledata){
+  if (tools::file_ext(urlfiledata) == ""){
+    if (grepl("./$",urlfiledata)){
       #GCAM
-      utils::read.csv(input$urlfiledata) %>%
+      utils::read.csv(urlfiledata) %>%
         as.data.frame()
-    } else if((!grepl("./$",input$urlfiledata, "/") || !grepl(".zip$",input$urlfiledata) || !grepl(".csv$",input$urlfiledata))){
-      if (grepl(".zip", input$urlfiledata, fixed=TRUE)){
+    } else if((!grepl("./$",urlfiledata, "/") || !grepl(".zip$",urlfiledata) || !grepl(".csv$",urlfiledata))){
+      if (grepl(".zip", urlfiledata, fixed=TRUE)){
         temp <- tempfile()
-        utils::download.file(input$urlfiledata, temp)
+        utils::download.file(urlfiledata, temp)
         return(parse_zip(temp))
-      }else if (grepl(".csv", input$urlfiledata, fixed=TRUE)){
-        return(utils::read.csv(input$urlfiledata) %>%
+      }else if (grepl(".csv", urlfiledata, fixed=TRUE)){
+        return(utils::read.csv(urlfiledata) %>%
                  as.data.frame())
       }
     }
-  }else if ((tools::file_ext(input$urlfiledata) == "zip")){
+  }else if ((tools::file_ext(urlfiledata) == "zip")){
     temp <- tempfile()
-    utils::download.file(input$urlfiledata, temp)
+    utils::download.file(urlfiledata, temp)
     return(parse_zip(temp))
-  }else if (tools::file_ext(input$urlfiledata) == "csv"){
+  }else if (tools::file_ext(urlfiledata) == "csv"){
     temp <- tempfile()
-    utils::download.file(input$urlfiledata, temp)
-    return(utils::read.csv(input$urlfiledata) %>%
+    utils::download.file(urlfiledata, temp)
+    return(utils::read.csv(urlfiledata) %>%
              as.data.frame())
   }else{
     return(NULL)
@@ -124,19 +125,19 @@ parse_remote <- function(input){
 #' parse_local
 #'
 #' parse local files
-#' @param input reactive local file to parse
+#' @param input local file to parse
 #' @importFrom magrittr %>%
 #' @export
-parse_local <- function(input){
-  if (tools::file_ext(input$filedata$datapath) == ""){
-    if (grepl("./$",input$urlfiledata$datapath)){
-      utils::read.csv(input$filedata$datapath) %>%
+parse_local <- function(datapath){
+  if (tools::file_ext(datapath) == ""){
+    if (grepl("./$",urlfiledata$datapath)){
+      utils::read.csv(datapath) %>%
         as.data.frame()
     }
-  }else if (tools::file_ext(input$filedata$datapath) == "zip"){
-    return(parse_zip(input$filedata$datapath))
-  }else if (tools::file_ext(input$filedata$datapath) == "csv"){
-    return(utils::read.csv(input$filedata$datapath) %>%
+  }else if (tools::file_ext(datapath) == "zip"){
+    return(parse_zip(datapath))
+  }else if (tools::file_ext(datapath) == "csv"){
+    return(utils::read.csv(datapath) %>%
              as.data.frame())
   }else{
     return(NULL)
@@ -604,3 +605,108 @@ process_map <- function(dataMap_raw,
   # data_map%>%head()
   return(list(shp_df, dataMapPlot, paletteAbs, paletteDiff))
 }
+
+
+#' mapBase
+#'
+#' returns map
+#' @param dataMap input dataframe
+#' @importFrom magrittr %>%
+#' @import ggplot2
+#' @export
+
+mapBase<- function(dataMapx){
+
+  dataMap_raw <- dataMapx %>% dplyr::ungroup() %>%
+    dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
+    dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
+                                      TRUE~subRegion)) %>%
+    dplyr::select(-subRegionMap)
+
+  plist <- list()
+  pcount = 1
+  subRegTypelist <- c()
+  for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
+
+    dataMap_raw_regions <- dataMap_raw %>%
+      dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+      dplyr::filter(param == i) %>%
+      dplyr::select(subRegion) %>%
+      unique(); dataMap_raw_regions
+
+    dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
+      dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
+      dplyr::group_by(subRegion) %>%
+      dplyr::mutate(minLong = min(long),
+                    negLongSum = sum(long[which(long<=0)], na.rm=T),
+                    maxLong = max(long),
+                    posLongSum = sum(long[which(long>=0)], na.rm=T),
+                    flip = dplyr::case_when(minLong<-160 & maxLong>160 ~ 1,
+                                     TRUE~0),
+                    long = dplyr::case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                     (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                     TRUE~long))%>%
+      dplyr::ungroup()
+
+    dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
+      dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
+      dplyr::group_by(subRegion) %>%
+      dplyr::mutate(minLong = min(long),
+                    negLongSum = sum(long[which(long<=0)], na.rm=T),
+                    maxLong = max(long),
+                    posLongSum = sum(long[which(long>=0)], na.rm=T),
+                    flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                                     TRUE~0),
+                    long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                     (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                     TRUE~long))%>%
+      dplyr::ungroup()
+
+    if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
+
+      subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
+
+      prcntZoom <- 1
+      longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
+      longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
+      latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
+      latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
+
+      prcntZoom <- 0.1
+      longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
+      longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
+      latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
+      latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
+
+      shp_bg <- argus::mapCountriesdf%>%
+        dplyr::filter(long > longLimMinbg,
+                      long < longLimMaxbg,
+                      lat > latLimMinbg,
+                      lat < latLimMaxbg);
+
+      cnames <- aggregate(cbind(long, lat) ~ subRegion, data=dataMapPlot, FUN=mean)
+
+      map <- ggplot() + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)
+      map <- map + geom_polygon(data = dataMapPlot,
+                                aes(x = long, y = lat, group = group, fill=subRegion),
+                                colour = "gray10", lwd=0.5, show.legend = F) +
+        coord_fixed(ratio = 1.0,ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
+        theme(panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank()
+        )+
+        theme(plot.margin=margin(10,10,10,10,"pt"),
+              axis.title=element_blank(),
+              axis.text=element_blank(),
+              axis.ticks=element_blank())
+      map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = subRegion),color="black", size = 4)
+      map <- map + theme(panel.background = element_rect(fill="lightblue1")) + ggtitle(unique(dataMapPlot$subRegionType))
+      map
+
+      plist[[pcount]] <- map
+      pcount=pcount+1
+      globcount <- pcount
+    }
+  }
+  return(cowplot::plot_grid(plotlist=plist,ncol=1,align = "v"))
+}
+
