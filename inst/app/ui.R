@@ -120,10 +120,10 @@ ui <- fluidPage(
       # Params
       uiOutput('selectParams'),
       # Regions
-      div(
-        style="visibility: hidden;display: none;",
-        uiOutput('selectRegions')
-        ),
+      #div(
+      #  style="visibility: hidden;display: none;",
+      #  uiOutput('selectRegions')
+      #  ),
       div(
         class="charts",
         leafletOutput(outputId = "mymap")

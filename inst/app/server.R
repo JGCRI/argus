@@ -50,8 +50,6 @@ server <- function(input, output, session) {
                     "scenariosSelect",
                     "scenarioRefSelect",
                     "paramsSelect")
-
-  # session$sendCustomMessage("rhm_clic", unique(data()$subRegion))
   # Create Modal for Settings Download and Loading
   observeEvent(input$loadsetting, {
     showModal(
@@ -679,9 +677,15 @@ server <- function(input, output, session) {
           dataMapPlot <- dataMapPlot %>% dplyr::left_join(dict,by="subRegion") %>%  dplyr::mutate(subRegionMap=case_when(is.na(subRegionMap)~subRegion, TRUE~subRegionMap))
           a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
           #z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+             # palx <- colorFactor(
+             #   palette = c("green", "red"),
+             #   dataMapPlot$subRegionType)
           if (length(a) >= 2){
             for (i in 1:length(a)){#group =unique(a[[i]]$subRegion)
-              z <- z %>% addPolygons(data=a[[i]],  group=~unique(subRegionMap), label = ~unique(subRegionMap), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+              pal <- colorNumeric(
+                palette = c("green", "red"),
+                domain = 1:length(a))
+              z <- z %>% addPolygons(data=a[[i]],  group=~unique(subRegionMap), label = ~unique(subRegionMap), lat=~lat, lng=~long, fillColor = ~pal(i), stroke = FALSE)
             #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
             }
             for (i in 1:(length(a))){
@@ -698,27 +702,38 @@ server <- function(input, output, session) {
          overlayGroups = unique(subRegTypelist),
          options = layersControlOptions(collapsed = FALSE)
        )
+      session$sendCustomMessage("rhm_clic", unique(data()$subRegion))
     #z<-leaflet() %>% addTiles() %>% addPolygons(data=base, layerId = ~group, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
     return(z)
   })
 
   observeEvent(input$mymap_shape_click,{
+    print(input$mymap_shape_click)
     if (is.null(input$mymap_shape_click$id)){
       return(0)
     }
     l = strsplit(input$mymap_shape_click$id, "[[:digit:]]")[[1]][[1]]
     selectedx <- reactiveValuesToList(input)$regionsSelected
+    print(selectedx)
+    print(input$regionsSelected)
     if (l %in% selectedx){
+      print("deselecting")
       leafletProxy("mymap") %>% hideGroup(l)
       selectedx =  selectedx[!(selectedx %in% l)]
-      print(selectedx)
     }else{
+      print("selecting")
       leafletProxy("mymap") %>% showGroup(l)
       leafletProxy("mymap") %>% hideGroup(input$mymap_shape_click$group)
       leafletProxy("mymap") %>% showGroup(input$mymap_shape_click$group)
       selectedx =  append(selectedx, l)
     }
     session$sendCustomMessage("rhm_clic", selectedx)
+    #updatePickerInput(
+    #  inputId = "regionsSelected",
+    #  session=session,
+    #  choices = unique(data()$subRegion),
+    #  selected = unique(data()$subRegion)
+    #  )
   })
 
   #---------------------------
