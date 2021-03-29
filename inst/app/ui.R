@@ -30,7 +30,7 @@ ui <- fluidPage(
   useShinyalert(),
 
   tags$script("
-    Shiny.addCustomMessageHandler('regionsSeleced', function(value) {
+    Shiny.addCustomMessageHandler('rhm_clic', function(value) {
     Shiny.setInputValue('regionsSelected', value);
     });
   "),
@@ -120,7 +120,14 @@ ui <- fluidPage(
       # Params
       uiOutput('selectParams'),
       # Regions
-      uiOutput('selectRegions'),
+      div(
+        style="visibility: hidden;display: none;",
+        uiOutput('selectRegions')
+        ),
+      div(
+        class="charts",
+        leafletOutput(outputId = "mymap")
+      )
       # div(id="map", class="maps")
       # leafletOutput(outputId = "mymap")
     ),
@@ -268,7 +275,7 @@ ui <- fluidPage(
                                               div(
                                                 class="charts",
                                                 leafletOutput(outputId = "mymapBase")
-                                                )                                      
+                                                )
                                                 #div(
                                                 #  class="charts",
                                                 #  plotOutput(outputId = "mapBase", width = "100%", height="100%"))
@@ -317,10 +324,6 @@ ui <- fluidPage(
                                        #tabPanel("Compare Years"),
                                        #tabPanel("Class"),
                                        #tabPanel("Class Compare years")
-                           ),
-                           div(
-                              class="charts",
-                              leafletOutput(outputId = "mymap")
                            )
 
                   ),

@@ -51,6 +51,7 @@ server <- function(input, output, session) {
                     "scenarioRefSelect",
                     "paramsSelect")
 
+  # session$sendCustomMessage("rhm_clic", unique(data()$subRegion))
   # Create Modal for Settings Download and Loading
   observeEvent(input$loadsetting, {
     showModal(
@@ -576,7 +577,7 @@ server <- function(input, output, session) {
  output$mymapBase <- renderLeaflet({
 
 
-    dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
+    dataMap_raw <- data() %>% dplyr::ungroup() %>%
       dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
       dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
                                         TRUE~subRegion)) %>%
@@ -586,6 +587,7 @@ server <- function(input, output, session) {
     pcount = 1
     subRegTypelist <- c()
     z <- leaflet() %>% addTiles()
+    print(dataMap_raw$subRegion)
     print("===============================================")
     for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
       dataMap_raw_regions <- dataMap_raw %>%
@@ -618,7 +620,7 @@ server <- function(input, output, session) {
             for (i in 1:length(a)){#group =unique(a[[i]]$subRegion),
             z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$subRegion), group=~unique(subRegionType),lat=~lat, lng=~long, stroke = TRUE)
             #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
-              } 
+              }
             }
         }
     }
@@ -629,17 +631,15 @@ server <- function(input, output, session) {
           options = layersControlOptions(collapsed = FALSE)
         )
     #z<-leaflet() %>% addTiles() %>% addPolygons(data=base, layerId = ~group, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-    print(z)
     return(z)
   })
 
 
   output$mymap <- renderLeaflet({
+    dataMap_raw <- data() %>% dplyr::ungroup() %>%
+      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion")
 
-
-    dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
-      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-      dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
+    dataMap_raw <- dataMap_raw %>%  dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
                                         TRUE~subRegion)) %>%
       dplyr::select(-subRegionMap)
 
@@ -673,49 +673,49 @@ server <- function(input, output, session) {
           subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
           pcount = pcount+1
           #a <-  dataMapPlot %>% group_by(subRegion) %>% group_split()
+          dict <- argus::mappings("mappingGCAMBasins")
+          dict$subRegion <- argus::mappings("mappingGCAMBasins")$subRegionMap
+          dict$subRegionMap <- argus::mappings("mappingGCAMBasins")$subRegion
+          dataMapPlot <- dataMapPlot %>% dplyr::left_join(dict,by="subRegion") %>%  dplyr::mutate(subRegionMap=case_when(is.na(subRegionMap)~subRegion, TRUE~subRegionMap))
           a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
           #z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
           if (length(a) >= 2){
-            for (i in 1:(length(a))){
-              z <- z %>% addPolygons(data=a[[i]], group =unique(a[[i]]$subRegion), lat=~lat, lng=~long, color = "#4287f5", stroke=TRUE)
-              }
-            for (i in 1:length(a)){#group =unique(a[[i]]$subRegion),
-            z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$group), group="a", layerId = ~unique(group), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+            for (i in 1:length(a)){#group =unique(a[[i]]$subRegion)
+              z <- z %>% addPolygons(data=a[[i]],  group=~unique(subRegionMap), label = ~unique(subRegionMap), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
             #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
-              } 
+            }
+            for (i in 1:(length(a))){
+              tem<-a[[i]] %>% dplyr::mutate(subRegionA =paste(subRegionMap, sep="", piece))
+              z <- z %>% addPolygons(data=tem, group= ~unique(subRegionType), layerId = ~unique(subRegionA), label = ~unique(subRegionMap), lat=~lat, lng=~long, color = "#4287f5", stroke=TRUE, weight = 0.5)
+            }
             }
 
         }
     }
     print("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
-    #z <- z%>%
-    #    addLayersControl(
-    #      overlayGroups = unique(dataMap_raw$group),
-    #      options = layersControlOptions(collapsed = FALSE)
-    #    )
+    z <- z%>%
+       addLayersControl(
+         overlayGroups = unique(subRegTypelist),
+         options = layersControlOptions(collapsed = FALSE)
+       )
     #z<-leaflet() %>% addTiles() %>% addPolygons(data=base, layerId = ~group, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-    print(z)
     return(z)
   })
 
   observeEvent(input$mymap_shape_click,{
-    print(input$mymap_shape_click)
-    print(input$regionsSelected)
-    l <- gsub('\\.', '', gsub('\\d', '', input$mymap_shape_click$id))
-    print(l)
+    if (is.null(input$mymap_shape_click$id)){
+      return(0)
+    }
+    l = strsplit(input$mymap_shape_click$id, "[[:digit:]]")[[1]][[1]]
     selectedx <- reactiveValuesToList(input)$regionsSelected
-    print(selectedx)
-    print (l %in% selectedx)
     if (l %in% selectedx){
-      print('oof')
       leafletProxy("mymap") %>% hideGroup(l)
       selectedx =  selectedx[!(selectedx %in% l)]
+      print(selectedx)
     }else{
-      print('oofx')
-      #print(l)
       leafletProxy("mymap") %>% showGroup(l)
-      leafletProxy("mymap") %>% hideGroup("a")
-      leafletProxy("mymap") %>% showGroup("a")
+      leafletProxy("mymap") %>% hideGroup(input$mymap_shape_click$group)
+      leafletProxy("mymap") %>% showGroup(input$mymap_shape_click$group)
       selectedx =  append(selectedx, l)
     }
     session$sendCustomMessage("rhm_clic", selectedx)
