@@ -720,7 +720,7 @@ mapBase<- function(dataMapx){
 #' @param aspectratio aspect ratio
 #' @param textsize text size
 #' @param titletext title text
-#' @param dataSumx dataSumx
+#' @param dataSumx dataSumx()
 #' @importFrom magrittr %>%
 #' @export
 summaryPlot <- function(aspectratio,
@@ -750,7 +750,7 @@ summaryPlot <- function(aspectratio,
 
 #' plotDiff
 #'
-#' generate chart plot
+#' generate chart plot for absolute difference and percent difference
 #' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
 #' @param scenarioRefSeleceted scenarioRefSeleceted
 #' @importFrom magrittr %>%
@@ -836,8 +836,8 @@ plotDiff<- function(dataChartPlot, scenarioRefSelected){
 
 #' plotAbs
 #'
-#' generate chart plot
-#' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
+#' generate chart plot for absolute value
+#' @param dataChartPlot dataChartPlot: dataChartx()
 #' @param scenarioRefSelected scenarioRefSelected
 #' @importFrom magrittr %>%
 #' @export
