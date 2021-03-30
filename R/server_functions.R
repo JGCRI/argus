@@ -125,19 +125,20 @@ parse_remote <- function(urlfiledata){
 #' parse_local
 #'
 #' parse local files
-#' @param input local file to parse
+#' @param inputdatapath local file to parse
+#' @param urlfiledatadatapath local file to parse
 #' @importFrom magrittr %>%
 #' @export
-parse_local <- function(datapath){
-  if (tools::file_ext(datapath) == ""){
-    if (grepl("./$",urlfiledata$datapath)){
-      utils::read.csv(datapath) %>%
+parse_local <- function(inputdatapath, urlfiledatadatapath){
+  if (tools::file_ext(inputdatapath) == ""){
+    if (grepl("./$",urlfiledatadatapath)){
+      utils::read.csv(inputdatapath) %>%
         as.data.frame()
     }
-  }else if (tools::file_ext(datapath) == "zip"){
-    return(parse_zip(datapath))
-  }else if (tools::file_ext(datapath) == "csv"){
-    return(utils::read.csv(datapath) %>%
+  }else if (tools::file_ext(inputdatapath) == "zip"){
+    return(parse_zip(inputdatapath))
+  }else if (tools::file_ext(inputdatapath) == "csv"){
+    return(utils::read.csv(inputdatapath) %>%
              as.data.frame())
   }else{
     return(NULL)
@@ -234,6 +235,7 @@ summaryPlotReg <- function(titletext,
 #' @param dataMap_raw_param Input dataframe
 #' @param breaks_n Number of breaks
 #' @importFrom magrittr %>%
+#' @import ggplot2
 #' @export
 
 breaks <- function(dataMap_raw_param, breaks_n){
@@ -610,16 +612,18 @@ process_map <- function(dataMap_raw,
 #' mapBase
 #'
 #' returns map
-#' @param dataMap input dataframe
+#' @param dataMapx input dataframe
 #' @importFrom magrittr %>%
 #' @import ggplot2
 #' @export
 
 mapBase<- function(dataMapx){
 
+  NULL->long->lat->group->aggregate->param->subRegionMap->param->subRegion
+
   dataMap_raw <- dataMapx %>% dplyr::ungroup() %>%
     dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-    dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
+    dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
                                       TRUE~subRegion)) %>%
     dplyr::select(-subRegionMap)
 
@@ -655,9 +659,9 @@ mapBase<- function(dataMapx){
                     negLongSum = sum(long[which(long<=0)], na.rm=T),
                     maxLong = max(long),
                     posLongSum = sum(long[which(long>=0)], na.rm=T),
-                    flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                    flip = dplyr::case_when(minLong<-160 & maxLong>160 ~ 1,
                                      TRUE~0),
-                    long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                    long = dplyr::case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
                                      (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
                                      TRUE~long))%>%
       dplyr::ungroup()
@@ -709,4 +713,185 @@ mapBase<- function(dataMapx){
   }
   return(cowplot::plot_grid(plotlist=plist,ncol=1,align = "v"))
 }
+
+#' summaryPlot
+#'
+#' generate summary plot
+#' @param aspectratio aspect ratio
+#' @param textsize text size
+#' @param titletext title text
+#' @param dataSumx dataSumx
+#' @importFrom magrittr %>%
+#' @export
+summaryPlot <- function(aspectratio,
+                        textsize,
+                        titletext,
+                        dataSumx){
+  NULL->x->value->scenario->ggplottheme
+  ggplot2::ggplot(dataSumx,
+                  aes(x=x,y=value,
+                      group=scenario,
+                      color=scenario))+
+    geom_line(size=1.25) +
+    ggplottheme +
+    geom_line() +
+    ylab(NULL) +  xlab(NULL) +
+    facet_wrap(.~param, scales="free", ncol = 3,
+               labeller = labeller(param = label_wrap_gen(15)))+
+    theme(legend.position="top",
+          legend.text=element_text(size=titletext),
+          legend.title = element_blank(),
+          plot.margin=margin(20,20,20,0,"pt"),
+          text=element_text(size=textsize),
+          aspect.ratio = aspectratio
+    )
+}
+
+
+#' plotDiff
+#'
+#' generate chart plot
+#' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
+#' @importFrom magrittr %>%
+#' @export
+plotDiff<- function(dataChartPlot){
+
+  NULL -> filter -> param -> scenario -> input -> value
+
+  g <- 2
+
+  print("abs diff")
+
+  plist <- list()
+  x = 1
+
+  for(i in 1:length(unique(dataChartPlot$param))){
+    # Check Color Palettes
+    palAdd <- c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise")
+
+    missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
+                                               names(argus::mappings()$pal_all)]
+    if (length(missNames) > 0) {
+      palAdd <- palAdd[1:length(missNames)]
+      names(palAdd) <- missNames
+      palCharts <- c(argus::mappings()$pal_all, palAdd)
+    } else{
+      palCharts <- argus::mappings()$pal_all
+    }
+    print(palCharts)
+
+    chartz <- dataChartPlot %>%
+      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)
+    z<-x
+
+    plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                       dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
+                                       droplevels(),
+                                     aes(x=x,y=value,
+                                         group=scenario,
+                                         fill=class))+
+      ggplot2::theme_bw() +
+      xlab(NULL) +
+      ylab(NULL) +
+      scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+      scale_y_continuous(position = "left")+
+      geom_bar(position="stack", stat="identity") +
+      # geom_line()+
+      # geom_point()+
+      facet_grid(param~scenario, scales="free",switch="y") +
+      theme(legend.position="bottom",
+            legend.title = element_blank(),
+            strip.text.y = element_blank(),
+            legend.margin=margin(0,0,0,0,"pt"),
+            legend.key.height=unit(0, "cm"),
+            text = element_text(size = 12.5),
+            plot.margin=margin(20,20,20,0,"pt"))
+    x = x+2
+
+
+    plist[[z]] <-  ggplot2::ggplot(chartz%>%
+                                     droplevels(),
+                                   aes(x=x,y=value,
+                                       group=scenario,
+                                       fill=class))+
+      ggplot2::theme_bw()  +
+      xlab(NULL) +
+      ylab(unique(dataChartPlot$param)[i])+
+      scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+      scale_y_continuous(position = "left")+
+      geom_bar(position="stack", stat="identity") +
+      facet_grid(param~scenario, scales="free",switch="y")+
+      theme(legend.position="bottom",
+            strip.text.y = element_blank(),
+            legend.title = element_blank(),
+            legend.margin=margin(0,0,0,0,"pt"),
+            legend.key.height=unit(0, "cm"),
+            text = element_text(size = 12.5),
+            plot.margin=margin(20,0,20,0,"pt"))
+  }
+  cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
+}
+
+
+#' plotAbs
+#'
+#' generate chart plot
+#' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
+#' @param scenarioRefSelected scenarioRefSelected
+#' @importFrom magrittr %>%
+#' @export
+plotAbs <- function(dataChartPlot, scenarioRefSelected){
+
+  NULL -> filter -> param -> scenario -> input -> value
+
+  g <- 1
+
+  plist <- list()
+  x = 1
+  for(i in 1:length(unique(dataChartPlot$param))){
+    # Check Color Palettes
+    palAdd <- c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise")
+
+    missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
+                                               names(argus::mappings()$pal_all)]
+    if (length(missNames) > 0) {
+      palAdd <- palAdd[1:length(missNames)]
+      names(palAdd) <- missNames
+      palCharts <- c(argus::mappings()$pal_all, palAdd)
+    } else{
+      palCharts <- argus::mappings()$pal_all
+    }
+    print(palCharts)
+
+    chartz <- dataChartPlot %>%
+      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == scenarioRefSelected)
+    z<-x
+
+    chartz <- dataChartPlot %>%
+      dplyr::filter(param==unique(dataChartPlot$param)[i])
+    x=x+1
+
+    plist[[z]] <-  ggplot2::ggplot(chartz%>%
+                                     droplevels(),
+                                   aes(x=x,y=value,
+                                       group=scenario,
+                                       fill=class))+
+      ggplot2::theme_bw() +
+      xlab(NULL) +
+      ylab(unique(dataChartPlot$param)[i])+
+      scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+      scale_y_continuous(position = "left")+
+      geom_bar(position="stack", stat="identity") +
+      facet_grid(param~scenario, scales="free",switch="y")+
+      theme(legend.position="bottom",
+            strip.text.y = element_blank(),
+            legend.title = element_blank(),
+            legend.margin=margin(0,0,0,0,"pt"),
+            legend.key.height=unit(0, "cm"),
+            text = element_text(size = 12.5),
+            plot.margin=margin(20,0,20,0,"pt"))
+  }
+  cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
+}
+
 

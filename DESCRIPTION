@@ -27,7 +27,8 @@ Imports:
     tidyr,
 	cowplot,
 	ggplot2,
-	xfun
+	xfun,
+	scales
 Remotes: github::JGCRI/rgcam
 VignetteBuilder: 
     knitr

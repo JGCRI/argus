@@ -210,6 +210,12 @@ ui <- fluidPage(
                                                 br(),
                                                 div(
                                                   id = "testz",
+                                                  fluidRow(
+                                                    column(
+                                                      9),
+                                                    column(
+                                                      3, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png",  class = "download_button"), style = "float: right")
+                                                    )),
                                                   tabsetPanel(
                                                     type="pills",
                                                     tabPanel("Absolute Value",
@@ -231,27 +237,6 @@ ui <- fluidPage(
                                                     )
                                                   )
                                                 ),
-
-                                                # fluidRow(
-                                                #   column(
-                                                #     3),
-                                                #   column(
-                                                #     2,
-                                                #          div(
-                                                #             actionButton(label="Absolute\nValue", inputId = "absChart",width="100%", class="diff_button")
-                                                #             )
-                                                #          ),
-                                                #   column(
-                                                #     2,
-                                                #          actionButton(label="Absolute\nDifference", inputId = "absDiffChart",width="100%", class="diff_button")
-                                                #          ),
-                                                #   column(
-                                                #     2,
-                                                #          actionButton(label="Percent\nDifference", inputId = "percDiffChart", width="100%", class="diff_button")
-                                                #          ),
-                                                #   column(
-                                                #     3, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png",  class = "download_button"), style = "float: right")
-                                                #   )),
                                        br(),
                                        p("*Sum of Regions Selected", style="color:#cc0000")
                            ))

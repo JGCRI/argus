@@ -118,7 +118,7 @@
     class_temp -> resource -> subRegAreaSum -> subsector->tblFinalNrgIntlAvShipMod -> 'transportation' ->
     'International Aviation' -> 'International Ship' -> 'International Aviation oil' -> 'a oil' ->
     'International Ship oil' -> 'International Aviation liquids' -> liquids -> 'International Ship liquids'->crop->
-    paramsSelectAll -> dataTemplate->tblFinalNrgIntlAvShip->datax->group->basin->subRegion->query->subresource
+    paramsSelectAll -> dataTemplate->tblFinalNrgIntlAvShip->datax->group->basin->subRegion->query->subresource -> gcamdatabasepath
 
 
   #---------------------

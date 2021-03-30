@@ -7,7 +7,7 @@
 mapBase(dataMapx)
 }
 \arguments{
-\item{dataMap}{input dataframe}
+\item{dataMapx}{input dataframe}
 }
 \description{
 returns map

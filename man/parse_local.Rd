@@ -4,10 +4,12 @@
 \alias{parse_local}
 \title{parse_local}
 \usage{
-parse_local(datapath)
+parse_local(inputdatapath, urlfiledatadatapath)
 }
 \arguments{
-\item{input}{local file to parse}
+\item{inputdatapath}{local file to parse}
+
+\item{urlfiledatadatapath}{local file to parse}
 }
 \description{
 parse local files
