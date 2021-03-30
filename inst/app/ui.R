@@ -219,17 +219,20 @@ ui <- fluidPage(
                                                   tabsetPanel(
                                                     type="pills",
                                                     tabPanel("Absolute Value",
+                                                             br(),
                                                              div(
                                                                class="charts",
                                                                plotOutput(outputId = "plotAbs", width = "100%", height="100%"))
                                                     ),
                                                     tabPanel("Absolute Difference",
+                                                             br(),
                                                              div(
                                                                class="charts",
 
                                                                plotOutput(outputId = "plotDiff", width = "100%", height="100%"))
                                                     ),
                                                     tabPanel("Percent Difference",
+                                                             br(),
                                                              div(
                                                                class="charts",
 
@@ -304,17 +307,20 @@ ui <- fluidPage(
                                                   tabsetPanel(
                                                     type="pills",
                                                     tabPanel("Absolute Value",
+                                                             br(),
                                                              div(
                                                                class="charts",
                                                                plotOutput(outputId = "mapAbs", width = "100%", height="100%"))
                                                     ),
                                                     tabPanel("Absolute Difference",
+                                                             br(),
                                                              div(
                                                                class="charts",
 
                                                                plotOutput(outputId = "mapDiff", width = "100%", height="100%"))
                                                     ),
                                                     tabPanel("Percent Difference",
+                                                             br(),
                                                              div(
                                                                class="charts",
 

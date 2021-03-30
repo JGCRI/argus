@@ -1162,7 +1162,7 @@ server <- function(input, output, session) {
   #---------------------------
 
   output$plotDiff <- renderPlot({
-    argus::plotDiff(dataDiffAbsx())
+    argus::plotDiff(dataDiffAbsx(), input$scenarioRefSelected)
   },
   height=function(){300*length(unique(dataChartx()$param))},
   width=function(){max(600, 400*length(unique(data()$scenario)))}
@@ -1246,7 +1246,7 @@ server <- function(input, output, session) {
   # }
 
   output$plotPerc <- renderPlot({
-    argus::plotDiff(dataPrcntAbsx())
+    argus::plotDiff(dataPrcntAbsx(), input$scenarioRefSelected)
   },
   height=function(){300*length(unique(dataChartx()$param))},
   width=function(){max(600, 400*length(unique(data()$scenario)))}

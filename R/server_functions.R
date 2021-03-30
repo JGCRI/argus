@@ -752,9 +752,10 @@ summaryPlot <- function(aspectratio,
 #'
 #' generate chart plot
 #' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
+#' @param scenarioRefSeleceted scenarioRefSeleceted
 #' @importFrom magrittr %>%
 #' @export
-plotDiff<- function(dataChartPlot){
+plotDiff<- function(dataChartPlot, scenarioRefSelected){
 
   NULL -> filter -> param -> scenario -> input -> value
 
@@ -781,11 +782,11 @@ plotDiff<- function(dataChartPlot){
     print(palCharts)
 
     chartz <- dataChartPlot %>%
-      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)
+      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == scenarioRefSelected)
     z<-x
 
     plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                       dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
+                                       dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != scenarioRefSelected)%>%
                                        droplevels(),
                                      aes(x=x,y=value,
                                          group=scenario,
