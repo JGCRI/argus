@@ -7,10 +7,10 @@
 plotAbs(dataChartPlot, scenarioRefSelected)
 }
 \arguments{
-\item{dataChartPlot}{dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()}
+\item{dataChartPlot}{dataChartPlot: dataChartx()}
 
 \item{scenarioRefSelected}{scenarioRefSelected}
 }
 \description{
-generate chart plot
+generate chart plot for absolute value
 }

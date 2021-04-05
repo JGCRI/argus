@@ -752,7 +752,7 @@ summaryPlot <- function(aspectratio,
 #'
 #' generate chart plot for absolute difference and percent difference
 #' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
-#' @param scenarioRefSeleceted scenarioRefSeleceted
+#' @param scenarioRefSelected scenarioRefSeleceted
 #' @importFrom magrittr %>%
 #' @export
 plotDiff<- function(dataChartPlot, scenarioRefSelected){

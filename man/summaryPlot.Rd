@@ -13,7 +13,7 @@ summaryPlot(aspectratio, textsize, titletext, dataSumx)
 
 \item{titletext}{title text}
 
-\item{dataSumx}{dataSumx}
+\item{dataSumx}{dataSumx()}
 }
 \description{
 generate summary plot

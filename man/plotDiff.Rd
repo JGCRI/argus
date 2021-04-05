@@ -4,11 +4,13 @@
 \alias{plotDiff}
 \title{plotDiff}
 \usage{
-plotDiff(dataChartPlot)
+plotDiff(dataChartPlot, scenarioRefSelected)
 }
 \arguments{
 \item{dataChartPlot}{dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()}
+
+\item{scenarioRefSelected}{scenarioRefSeleceted}
 }
 \description{
-generate chart plot
+generate chart plot for absolute difference and percent difference
 }
