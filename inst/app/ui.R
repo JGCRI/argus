@@ -28,6 +28,25 @@ ui <- fluidPage(
   ),
 
   useShinyalert(),
+
+  tags$script("
+    Shiny.addCustomMessageHandler('rhm_clic', function(value) {
+    Shiny.setInputValue('regionsSelected', value);
+    });
+  "),
+
+  #     <script async defer
+  # 			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5aevdcRxbI2nBJ8UGTh_m7kESdN0AVqA&callback=initMap">
+  # 		</script>
+
+  tags$script(src = "script.js"),
+  tags$div(
+    HTML('
+      <script src="https://api.mqcdn.com/sdk/mapquest-js/v1.3.2/mapquest.js"></script>
+      <link type="text/css" rel="stylesheet" href="https://api.mqcdn.com/sdk/mapquest-js/v1.3.2/mapquest.css"/>
+    ')
+  ),
+
   #---------------------------
   # Initial Settings/Theme
   #---------------------------
@@ -101,8 +120,22 @@ ui <- fluidPage(
       # Params
       uiOutput('selectParams'),
       # Regions
-      uiOutput('selectRegions')
-
+      #uiOutput('selectRegions')
+      tabsetPanel(
+        type = "tabs",
+        id="tabs",
+        tabPanel(
+          "Drop Down Selection",
+          br(),
+          uiOutput('selectRegions')
+        ),
+        tabPanel(
+            "Map Selection",
+            leafletOutput(outputId = "mymap", height="30vh")
+        )
+      ),
+      # div(id="map", class="maps")
+      # leafletOutput(outputId = "mymap")
     ),
 
 
@@ -251,23 +284,14 @@ ui <- fluidPage(
                            br(),
                            tabsetPanel(type = "pills",
                                        tabPanel("Base Map",
-                                                br(),
-                                                fluidRow(
-                                                  column(
-                                                    12, div(
-                                                      downloadButton(
-                                                        'downloadMapBase',
-                                                        NULL,
-                                                        download = "mapBase.png",
-                                                        class = "download_button"
-                                                      ),
-                                                      style="float:right"
-                                                    ))
+                                              div(
+                                                class="maps",
+                                                leafletOutput(outputId = "mymapBase", height="90vh")
+                                                )
+                                                #div(
+                                                #  class="charts",
+                                                #  plotOutput(outputId = "mapBase", width = "100%", height="100%"))
                                                 ),
-                                                div(
-                                                  class="charts",
-                                                  plotOutput(outputId = "mapBase", width = "100%", height="100%"))
-                                       ),
                                        tabPanel("Summary",
                                                 fluidRow(
                                                   column(
@@ -326,34 +350,25 @@ ui <- fluidPage(
 
                                                                plotOutput(outputId = "mapPerc", width = "100%", height="100%"))
                                                     )
-                                                  )
-                                                ),
-                                                # fluidRow(
-                                                #   column(
-                                                #     3),
-                                                #   column(
-                                                #     2,
-                                                #     div(
-                                                #       actionButton(label="Absolute\nValue", inputId = "absMap",width="100%", class="diff_button")
-                                                #     )
-                                                #   ),
-                                                #   column(
-                                                #     2,
-                                                #     actionButton(label="Absolute\nDifference", inputId = "absDiffMap",width="100%", class="diff_button")
-                                                #   ),
-                                                #   column(
-                                                #     2,
-                                                #     actionButton(label="Percent\nDifference", inputId = "percDiffMap", width="100%", class="diff_button")
-                                                #   )),
-                                                br(),
-                                                div(
-                                                  class="charts",
-                                                  plotOutput(outputId = "map", width = "100%", height="100%"))
-                                       )#,
+                                                  ),
+                                                  column(
+                                                    2,
+                                                    actionButton(label="Absolute\nDifference", inputId = "absDiffMap",width="100%", class="diff_button")
+                                                  ),
+                                                  column(
+                                                    2,
+                                                    actionButton(label="Percent\nDifference", inputId = "percDiffMap", width="100%", class="diff_button")
+                                                  )),
+                                                br()
+                                                #,div(
+                                                #  class="charts",
+                                                #  plotOutput(outputId = "map", width = "100%", height="100%"))
+                                       )
                                        #tabPanel("Compare Years"),
                                        #tabPanel("Class"),
                                        #tabPanel("Class Compare years")
                            )
+
                   ),
                   #---------------------------
                   # Main Panel: Table Tab

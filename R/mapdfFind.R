@@ -38,6 +38,8 @@ mapdfFind <- function(dataTbl) {
     if(!all(c("subRegion") %in% names(dataTbl))){stop("dataTbl must have subRegion columns.")}
 
     subRegShapeTblOrig <- unique(dataTbl$subRegion)
+    print("????????")
+    print(subRegShapeTblOrig)
 
     # Map subRegions to argus regions
     dataTbl <- dataTbl %>%
