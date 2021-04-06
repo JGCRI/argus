@@ -424,7 +424,7 @@ server <- function(input, output, session) {
 
 
   rv$pcount = 1;
-
+  rv$mapflag = 0;
   # Charts initializing abs, percDiff, and absDiff
   rv$absChart = 1;
   rv$percDiffChart = 0;
@@ -573,8 +573,6 @@ server <- function(input, output, session) {
   })
 
  output$mymapBase <- renderLeaflet({
-
-
     dataMap_raw <- data() %>% dplyr::ungroup() %>%
       dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
       dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
@@ -713,8 +711,15 @@ server <- function(input, output, session) {
     #   choices = unique(data()$subRegion),
     #   selected = unique(reactiveValuesToList(input)$regionsSelected)
     # )
-    check()
+    rv$mapflag = 1
     return(z)
+  })
+
+  observe({
+    if(rv$mapflag == 1){
+      check()
+      rv$mapflag = 0
+    }
   })
 
   check <- function(){
@@ -724,12 +729,14 @@ server <- function(input, output, session) {
       print(paste("hiding", " ", i))
       leafletProxy("mymap") %>% hideGroup(i)
     }
+    print(reactiveValuesToList(input)$regionsSelected)
     for (i in unique(reactiveValuesToList(input)$regionsSelected)){
       print(paste("showing", " ", i))
       leafletProxy("mymap") %>% showGroup(i)
     }
     return(0)
   }
+
 
   observeEvent(input$regionsSelected, {
     check()
