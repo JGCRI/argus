@@ -120,11 +120,20 @@ ui <- fluidPage(
       # Params
       uiOutput('selectParams'),
       # Regions
-      uiOutput('selectRegions'),
-      div(
-        class="charts",
-        leafletOutput(outputId = "mymap")
-      )
+      #uiOutput('selectRegions')
+      tabsetPanel(
+        type = "tabs",
+        id="tabs",
+        tabPanel(
+          "Drop Down Selection",
+          br(),
+          uiOutput('selectRegions')
+        ),
+        tabPanel(
+            "Map Selection",
+            leafletOutput(outputId = "mymap", height="30vh")
+        )
+      ),
       # div(id="map", class="maps")
       # leafletOutput(outputId = "mymap")
     ),

@@ -707,10 +707,17 @@ server <- function(input, output, session) {
        )
       session$sendCustomMessage("rhm_clic", unique(data()$subRegion))
     #z<-leaflet() %>% addTiles() %>% addPolygons(data=base, layerId = ~group, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+    # updatePickerInput(
+    #   inputId = "regionsSelected",
+    #   session=session,
+    #   choices = unique(data()$subRegion),
+    #   selected = unique(reactiveValuesToList(input)$regionsSelected)
+    # )
+    check()
     return(z)
   })
 
-  observeEvent(input$regionsSelected, {
+  check <- function(){
     print("oof")
     hidden_group <- data()$subRegion[which(!data()$subRegion %in% reactiveValuesToList(input)$regionsSelected)]
     for (i in unique(hidden_group)){
@@ -722,6 +729,10 @@ server <- function(input, output, session) {
       leafletProxy("mymap") %>% showGroup(i)
     }
     return(0)
+  }
+
+  observeEvent(input$regionsSelected, {
+    check()
   }, ignoreNULL = FALSE)
 
   observeEvent(input$mymap_shape_click,{
