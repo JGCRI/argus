@@ -4,10 +4,10 @@
 \alias{parse_remote}
 \title{parse_remote}
 \usage{
-parse_remote(input)
+parse_remote(urlfiledata)
 }
 \arguments{
-\item{input}{reactive remote file link to parse}
+\item{urlfiledata}{remote file link to parse}
 }
 \description{
 parse remote files

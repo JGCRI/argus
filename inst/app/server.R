@@ -3,6 +3,7 @@
 #---------------------------
 # Libraries Needed
 #---------------------------
+
 library(shiny)
 library(ggplot2)
 library(dplyr)
@@ -18,6 +19,7 @@ library(leafsync)
 library(rgcam)
 library(plyr)
 library(broom)
+library(mvbutils)
 
 #---------------------------
 # Options
@@ -45,11 +47,14 @@ server <- function(input, output, session) {
 
   # Initialize Settings
   settings <- reactive({data.frame()})
-  settingsVars <- c("urlSelect",
-                    "regionsSelect",
-                    "scenariosSelect",
-                    "scenarioRefSelect",
-                    "paramsSelect")
+
+
+  #<TOBEMOVED>
+  # settingsVars <- c("urlSelect",
+  #                   "regionsSelect",
+  #                   "scenariosSelect",
+  #                   "scenarioRefSelect",
+  #                   "paramsSelect")
 
   # Create Modal for Settings Download and Loading
   observeEvent(input$loadsetting, {
@@ -102,9 +107,6 @@ server <- function(input, output, session) {
                 file=filename,
                 row.names = F)
     })
-
-
-
 
   # Load Settings Data if Selected
   observeEvent(input$settingdata,{
@@ -457,7 +459,7 @@ server <- function(input, output, session) {
       rv$urlfiledatax <- NULL
     } else if(!is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
       return(argus::addMissing(
-        argus::parse_local(input)%>%
+        argus::parse_local(input$filedata$datapath, inpu$urlfiledata$datapath)%>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
       rv$filedatax <- NULL
@@ -469,7 +471,7 @@ server <- function(input, output, session) {
       rv$urlfiledatax <- NULL
     }else{
       return(argus::addMissing(
-        argus::parse_remote(input)%>%
+        argus::parse_remote(input$urlfiledata)%>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
       rv$filedatax <- NULL
@@ -612,12 +614,9 @@ server <- function(input, output, session) {
   #---------------------------
   # Reactive Reference Scenario Select
   #---------------------------
-
   scenarioRefSelectedx <- reactive({
     input$scenarioRefSelected
   })
-
-
   #---------------------------
   # Reactive Regions Select based on inputs
   #---------------------------
@@ -683,7 +682,8 @@ server <- function(input, output, session) {
 
   })
 
-  # Filter Data after Reactive Choices -------------------
+  # Filter Data after Reactive Choices
+  #---------------------------
   dataSumx <- reactive({
     # print(unique(scenariosSelectedx()))
     # print(paramsSelectedx())
@@ -717,8 +717,9 @@ server <- function(input, output, session) {
     dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
 
   })
-
-  # Filter Data after Reactive Choices -------------------
+  #---------------------------
+  # Filter Data after Reactive Choices
+  #---------------------------
   dataMapx <- reactive({
     dataMap() %>%
       dplyr::filter(scenario %in% input$scenariosSelected,
@@ -909,6 +910,7 @@ server <- function(input, output, session) {
   #---------------------------
   # Data Map Absolute Diff
   #---------------------------
+
   dataDiffAbsMapx <- reactive({
     diffText <- " Diff Abs"
 
@@ -1057,28 +1059,28 @@ server <- function(input, output, session) {
   #---------------------------
   # Summary Plot
   #---------------------------
-  summaryPlot <- function(aspectratio, textsize, titletext){
-    ggplot2::ggplot(dataSumx(),
-                    aes(x=x,y=value,
-                        group=scenario,
-                        color=scenario))+
-      geom_line(size=1.25) +
-      ggplottheme +
-      geom_line() +
-      ylab(NULL) +  xlab(NULL) +
-      facet_wrap(.~param, scales="free", ncol = 3,
-                 labeller = labeller(param = label_wrap_gen(15)))+
-      theme(legend.position="top",
-            legend.text=element_text(size=titletext),
-            legend.title = element_blank(),
-            plot.margin=margin(20,20,20,0,"pt"),
-            text=element_text(size=textsize),
-            aspect.ratio = aspectratio
-      )
-  }
+  # summaryPlot <- function(aspectratio, textsize, titletext){
+  #   ggplot2::ggplot(dataSumx(),
+  #                   aes(x=x,y=value,
+  #                       group=scenario,
+  #                       color=scenario))+
+  #     geom_line(size=1.25) +
+  #     ggplottheme +
+  #     geom_line() +
+  #     ylab(NULL) +  xlab(NULL) +
+  #     facet_wrap(.~param, scales="free", ncol = 3,
+  #                labeller = labeller(param = label_wrap_gen(15)))+
+  #     theme(legend.position="top",
+  #           legend.text=element_text(size=titletext),
+  #           legend.title = element_blank(),
+  #           plot.margin=margin(20,20,20,0,"pt"),
+  #           text=element_text(size=textsize),
+  #           aspect.ratio = aspectratio
+  #     )
+  # }
 
   output$summary <- renderPlot({
-    summaryPlot(NULL, 17.5, 20)
+    argus::summaryPlot(NULL, 17.5, 20, dataSumx())
   },
   height=function(){
     if (length(unique(dataChartx()$param))%%3==0){
@@ -1097,12 +1099,13 @@ server <- function(input, output, session) {
     }
     }
   )
+
   output$downloadPlotSum <- downloadHandler(
     filename = "summaryChart.png",
-    content = function(file) {
+    content = function(filename) {
       ggsave(
-        file,
-        plot=summaryPlot(0.75, 10, 10),
+        filename,
+        plot=argus::summaryPlot(0.75, 10, 10, dataSumx()),
         #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
         height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
         width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
@@ -1114,39 +1117,9 @@ server <- function(input, output, session) {
   #---------------------------
   # Summary Plot Compare Regions
   #---------------------------
-  summaryPlotReg <- function(titletext){
-
-    dataChartPlot <- # All regions
-      dataMapx() %>% tidyr::complete(scenario,param,subRegion,x) %>%
-      dplyr::mutate(value=case_when(is.na(value)~0,
-                                    TRUE~value))%>%
-      dplyr::filter(subRegion %in% subsetRegionsx())
-
-    plist <- list()
-    for(i in 1:length(unique(dataChartPlot$param))){
-
-      plist[[i]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                       filter(param==unique(dataChartPlot$param)[i]),
-                                     aes(x=x,y=value,
-                                         group=scenario,
-                                         color=scenario)) +
-        ggplottheme +
-        ylab(NULL) + xlab(NULL) +
-        geom_line() +
-        scale_y_continuous(position = "right")+
-        facet_grid(param~subRegion, scales="free",switch="y",
-                   labeller = labeller(param = label_wrap_gen(15))
-        )+
-        theme(legend.position="right",
-              legend.text=element_text(size=titletext),
-              legend.title = element_blank(),
-              plot.margin=margin(20,20,20,20,"pt"))}
-    cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
-  }
-
 
   output$summaryReg <- renderPlot({
-    summaryPlotReg(10)
+    summaryPlotReg(10, dataMapx(),ggplottheme, subsetRegionsx())
   },
   height=function(){200*length(unique(dataMapx()$param))},
   width=function(){max(400,200*length(subsetRegionsx())+100)}
@@ -1154,8 +1127,8 @@ server <- function(input, output, session) {
 
   output$downloadPlotSumReg <- downloadHandler(
     filename = "summaryChartReg.png",
-    content = function(file) {
-      ggsave(file,plot=summaryPlotReg(10),
+    content = function(filename) {
+      ggsave(file,plot=summaryPlotReg(10,dataMapx(),ggplottheme, subsetRegionsx()),
              height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
              width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
              units = "in")
@@ -1185,137 +1158,122 @@ server <- function(input, output, session) {
   })
 
   #---------------------------
-  # Chart Plot
+  # Chart Plot Abs Diff
   #---------------------------
-  chartPlot <- function(){
-    print(rv)
-    print(rv$absChart)
-    print(rv$percDiffChart)
-    print(rv$absDiffChart)
-    g <- 2
-    if(rv$absChart == 1){
-      print("abs")
-      g <- 1
-      dataChartPlot <- dataChartx()
-    }else if(rv$percDiffChart == 1){
-      print("perc diff")
-      dataChartPlot <- dataPrcntAbsx()
-    }else if(rv$absDiffChart == 1){
-      print("abs diff")
-      dataChartPlot <- dataDiffAbsx()
-    }
 
-    plist <- list()
-    x = 1
-    for(i in 1:length(unique(dataChartPlot$param))){
-      # Check Color Palettes
-      palAdd <- c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise")
+  output$plotDiff <- renderPlot({
+    argus::plotDiff(dataDiffAbsx(), input$scenarioRefSelected)
+  },
+  height=function(){300*length(unique(dataChartx()$param))},
+  width=function(){max(600, 400*length(unique(data()$scenario)))}
+  )
 
-      missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
-                                                 names(pal_all)]
-      if (length(missNames) > 0) {
-        palAdd <- palAdd[1:length(missNames)]
-        names(palAdd) <- missNames
-        palCharts <- c(pal_all, palAdd)
-      } else{
-        palCharts <- pal_all
-      }
-      print(palCharts)
 
-      chartz <- dataChartPlot %>%
-        filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)
-      z<-x
-      if(rv$percDiffChart == 1){
-        plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                           filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
-                                           droplevels(),
-                                         aes(x=x,y=value,
-                                             # group=class,
-                                             colour=class
-                                         )) +
-          ggplottheme +
-          ylab(NULL) + xlab(NULL) +
-          scale_color_manual(breaks=names(palCharts),values=palCharts) +
-          # scale_y_continuous(position = "right")+
-          # geom_bar(position="stack", stat="identity") +
-          geom_line()+
-          geom_point()+
-          scale_color_manual(breaks=names(palCharts),values=palCharts) +
-          facet_grid(param~scenario, scales="free",switch="y")+
-          theme(legend.position="bottom",
-                strip.text.y = element_blank(),
-                legend.title = element_blank(),
-                legend.margin=margin(0,0,0,0,"pt"),
-                legend.key.height=unit(0, "cm"),
-                text = element_text(size = 12.5),
-                plot.margin=margin(20,20,20,0,"pt"))
-        x = x+2
-      }else if(rv$absDiffChart == 1){
-        plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
-                                           filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
-                                           droplevels(),
-                                         aes(x=x,y=value,
-                                             group=scenario,
-                                             fill=class))+
-          ggplottheme +
-          xlab(NULL) +
-          ylab(NULL) +
-          scale_fill_manual(breaks=names(palCharts),values=palCharts) +
-          scale_y_continuous(position = "left")+
-          geom_bar(position="stack", stat="identity") +
-          # geom_line()+
-          # geom_point()+
-          facet_grid(param~scenario, scales="free",switch="y") +
-          theme(legend.position="bottom",
-                legend.title = element_blank(),
-                strip.text.y = element_blank(),
-                legend.margin=margin(0,0,0,0,"pt"),
-                legend.key.height=unit(0, "cm"),
-                text = element_text(size = 12.5),
-                plot.margin=margin(20,20,20,0,"pt"))
-        x = x+2
-      }else{
-        chartz <- dataChartPlot %>%
-          filter(param==unique(dataChartPlot$param)[i])
-        x=x+1
-      }
+  # #---------------------------
+  # # Chart Plot Perc
+  # #---------------------------
+  # plotPerc <- function(){
+  #   g <- 2
+  #   print("perc diff")
+  #   dataChartPlot <- dataPrcntAbsx()
+  #
+  #   plist <- list()
+  #   x = 1
+  #   for(i in 1:length(unique(dataChartPlot$param))){
+  #     # Check Color Palettes
+  #     palAdd <- c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise")
+  #
+  #     missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
+  #                                                names(pal_all)]
+  #     if (length(missNames) > 0) {
+  #       palAdd <- palAdd[1:length(missNames)]
+  #       names(palAdd) <- missNames
+  #       palCharts <- c(pal_all, palAdd)
+  #     } else{
+  #       palCharts <- pal_all
+  #     }
+  #     print(palCharts)
+  #
+  #     chartz <- dataChartPlot %>%
+  #       filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)
+  #     z<-x
+  #     plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
+  #                                        filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
+  #                                        droplevels(),
+  #                                      aes(x=x,y=value,
+  #                                          # group=class,
+  #                                          colour=class
+  #                                      )) +
+  #       ggplottheme +
+  #       ylab(NULL) + xlab(NULL) +
+  #       scale_color_manual(breaks=names(palCharts),values=palCharts) +
+  #       # scale_y_continuous(position = "right")+
+  #       # geom_bar(position="stack", stat="identity") +
+  #       geom_line()+
+  #       geom_point()+
+  #       scale_color_manual(breaks=names(palCharts),values=palCharts) +
+  #       facet_grid(param~scenario, scales="free",switch="y")+
+  #       theme(legend.position="bottom",
+  #             strip.text.y = element_blank(),
+  #             legend.title = element_blank(),
+  #             legend.margin=margin(0,0,0,0,"pt"),
+  #             legend.key.height=unit(0, "cm"),
+  #             text = element_text(size = 12.5),
+  #             plot.margin=margin(20,20,20,0,"pt"))
+  #     x = x+2
+  #
+  #     plist[[z]] <-  ggplot2::ggplot(chartz%>%
+  #                                      droplevels(),
+  #                                    aes(x=x,y=value,
+  #                                        group=scenario,
+  #                                        fill=class))+
+  #       ggplottheme +
+  #       xlab(NULL) +
+  #       ylab(unique(dataChartPlot$param)[i])+
+  #       scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+  #       scale_y_continuous(position = "left")+
+  #       geom_bar(position="stack", stat="identity") +
+  #       facet_grid(param~scenario, scales="free",switch="y")+
+  #       theme(legend.position="bottom",
+  #             strip.text.y = element_blank(),
+  #             legend.title = element_blank(),
+  #             legend.margin=margin(0,0,0,0,"pt"),
+  #             legend.key.height=unit(0, "cm"),
+  #             text = element_text(size = 12.5),
+  #             plot.margin=margin(20,0,20,0,"pt"))
+  #   }
+  #   cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
+  # }
 
-      plist[[z]] <-  ggplot2::ggplot(chartz%>%
-                                       droplevels(),
-                                      aes(x=x,y=value,
-                                          group=scenario,
-                                          fill=class))+
-        ggplottheme +
-        xlab(NULL) +
-        ylab(unique(dataChartPlot$param)[i])+
-        scale_fill_manual(breaks=names(palCharts),values=palCharts) +
-        scale_y_continuous(position = "left")+
-        geom_bar(position="stack", stat="identity") +
-        facet_grid(param~scenario, scales="free",switch="y")+
-        theme(legend.position="bottom",
-              strip.text.y = element_blank(),
-              legend.title = element_blank(),
-              legend.margin=margin(0,0,0,0,"pt"),
-              legend.key.height=unit(0, "cm"),
-              text = element_text(size = 12.5),
-              plot.margin=margin(20,0,20,0,"pt"))
-    }
-    cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
-  }
+  output$plotPerc <- renderPlot({
+    argus::plotDiff(dataPrcntAbsx(), input$scenarioRefSelected)
+  },
+  height=function(){300*length(unique(dataChartx()$param))},
+  width=function(){max(600, 400*length(unique(data()$scenario)))}
+  )
 
-  output$plot <- renderPlot({
-    chartPlot()
+
+
+
+  #---------------------------
+  # Chart Plot Abs
+  #---------------------------
+
+
+  output$plotAbs <- renderPlot({
+    argus::plotAbs(dataChartx(), input$scenarioRefSelected)
   },
   height=function(){300*length(unique(dataChartx()$param))},
   width=function(){max(600, 400*length(unique(data()$scenario)))}
   )
 
   output$downloadPlotChart <- downloadHandler(
-    filename = "barChart.png",
+    file = "barChart.png",
     content = function(file) {
+      # foodweb(where=environment())
       ggsave(file,plot=chartPlot(),
-             width=argus::exportWidth(49, length(unique(dataChartx()$param)), 5),
-             height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
+             width=argus::exportWidth(49, length(unique(dataChartx()$param)), 6),
+             height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 3)+2,
              unit = "in"
       )
       # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
@@ -1330,458 +1288,68 @@ server <- function(input, output, session) {
   # Map Analysis by Base Map
   #---------------------------
 
+  output$downloadMapBase <- downloadHandler(
+    file = "mapBase.png",
+    content = function(file) {
+      ggsave(
+        file,
+        plot=mapBase(dataMapx()),
+        height = argus::exportHeight(1, 49, rv$pcount, 5),
+        width=argus::exportWidth(49, 1, 10),
+        units="in"
+      )
+    })
+
   output$mapBase <- renderPlot({
-
-    dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
-      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-      dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                        TRUE~subRegion)) %>%
-      dplyr::select(-subRegionMap)
-
-    plist <- list()
-    pcount = 1
-    subRegTypelist <- c()
-    for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
-
-      dataMap_raw_regions <- dataMap_raw %>%
-        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-        dplyr::filter(param == i) %>%
-        dplyr::select(subRegion) %>%
-        unique(); dataMap_raw_regions
-
-      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
-        dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
-        dplyr::group_by(subRegion) %>%
-        dplyr::mutate(minLong = min(long),
-                      negLongSum = sum(long[which(long<=0)], na.rm=T),
-                      maxLong = max(long),
-                      posLongSum = sum(long[which(long>=0)], na.rm=T),
-                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
-                                       TRUE~0),
-                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                       TRUE~long))%>%
-        dplyr::ungroup()
-
-
-      if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
-
-        subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
-
-        prcntZoom <- 1
-        longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
-        longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
-        latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
-        latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
-
-        prcntZoom <- 0.1
-        longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
-        longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
-        latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
-        latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
-
-
-        shp_bg <- argus::mapCountriesdf%>%
-          dplyr::filter(long > longLimMinbg,
-                        long < longLimMaxbg,
-                        lat > latLimMinbg,
-                        lat < latLimMaxbg);
-
-        cnames <- aggregate(cbind(long, lat) ~ subRegion, data=dataMapPlot, FUN=mean)
-
-        map <- ggplot() + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)
-        map <- map + geom_polygon(data = dataMapPlot,
-                                  aes(x = long, y = lat, group = group, fill=subRegion),
-                                  colour = "gray10", lwd=0.5, show.legend = F) +
-          coord_fixed(ratio = 1.0,ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
-          theme(panel.grid.major = element_blank(),
-                panel.grid.minor = element_blank()
-          )+
-          theme(plot.margin=margin(20,20,20,20,"pt"),
-                axis.title=element_blank(),
-                axis.text=element_blank(),
-                axis.ticks=element_blank())
-        map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = subRegion),color="black", size = 4)
-        map <- map + theme(panel.background = element_rect(fill="lightblue1")) + ggtitle(unique(dataMapPlot$subRegionType))
-        map
-
-        plist[[pcount]] <- map
-        pcount=pcount+1
-        rv$pcount <- pcount
-      }
-    }
-    rv$pcount <- pcount
-    print(rv$pcount)
-    cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
-
-  },
-  height=function(){300*(rv$pcount)}
+      mapBase(dataMapx())
+    },
+    height=function(){300*(5)}
   )
-
-  #---------------------------
-  # Pick between Absolute and Percent Diff
-  #---------------------------
-
-  observeEvent(input$absMap, {
-    rv$absMap = 1;
-    rv$percDiffMap = 0;
-    rv$absDiffMap = 0;
-  })
-
-  observeEvent(input$percDiffMap, {
-    rv$absMap = 0;
-    rv$percDiffMap = 1;
-    rv$absDiffMap = 0;
-  })
-
-  observeEvent(input$absDiffMap, {
-    rv$absMap = 0;
-    rv$percDiffMap = 0;
-    rv$absDiffMap = 1;
-  })
 
   #---------------------------
   # Map Analysis by Scenario x Param
   #---------------------------
 
+  output$downloadMap <- downloadHandler(
+    file = "map.png",
+    content = function(file) {
+      ggsave(
+        file,
+        plot=map(),
+        height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 7),
+        width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
+        units="in"
+      )
+    })
 
-  breaks <- function(dataMap_raw_param, breaks_n){
-    breaks_pretty <- scales::pretty_breaks(n=breaks_n)(dataMap_raw_param$value); breaks_pretty
-    breaks_kmean <- sort(as.vector((stats::kmeans(dataMap_raw_param$value,
-                                                  centers=max(1,
-                                                              min(length(unique(dataMap_raw_param$value))-1,
-                                                                  (breaks_n-1)))))$centers[,1]));breaks_kmean
-    if((max(range(dataMap_raw_param$value))-min(range(dataMap_raw_param$value)))<1E-10 &
-       (max(range(dataMap_raw_param$value))-min(range(dataMap_raw_param$value)))>-1E-10){valueRange=floor(min(dataMap_raw_param$value))}else{
-         valueRange=range(dataMap_raw_param$value)
-       }
-    breaks_kmean
+  # map <- function(flag,
+  #                 mapLegend,
+  #                 mapYear,
+  #                 scenarioRefSelected,
+  #                 dataMapx,
+  #                 dataMapz){
+  #
 
-    if(abs(min(valueRange,na.rm = T))==abs(max(valueRange,na.rm = T))){valueRange=abs(min(valueRange,na.rm = T))}
-    if(mean(valueRange,na.rm = T)<0.01 & mean(valueRange,na.rm = T)>(-0.01)){animLegendDigits<-5}else{
-      if(mean(valueRange,na.rm = T)<0.1 & mean(valueRange,na.rm = T)>(-0.1)){animLegendDigits<-4}else{
-        if(mean(valueRange,na.rm = T)<1 & mean(valueRange,na.rm = T)>(-1)){animLegendDigits<-3}else{
-          if(mean(valueRange,na.rm = T)<10 & mean(valueRange,na.rm = T)>(-10)){animLegendDigits<-2}else{animLegendDigits<-2}}}}
-    animLegendDigits
-    breaks_kmean <- signif(breaks_kmean,animLegendDigits); breaks_kmean
-
-    if(!min(dataMap_raw_param$value) %in% breaks_kmean){
-      breaks_kmean[breaks_kmean==min(breaks_kmean,na.rm=T)] <- signif(floor(min(dataMap_raw_param$value)),animLegendDigits)};breaks_kmean
-    if(!max(dataMap_raw_param$value) %in% breaks_kmean){
-      breaks_kmean[breaks_kmean==max(breaks_kmean,na.rm=T)] <- signif(ceiling(max(dataMap_raw_param$value)),animLegendDigits)};breaks_kmean
-
-    return(list(breaks_kmean, breaks_pretty))
-
-  }
-
-
-  process_map <- function(dataMap_raw, i){
-    US52Compact=F
-    naColor = "green"
-    breaks_n = 6
-    legendType = input$mapLegend
-    palAbsChosen <- c("yellow2","goldenrod","darkred")
-    yearsSelect <- input$mapYear
-    paramsSelect <- unique(dataMap_raw$param)
-
-    dataMap_raw_param <- dataMap_raw %>%
-      dplyr::filter(x==yearsSelect,
-                    param == i); dataMap_raw_param
-
-    breaks<- breaks(dataMap_raw_param, breaks_n)
-
-    if(legendType=="kmean"){breaks_map = breaks[[1]]}else if(
-      legendType=="pretty"){breaks_map = breaks[[2]]}
-
-    # breaks_map <- breaks_map %>%
-    #   format(big.mark=",", scientific=F);
-    paletteDiff <- ""
-    breaks_map <- breaks_map%>%unique()
-    if(length(breaks_map)==1){
-      data_map <- dataMap_raw_param %>%
-        dplyr::mutate(brks = format(unique(dataMap_raw_param$value), nsmall=2, digits=2, big.mark = ","))
-      paletteAbs = "red"
-      if(length(unique(format(unique(dataMap_raw_param$value), nsmall=2, digits=2, big.mark = ",")))!=1){
-        breaks_map = format(unique(dataMap_raw_param$value), nsmall=2, digits=2, big.mark = ",")
-        paletteAbs <- grDevices::colorRampPalette(palAbsChosen)(length(breaks_map)); paletteAbs
-        data_map <- data_map %>%
-          dplyr::mutate(brks = factor(brks,levels=breaks_map))
-      }
-    } else {
-      breaks_map_levels <- gsub(","," to ",
-                                gsub("\\(|\\]","",
-                                     levels(cut(breaks_map,breaks=breaks_map)))); breaks_map_levels
-
-      data_map <- dataMap_raw_param %>%
-        dplyr::mutate(brks = cut(value,breaks=breaks_map),
-                      brks = gsub("\\(|\\]","",brks),
-                      brks = gsub(","," to ",brks),
-                      brks = factor(brks,levels=breaks_map_levels))
-
-      # Select Palettes
-      paletteAbs <- grDevices::colorRampPalette(palAbsChosen)(length(breaks_map_levels)); paletteAbs
-      paletteDiff <- "BrBG"
-    }
-
-
-    data_map%>%head()
-
-    shp <- argus::mapdfFind(data_map)
-    subRegionCol <- unique(shp$subRegionType)
-
-    if(subRegionCol=="US52" & US52Compact==T){
-      shp <- argus::mapUS52Compactdf
-      subRegionCol <- "US52Compact"
-    }
-
-    # https://rpubs.com/huanfaChen/ggplotShapefile
-    shp_df <- shp
-
-    dataMapPlot <- shp_df %>%
-      dplyr::inner_join(data_map, by="subRegion") %>%
-      dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-      dplyr::group_by(subRegion) %>%
-      dplyr::mutate(minLong = min(long),
-                    negLongSum = sum(long[which(long<=0)], na.rm=T),
-                    maxLong = max(long),
-                    posLongSum = sum(long[which(long>=0)], na.rm=T),
-                    flip = case_when(minLong<-160 & maxLong>160 ~ 1,
-                                     TRUE~0),
-                    long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                     (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                     TRUE~long))%>%
-      dplyr::ungroup(); dataMapPlot %>% head()
-    # data_map%>%head()
-    return(list(shp_df, dataMapPlot, paletteAbs, paletteDiff))
-    }
-
-
-  output$map <- renderPlot({
-    gas <- 2
-    if (rv$absDiffMap == 1){
-      dataMap_raw <- dataDiffAbsMapx() %>% dplyr::ungroup() %>%
-        dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-        dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                          TRUE~subRegion)) %>%
-        dplyr::select(-subRegionMap)
-    }else if (rv$percDiffMap == 1){
-      dataMap_raw <- dataPrcntAbsMapx() %>% dplyr::ungroup() %>%
-        dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-        dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                          TRUE~subRegion)) %>%
-        dplyr::select(-subRegionMap)
-    }else{
-      dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
-        dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-        dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                          TRUE~subRegion)) %>%
-        dplyr::select(-subRegionMap)
-      gas<-1
-    }
-
-    # print("dataMap_raw")
-    # print(dataMap_raw)
-
-    # Map Settings
-    US52Compact=F
-    naColor = "green"
-    breaks_n = 6
-    legendType = input$mapLegend
-    palAbsChosen <- c("yellow2","goldenrod","darkred")
-    yearsSelect <- input$mapYear
-    paramsSelect <- unique(dataMap_raw$param)
-
-    #Partitions Value into breaks of ... 6?
-    z <- 1
-    plist <- list()
-    for(i in paramsSelect[!is.na(paramsSelect)]){
-      print(i)
-      print("++++++++++++++++=")
-      if ((rv$absDiffMap == 1)||(rv$percDiffMap == 1)){
-        proc <- process_map(dataMapx() %>% dplyr::ungroup() %>%
-                              dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-                              dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                                                TRUE~subRegion)) %>%
-                              dplyr::select(-subRegionMap), i)
-        shp_df <- proc[[1]]
-        dataMapPlot <- proc[[2]]
-        paletteAbs <- proc[[3]]
-        paletteDiff <- proc[[3]]
-
-        prcntZoom <- 1
-        longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
-        longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
-        latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
-        latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
-        prcntZoom <- 0.1
-        longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
-        longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
-        latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
-        latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
-
-        shp_bg <- argus::mapCountriesdf%>%
-          dplyr::filter(long > longLimMinbg,
-                        long < longLimMaxbg,
-                        lat > latLimMinbg,
-                        lat < latLimMaxbg);
-        # data_map, paletteDiff, paletteAbs
-        if(T){
-          map <- ggplot()
-          if(!US52Compact){
-            map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
-          #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
-          map <- map + geom_polygon(data = dataMapPlot %>% dplyr::filter(scenario == input$scenarioRefSelected),
-                                    aes(x = long, y = lat, group = group, fill = as.factor(brks)),
-                                    colour = "gray10", lwd=0.5) +
-            scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
-            ylab("hello") +
-            coord_fixed(ratio = 1.0,
-                        ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
-            theme(panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank()
-            )+
-            scale_y_continuous(position = "left")+
-            facet_grid(param~scenario, switch="y",
-                       labeller = labeller(param = label_wrap_gen(15))
-            ) +
-            ylab(i) +
-            theme(legend.position="bottom",
-                  legend.title = element_blank(),
-                  strip.text.y = element_blank(),
-                  plot.margin=margin(0,-30,0,0,"pt"),
-                  axis.title=element_text(10),
-                  axis.text=element_blank(),
-                  axis.ticks=element_blank())
-          if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
-        }; map
-
-        plist[[z]] <- map
-        z = z+1
-
-
-        proc <- process_map(dataMap_raw, i)
-        shp_df <- proc[[1]]
-        dataMapPlot <- proc[[2]]
-        paletteAbs <- proc[[3]]
-        paletteDiff <- proc[[3]]
-
-        prcntZoom <- 1
-        longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
-        longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
-        latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
-        latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
-        prcntZoom <- 0.1
-        longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
-        longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
-        latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
-        latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
-
-        shp_bg <- argus::mapCountriesdf%>%
-          dplyr::filter(long > longLimMinbg,
-                        long < longLimMaxbg,
-                        lat > latLimMinbg,
-                        lat < latLimMaxbg);
-        # data_map, paletteDiff, paletteAbs
-        if(T){
-          map <- ggplot()
-          if(!US52Compact){
-            map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
-          #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
-          map <- map + geom_polygon(data = dataMapPlot %>% dplyr::filter(scenario != input$scenarioRefSelected),
-                                    aes(x = long, y = lat, group = group, fill = as.factor(brks)),
-                                    colour = "gray10", lwd=0.5) +
-            scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
-            xlab(NULL) +
-            ylab("hello") +
-            coord_fixed(ratio = 1.0,
-                        ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
-            theme(panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank()
-            )+
-            scale_y_continuous(position = "right")+
-            facet_grid(param~scenario, switch="y",
-                       labeller = labeller(param = label_wrap_gen(15))
-            ) +
-            theme(legend.position="bottom",
-                  legend.title = element_blank(),
-                  plot.margin=margin(0,0,0,-30,"pt"),
-                  strip.text.y = element_blank(),
-                  axis.title=element_blank(),
-                  axis.text=element_blank(),
-                  axis.ticks=element_blank())
-          if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
-        }; map
-        plist[[z]] <- map
-        z = z+1
-      }else {
-        proc <- process_map(dataMapx() %>% dplyr::ungroup() %>%
-                              dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-                              dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                                                TRUE~subRegion)) %>%
-                              dplyr::select(-subRegionMap), i)
-        shp_df <- proc[[1]]
-        dataMapPlot <- proc[[2]]
-        paletteAbs <- proc[[3]]
-        paletteDiff <- proc[[3]]
-
-        prcntZoom <- 1
-        longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
-        longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
-        latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
-        latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
-        prcntZoom <- 0.1
-        longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
-        longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
-        latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
-        latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
-
-        shp_bg <- argus::mapCountriesdf%>%
-          dplyr::filter(long > longLimMinbg,
-                        long < longLimMaxbg,
-                        lat > latLimMinbg,
-                        lat < latLimMaxbg);
-        # data_map, paletteDiff, paletteAbs
-        if(T){
-          map <- ggplot()
-          if(!US52Compact){
-            map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
-          #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
-          map <- map +geom_polygon(data =  dataMapPlot,
-                                    aes(x = long, y = lat, group = group, fill = as.factor(brks)),
-                                    colour = "gray10", lwd=0.5) +
-            scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
-            coord_fixed(ratio = 1.0,
-                        ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
-            theme(panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank()
-            )+
-            scale_y_continuous(position = "left")+
-            facet_grid(param~scenario, switch="y",
-                       labeller = labeller(param = label_wrap_gen(15))
-            ) +
-            ylab(i) +
-            theme(legend.position="bottom",
-                  legend.title = element_blank(),
-                  strip.text.y = element_blank(),
-                  plot.margin=margin(0,0,0,0,"pt"),
-                  axis.title=element_text(10),
-                  axis.text=element_blank(),
-                  axis.ticks=element_blank())
-          if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
-        }; map
-
-        plist[[i]] <- map
-      }
-    }
-
-    cowplot::plot_grid(plotlist=plist,ncol=gas,align = "h", rel_widths = c(1, length(unique(data()$scenario))-1))
+  output$mapAbs <- renderPlot({
+    argus::map(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataMapx())
   },
-  height=function(){300*length(unique(dataMapx()$param))},
-  width=function(){max(600, 400*length(unique(data()$scenario)))}
+  height=function(){225*length(unique(dataMapx()$param))},
+  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
   )
 
+  output$mapPerc <- renderPlot({
+    argus::map(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
+  },
+  height=function(){225*length(unique(dataMapx()$param))},
+  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
+  )
 
-
+  output$mapDiff <- renderPlot({
+    argus::map(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
+  },
+  height=function(){225*length(unique(dataMapx()$param))},
+  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
+  )
 
   #---------------------------
   # Data Table
@@ -1810,13 +1378,15 @@ server <- function(input, output, session) {
       fs <- c("table.csv",
               "summaryChart.png",
               "barCharts.png",
-              "summaryChartReg.png"
+              "summaryChartReg.png",
+              "map.png",
+              "mapBase.png"
               )
       write.csv(data(), "table.csv")
-      ggsave("summaryChart.png", plot=summaryPlot(0.75, 10, 10),
+      ggsave("summaryChart.png", plot=argus::summaryPlot(0.75, 10, 10, dataSumx()),
              #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-             height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
-             width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+             height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 4),
+             width=argus::exportWidth(10, length(unique(dataChartx()$param)), 2),
              units="in"
       )
       ggsave("barCharts.png",plot=chartPlot(),
@@ -1824,13 +1394,25 @@ server <- function(input, output, session) {
               height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
               unit = "in"
              )
-      ggsave("summaryChartReg.png", plot=summaryPlotReg(10),
+      ggsave("summaryChartReg.png", plot=summaryPlotReg(10, dataMapx(),ggplottheme, subsetRegionsx()),
              height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
              width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
              units = "in"
              )
+      ggsave("map.png",plot=map(),
+              height = argus::exportHeight(3, 49, rv$pcount, 3),
+              width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+              units="in"
+              )
+      ggsave("mapBase.png", plot=mapBase(dataMapx()),
+              height = argus::exportHeight(3, 49, rv$pcount, 3),
+              width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+              units="in"
+            )
+
       print(fs)
       zip::zip(zipfile=file, files=fs)
     }
   )
 }
+
