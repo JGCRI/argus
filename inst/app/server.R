@@ -722,7 +722,7 @@ server <- function(input, output, session) {
       leafletProxy("mymap") %>% showGroup(i)
     }
     return(0)
-  })
+  }, ignoreNULL = FALSE)
 
   observeEvent(input$mymap_shape_click,{
     print(input$mymap_shape_click)
