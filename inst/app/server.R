@@ -17,7 +17,7 @@ library(tmap)
 library(leaflet)
 library(leafsync)
 library(rgcam)
-library(plyr)
+#library(plyr)
 library(broom)
 library(mvbutils)
 
@@ -25,6 +25,7 @@ library(mvbutils)
 # Options
 #---------------------------
 options(shiny.maxRequestSize=100*1024^2)
+# options(shiny.trace = TRUE)
 pal_all <- argus::mappings()$pal_all
 
 #---------------------------
@@ -47,15 +48,12 @@ server <- function(input, output, session) {
 
   # Initialize Settings
   settings <- reactive({data.frame()})
-
-
-  #<TOBEMOVED>
-  # settingsVars <- c("urlSelect",
-  #                   "regionsSelect",
-  #                   "scenariosSelect",
-  #                   "scenarioRefSelect",
-  #                   "paramsSelect")
-
+  settingsVars <- c("urlSelect",
+                    "regionsSelect",
+                    "scenariosSelect",
+                    "scenarioRefSelect",
+                    "paramsSelect")
+  
   # Create Modal for Settings Download and Loading
   observeEvent(input$loadsetting, {
     showModal(
@@ -93,6 +91,10 @@ server <- function(input, output, session) {
     )
   })
 
+
+  observeEvent(input$help,{
+    session$sendCustomMessage("handler1", unique(data()$subRegion))
+  })
 
   # Download Settings
   output$downloadSettings <- downloadHandler(
@@ -229,6 +231,8 @@ server <- function(input, output, session) {
   }
   })
 
+
+
   # Attempt to read settings if selected
   observeEvent(input$settingdata,
                if(!is.null(input$settingdata)){
@@ -254,6 +258,7 @@ server <- function(input, output, session) {
     # Update input File to Default (NULL)
     #---------------------------
     rv$filedatax <- NULL
+    rv$selectedx <- NULL
 
     #---------------------------
     # Scenarios Select
@@ -420,7 +425,9 @@ server <- function(input, output, session) {
 
 
   rv$pcount = 1;
-
+  rv$mapflag = 0;
+  rv$subRegTypelist = c()
+  rv$selectedBase = 0;
   # Charts initializing abs, percDiff, and absDiff
   rv$absChart = 1;
   rv$percDiffChart = 0;
@@ -566,6 +573,199 @@ server <- function(input, output, session) {
         `none-selected-text` = "None Selected"
       )
     )
+  })
+
+ output$mymapBase <- renderLeaflet({
+    dataMap_raw <- data() %>% dplyr::ungroup() %>%
+      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
+      dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
+                                        TRUE~subRegion)) %>%
+      dplyr::select(-subRegionMap)
+
+    plist <- list()
+    pcount = 1
+    subRegTypelist <- c()
+    z <- leaflet(height = "100vh") %>% addTiles()
+    for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
+      dataMap_raw_regions <- dataMap_raw %>%
+        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+        dplyr::filter(param == i) %>%
+        dplyr::select(subRegion) %>%
+        unique(); dataMap_raw_regions
+
+      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
+        dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
+        dplyr::group_by(subRegion) %>%
+        dplyr::mutate(minLong = min(long),
+                      negLongSum = sum(long[which(long<=0)], na.rm=T),
+                      maxLong = max(long),
+                      posLongSum = sum(long[which(long>=0)], na.rm=T),
+                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                                       TRUE~0),
+                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                       TRUE~long))%>%
+        dplyr::ungroup()
+      if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
+          subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
+          pcount = pcount+1
+          #a <-  dataMapPlot %>% group_by(subRegion) %>% group_split()
+          a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
+          #z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+          if (length(a) >= 2){
+            for (i in 1:length(a)){#group =unique(a[[i]]$subRegion),
+              pal <- colorNumeric(
+                palette = c("green", "red"),
+                domain = 1:length(a))
+            z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$subRegion), group=~unique(subRegionType),lat=~lat, lng=~long, fillColor = ~pal(i), stroke = TRUE, weight = 0.5)
+            #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
+              }
+            }
+        }
+    }
+    z <- z%>%
+        addLayersControl(
+          overlayGroups = unique(subRegTypelist),
+          options = layersControlOptions(collapsed = FALSE)
+        )
+    #z<-leaflet() %>% addTiles() %>% addPolygons(data=base, layerId = ~group, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+    return(z)
+  })
+
+
+  output$mymap <- renderLeaflet({
+    dataMap_raw <- data() %>% dplyr::ungroup() %>%
+      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion")
+
+    dataMap_raw <- dataMap_raw %>%  dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
+                                        TRUE~subRegion)) %>%
+      dplyr::select(-subRegionMap)
+
+    plist <- list()
+    pcount = 1
+    subRegTypelist <- c()
+    z <- leaflet(height = "100vh") %>% addTiles()
+    for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
+      dataMap_raw_regions <- dataMap_raw %>%
+        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+        dplyr::filter(param == i) %>%
+        dplyr::select(subRegion) %>%
+        unique(); dataMap_raw_regions
+
+      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
+        dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
+        dplyr::group_by(subRegion) %>%
+        dplyr::mutate(minLong = min(long),
+                      negLongSum = sum(long[which(long<=0)], na.rm=T),
+                      maxLong = max(long),
+                      posLongSum = sum(long[which(long>=0)], na.rm=T),
+                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                                       TRUE~0),
+                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                       TRUE~long))%>%
+        dplyr::ungroup()
+      if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
+          subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
+          pcount = pcount+1
+          #a <-  dataMapPlot %>% group_by(subRegion) %>% group_split()
+          dict <- argus::mappings("mappingGCAMBasins")
+          dict$subRegion <- argus::mappings("mappingGCAMBasins")$subRegionMap
+          dict$subRegionMap <- argus::mappings("mappingGCAMBasins")$subRegion
+          dataMapPlot <- dataMapPlot %>% dplyr::left_join(dict,by="subRegion") %>%  dplyr::mutate(subRegionMap=case_when(is.na(subRegionMap)~subRegion, TRUE~subRegionMap))
+          a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
+          #z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+             # palx <- colorFactor(
+             #   palette = c("green", "red"),
+             #   dataMapPlot$subRegionType)
+          if (length(a) >= 2){
+            for (i in 1:length(a)){#group =unique(a[[i]]$subRegion)
+              pal <- colorNumeric(
+                palette = c("green", "red"),
+                domain = 1:length(a))
+              z <- z %>% addPolygons(data=a[[i]],  group=~unique(subRegionMap), label = ~unique(subRegionMap), lat=~lat, lng=~long, fillColor = ~pal(i), stroke = FALSE)
+            #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
+            }
+            for (i in 1:(length(a))){
+              tem<-a[[i]] %>% dplyr::mutate(subRegionA =paste(subRegionMap, sep="", piece))
+              z <- z %>% addPolygons(data=tem, group= ~unique(subRegionType), layerId = ~unique(subRegionA), label = ~unique(subRegionMap), lat=~lat, lng=~long, color = "#4287f5", stroke=TRUE, weight = 0.5)
+            }
+            }
+
+        }
+    }
+    z <- z%>%
+       addLayersControl(
+         baseGroups = unique(subRegTypelist),
+         # overlayGroups = unique(subRegTypelist),
+         options = layersControlOptions(collapsed = FALSE)
+       )
+    rv$subRegTypelist = subRegTypelist
+    rv$mapflag = 1
+    rv$selectedBase = subRegTypelist[1]
+    return(z)
+  })
+
+  observe({
+    if(rv$mapflag == 1){
+      check()
+      rv$mapflag = 0
+    }
+  })
+
+  check <- function(){
+    hidden_group <- data()$subRegion[which(!data()$subRegion %in% reactiveValuesToList(input)$regionsSelected)]
+    for (i in unique(hidden_group)){
+      print(paste("hiding", " ", i))
+      leafletProxy("mymap") %>% hideGroup(i)
+    }
+    for (i in unique(reactiveValuesToList(input)$regionsSelected)){
+      print(paste("showing", " ", i))
+      leafletProxy("mymap") %>% showGroup(i)
+    }
+    for (i in unique(rv$selectedBase)){
+      leafletProxy("mymap") %>% hideGroup(i)
+      leafletProxy("mymap") %>% showGroup(i)
+    }
+    return(0)
+  }
+
+
+  observeEvent(input$regionsSelected, {
+    check()
+  }, ignoreNULL = FALSE)
+
+  observeEvent(input$mymap_groups,{
+    print(input$mymap_groups)
+    rv$selectedBase = (reactiveValuesToList(input)$mymap_groups)[which((reactiveValuesToList(input)$mymap_groups) %in%   rv$subRegTypelist)]
+    print(rv$selectedBase)
+  })
+
+  observeEvent(input$mymap_shape_click,{
+    print(input$mymap_shape_click)
+    if (is.null(input$mymap_shape_click$id)){
+      return(0)
+    }
+    l = strsplit(input$mymap_shape_click$id, "[[:digit:]]")[[1]][[1]]
+    selectedx <- reactiveValuesToList(input)$regionsSelected
+    print(selectedx)
+    print(input$regionsSelected)
+    if (l %in% selectedx){
+      leafletProxy("mymap") %>% hideGroup(l)
+      selectedx =  selectedx[!(selectedx %in% l)]
+    }else{
+      leafletProxy("mymap") %>% showGroup(l)
+      leafletProxy("mymap") %>% hideGroup(input$mymap_shape_click$group)
+      leafletProxy("mymap") %>% showGroup(input$mymap_shape_click$group)
+      selectedx =  append(selectedx, l)
+    }
+    # session$sendCustomMessage("rhm_clic", selectedx)
+    updatePickerInput(
+     inputId = "regionsSelected",
+     session=session,
+     choices = unique(data()$subRegion),
+     selected = unique(selectedx)
+     )
   })
 
   #---------------------------
@@ -1288,17 +1488,86 @@ server <- function(input, output, session) {
   # Map Analysis by Base Map
   #---------------------------
 
-  output$downloadMapBase <- downloadHandler(
-    file = "mapBase.png",
-    content = function(file) {
-      ggsave(
-        file,
-        plot=mapBase(dataMapx()),
-        height = argus::exportHeight(1, 49, rv$pcount, 5),
-        width=argus::exportWidth(49, 1, 10),
-        units="in"
-      )
-    })
+  output$mapBase <- renderPlot({
+
+    dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
+      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
+      dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
+                                        TRUE~subRegion)) %>%
+      dplyr::select(-subRegionMap)
+
+    plist <- list()
+    pcount = 1
+    subRegTypelist <- c()
+    for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
+
+      dataMap_raw_regions <- dataMap_raw %>%
+        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
+        dplyr::filter(param == i) %>%
+        dplyr::select(subRegion) %>%
+        unique(); dataMap_raw_regions
+
+      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
+        dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
+        dplyr::group_by(subRegion) %>%
+        dplyr::mutate(minLong = min(long),
+                      negLongSum = sum(long[which(long<=0)], na.rm=T),
+                      maxLong = max(long),
+                      posLongSum = sum(long[which(long>=0)], na.rm=T),
+                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
+                                       TRUE~0),
+                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
+                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
+                                       TRUE~long))%>%
+        dplyr::ungroup()
+
+      if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
+        subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
+
+        prcntZoom <- 1
+        longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
+        longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
+        latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
+        latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
+
+        prcntZoom <- 0.1
+        longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
+        longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
+        latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
+        latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
+
+        shp_bg <- argus::mapCountriesdf%>%
+          dplyr::filter(long > longLimMinbg,
+                        long < longLimMaxbg,
+                        lat > latLimMinbg,
+                        lat < latLimMaxbg);
+
+        cnames <- aggregate(cbind(long, lat) ~ subRegion, data=dataMapPlot, FUN=mean)
+
+        map <- ggplot() + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)
+        map <- map + geom_polygon(data = dataMapPlot,
+                                  aes(x = long, y = lat, group = group, fill=subRegion),
+                                  colour = "gray10", lwd=0.5, show.legend = F) +
+          coord_fixed(ratio = 1.0,ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
+          theme(panel.grid.major = element_blank(),
+                panel.grid.minor = element_blank()
+          )+
+          theme(plot.margin=margin(20,20,20,20,"pt"),
+                axis.title=element_blank(),
+                axis.text=element_blank(),
+                axis.ticks=element_blank())
+        map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = subRegion),color="black", size = 4)
+        map <- map + theme(panel.background = element_rect(fill="lightblue1")) + ggtitle(unique(dataMapPlot$subRegionType))
+        map
+
+        plist[[pcount]] <- map
+        pcount=pcount+1
+        rv$pcount <- pcount
+      }
+    }
+    rv$pcount <- pcount
+    print(rv$pcount)
+    return(cowplot::plot_grid(plotlist=plist,ncol=1,align = "v"))
 
   output$mapBase <- renderPlot({
       mapBase(dataMapx())

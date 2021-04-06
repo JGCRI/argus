@@ -20,16 +20,19 @@
 .charts{
   overflow:auto;
   height:60vh;
-  /*:70vh;*/
+  widh:70vh;
   position:relative;
 }
 
-#testz > div > ul {
-  display: flex !important;
-  justify-content: center !important;
-  width: 100%;
+.maps{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow:auto;
+  margin: 0 auto;
+  height:100vh;
 }
-
+/*  position:absolute;*/
 /*
 #selectScenarios  div  div  button{
   font-size: 90%;
