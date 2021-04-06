@@ -23,6 +23,7 @@ library(broom)
 # Options
 #---------------------------
 options(shiny.maxRequestSize=100*1024^2)
+# options(shiny.trace = TRUE)
 pal_all <- argus::mappings()$pal_all
 
 #---------------------------
@@ -703,14 +704,6 @@ server <- function(input, output, session) {
          overlayGroups = unique(subRegTypelist),
          options = layersControlOptions(collapsed = FALSE)
        )
-      session$sendCustomMessage("rhm_clic", unique(data()$subRegion))
-    #z<-leaflet() %>% addTiles() %>% addPolygons(data=base, layerId = ~group, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-    # updatePickerInput(
-    #   inputId = "regionsSelected",
-    #   session=session,
-    #   choices = unique(data()$subRegion),
-    #   selected = unique(reactiveValuesToList(input)$regionsSelected)
-    # )
     rv$mapflag = 1
     return(z)
   })
@@ -739,6 +732,7 @@ server <- function(input, output, session) {
 
 
   observeEvent(input$regionsSelected, {
+    print("lklklklklklklk")
     check()
   }, ignoreNULL = FALSE)
 
