@@ -210,20 +210,29 @@ ui <- fluidPage(
                                                 br(),
                                                 div(
                                                   id = "testz",
+                                                  fluidRow(
+                                                    column(
+                                                      9),
+                                                    column(
+                                                      3, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png",  class = "download_button"), style = "float: right")
+                                                    )),
                                                   tabsetPanel(
                                                     type="pills",
                                                     tabPanel("Absolute Value",
+                                                             br(),
                                                              div(
                                                                class="charts",
                                                                plotOutput(outputId = "plotAbs", width = "100%", height="100%"))
                                                     ),
                                                     tabPanel("Absolute Difference",
+                                                             br(),
                                                              div(
                                                                class="charts",
 
                                                                plotOutput(outputId = "plotDiff", width = "100%", height="100%"))
                                                     ),
                                                     tabPanel("Percent Difference",
+                                                             br(),
                                                              div(
                                                                class="charts",
 
@@ -231,27 +240,6 @@ ui <- fluidPage(
                                                     )
                                                   )
                                                 ),
-
-                                                # fluidRow(
-                                                #   column(
-                                                #     3),
-                                                #   column(
-                                                #     2,
-                                                #          div(
-                                                #             actionButton(label="Absolute\nValue", inputId = "absChart",width="100%", class="diff_button")
-                                                #             )
-                                                #          ),
-                                                #   column(
-                                                #     2,
-                                                #          actionButton(label="Absolute\nDifference", inputId = "absDiffChart",width="100%", class="diff_button")
-                                                #          ),
-                                                #   column(
-                                                #     2,
-                                                #          actionButton(label="Percent\nDifference", inputId = "percDiffChart", width="100%", class="diff_button")
-                                                #          ),
-                                                #   column(
-                                                #     3, div(downloadButton('downloadPlotChart',NULL, download = "barCharts.png",  class = "download_button"), style = "float: right")
-                                                #   )),
                                        br(),
                                        p("*Sum of Regions Selected", style="color:#cc0000")
                            ))
@@ -314,35 +302,25 @@ ui <- fluidPage(
                                                     style="float:right"
                                                   ))
                                                 ),
-                                                fluidRow(
-                                                  column(
-                                                    3,
-                                                    div(
-                                                      br(),
-                                                      br(),
-                                                      pickerInput(
-                                                        inputId = "mapLegend",
-                                                        label = "Legend Type",
-                                                        choices = c("kmean","pretty"),
-                                                        selected = "kmean",
-                                                        multiple = F)),
-                                                    style = "float: right")),
                                                 div(
                                                   id = "testz",
                                                   tabsetPanel(
                                                     type="pills",
                                                     tabPanel("Absolute Value",
+                                                             br(),
                                                              div(
                                                                class="charts",
                                                                plotOutput(outputId = "mapAbs", width = "100%", height="100%"))
                                                     ),
                                                     tabPanel("Absolute Difference",
+                                                             br(),
                                                              div(
                                                                class="charts",
 
                                                                plotOutput(outputId = "mapDiff", width = "100%", height="100%"))
                                                     ),
                                                     tabPanel("Percent Difference",
+                                                             br(),
                                                              div(
                                                                class="charts",
 
