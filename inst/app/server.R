@@ -426,6 +426,8 @@ server <- function(input, output, session) {
 
   rv$pcount = 1;
   rv$mapflag = 0;
+  rv$subRegTypelist = c()
+  rv$selectedBase = 0;
   # Charts initializing abs, percDiff, and absDiff
   rv$absChart = 1;
   rv$percDiffChart = 0;
@@ -701,10 +703,13 @@ server <- function(input, output, session) {
     print("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
     z <- z%>%
        addLayersControl(
-         overlayGroups = unique(subRegTypelist),
+         baseGroups = unique(subRegTypelist),
+         # overlayGroups = unique(subRegTypelist),
          options = layersControlOptions(collapsed = FALSE)
        )
+    rv$subRegTypelist = subRegTypelist
     rv$mapflag = 1
+    rv$selectedBase = subRegTypelist[1]
     return(z)
   })
 
@@ -727,6 +732,12 @@ server <- function(input, output, session) {
       print(paste("showing", " ", i))
       leafletProxy("mymap") %>% showGroup(i)
     }
+    for (i in unique(rv$selectedBase)){
+      print("mmnmnmnmnmnm")
+      print(i)
+      leafletProxy("mymap") %>% hideGroup(i)
+      leafletProxy("mymap") %>% showGroup(i)
+    }
     return(0)
   }
 
@@ -735,6 +746,13 @@ server <- function(input, output, session) {
     print("lklklklklklklk")
     check()
   }, ignoreNULL = FALSE)
+
+  observeEvent(input$mymap_groups,{
+    print("my group")
+    print(input$mymap_groups)
+    rv$selectedBase = (reactiveValuesToList(input)$mymap_groups)[which((reactiveValuesToList(input)$mymap_groups) %in%   rv$subRegTypelist)]
+    print(rv$selectedBase)
+  })
 
   observeEvent(input$mymap_shape_click,{
     print(input$mymap_shape_click)
