@@ -586,8 +586,6 @@ server <- function(input, output, session) {
     pcount = 1
     subRegTypelist <- c()
     z <- leaflet(height = "100vh") %>% addTiles()
-    print(dataMap_raw$subRegion)
-    print("===============================================")
     for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
       dataMap_raw_regions <- dataMap_raw %>%
         dplyr::filter(subRegion!="South_Pacific_Islands")%>%
@@ -609,7 +607,6 @@ server <- function(input, output, session) {
                                        TRUE~long))%>%
         dplyr::ungroup()
       if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
-          print(dataMapPlot)
           subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
           pcount = pcount+1
           #a <-  dataMapPlot %>% group_by(subRegion) %>% group_split()
@@ -626,7 +623,6 @@ server <- function(input, output, session) {
             }
         }
     }
-    print("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
     z <- z%>%
         addLayersControl(
           overlayGroups = unique(subRegTypelist),
@@ -649,7 +645,6 @@ server <- function(input, output, session) {
     pcount = 1
     subRegTypelist <- c()
     z <- leaflet(height = "100vh") %>% addTiles()
-    print("===============================================")
     for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
       dataMap_raw_regions <- dataMap_raw %>%
         dplyr::filter(subRegion!="South_Pacific_Islands")%>%
@@ -671,7 +666,6 @@ server <- function(input, output, session) {
                                        TRUE~long))%>%
         dplyr::ungroup()
       if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
-          print(dataMapPlot)
           subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
           pcount = pcount+1
           #a <-  dataMapPlot %>% group_by(subRegion) %>% group_split()
@@ -700,7 +694,6 @@ server <- function(input, output, session) {
 
         }
     }
-    print("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
     z <- z%>%
        addLayersControl(
          baseGroups = unique(subRegTypelist),
@@ -721,20 +714,16 @@ server <- function(input, output, session) {
   })
 
   check <- function(){
-    print("oof")
     hidden_group <- data()$subRegion[which(!data()$subRegion %in% reactiveValuesToList(input)$regionsSelected)]
     for (i in unique(hidden_group)){
       print(paste("hiding", " ", i))
       leafletProxy("mymap") %>% hideGroup(i)
     }
-    print(reactiveValuesToList(input)$regionsSelected)
     for (i in unique(reactiveValuesToList(input)$regionsSelected)){
       print(paste("showing", " ", i))
       leafletProxy("mymap") %>% showGroup(i)
     }
     for (i in unique(rv$selectedBase)){
-      print("mmnmnmnmnmnm")
-      print(i)
       leafletProxy("mymap") %>% hideGroup(i)
       leafletProxy("mymap") %>% showGroup(i)
     }
@@ -743,12 +732,10 @@ server <- function(input, output, session) {
 
 
   observeEvent(input$regionsSelected, {
-    print("lklklklklklklk")
     check()
   }, ignoreNULL = FALSE)
 
   observeEvent(input$mymap_groups,{
-    print("my group")
     print(input$mymap_groups)
     rv$selectedBase = (reactiveValuesToList(input)$mymap_groups)[which((reactiveValuesToList(input)$mymap_groups) %in%   rv$subRegTypelist)]
     print(rv$selectedBase)
@@ -764,11 +751,9 @@ server <- function(input, output, session) {
     print(selectedx)
     print(input$regionsSelected)
     if (l %in% selectedx){
-      print("deselecting")
       leafletProxy("mymap") %>% hideGroup(l)
       selectedx =  selectedx[!(selectedx %in% l)]
     }else{
-      print("selecting")
       leafletProxy("mymap") %>% showGroup(l)
       leafletProxy("mymap") %>% hideGroup(input$mymap_shape_click$group)
       leafletProxy("mymap") %>% showGroup(input$mymap_shape_click$group)
