@@ -142,6 +142,17 @@
 #' }
 "grid050"
 
+#' grid025
+#'
+#' @source "inst/extdata/grid025.csv"
+#' @format .csv
+#' @examples
+#' \dontrun{
+#'  library(argus);
+#'  argus::grid025
+#' }
+"grid025"
+
 # Maps prepared for ggplot dataframes
 
 #-----------------
