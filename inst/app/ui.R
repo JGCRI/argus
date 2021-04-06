@@ -120,10 +120,7 @@ ui <- fluidPage(
       # Params
       uiOutput('selectParams'),
       # Regions
-      #div(
-      #  style="visibility: hidden;display: none;",
-      #  uiOutput('selectRegions')
-      #  ),
+      uiOutput('selectRegions'),
       div(
         class="charts",
         leafletOutput(outputId = "mymap")
@@ -273,8 +270,8 @@ ui <- fluidPage(
                            tabsetPanel(type = "pills",
                                        tabPanel("Base Map",
                                               div(
-                                                class="charts",
-                                                leafletOutput(outputId = "mymapBase")
+                                                class="maps",
+                                                leafletOutput(outputId = "mymapBase", height="90vh")
                                                 )
                                                 #div(
                                                 #  class="charts",

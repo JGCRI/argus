@@ -584,7 +584,7 @@ server <- function(input, output, session) {
     plist <- list()
     pcount = 1
     subRegTypelist <- c()
-    z <- leaflet() %>% addTiles()
+    z <- leaflet(height = "100vh") %>% addTiles()
     print(dataMap_raw$subRegion)
     print("===============================================")
     for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
@@ -616,7 +616,10 @@ server <- function(input, output, session) {
           #z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
           if (length(a) >= 2){
             for (i in 1:length(a)){#group =unique(a[[i]]$subRegion),
-            z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$subRegion), group=~unique(subRegionType),lat=~lat, lng=~long, stroke = TRUE)
+              pal <- colorNumeric(
+                palette = c("green", "red"),
+                domain = 1:length(a))
+            z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$subRegion), group=~unique(subRegionType),lat=~lat, lng=~long, fillColor = ~pal(i), stroke = TRUE, weight = 0.5)
             #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
               }
             }
@@ -644,7 +647,7 @@ server <- function(input, output, session) {
     plist <- list()
     pcount = 1
     subRegTypelist <- c()
-    z <- leaflet() %>% addTiles()
+    z <- leaflet(height = "100vh") %>% addTiles()
     print("===============================================")
     for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
       dataMap_raw_regions <- dataMap_raw %>%
@@ -707,6 +710,20 @@ server <- function(input, output, session) {
     return(z)
   })
 
+  observeEvent(input$regionsSelected, {
+    print("oof")
+    hidden_group <- data()$subRegion[which(!data()$subRegion %in% reactiveValuesToList(input)$regionsSelected)]
+    for (i in unique(hidden_group)){
+      print(paste("hiding", " ", i))
+      leafletProxy("mymap") %>% hideGroup(i)
+    }
+    for (i in unique(reactiveValuesToList(input)$regionsSelected)){
+      print(paste("showing", " ", i))
+      leafletProxy("mymap") %>% showGroup(i)
+    }
+    return(0)
+  })
+
   observeEvent(input$mymap_shape_click,{
     print(input$mymap_shape_click)
     if (is.null(input$mymap_shape_click$id)){
@@ -727,13 +744,13 @@ server <- function(input, output, session) {
       leafletProxy("mymap") %>% showGroup(input$mymap_shape_click$group)
       selectedx =  append(selectedx, l)
     }
-    session$sendCustomMessage("rhm_clic", selectedx)
-    #updatePickerInput(
-    #  inputId = "regionsSelected",
-    #  session=session,
-    #  choices = unique(data()$subRegion),
-    #  selected = unique(data()$subRegion)
-    #  )
+    # session$sendCustomMessage("rhm_clic", selectedx)
+    updatePickerInput(
+     inputId = "regionsSelected",
+     session=session,
+     choices = unique(data()$subRegion),
+     selected = unique(selectedx)
+     )
   })
 
   #---------------------------
