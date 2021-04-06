@@ -28,7 +28,8 @@ Imports:
 	cowplot,
 	ggplot2,
 	xfun,
-	scales
+	scales,
+	mvbutils
 Remotes: github::JGCRI/rgcam
 VignetteBuilder: 
     knitr
