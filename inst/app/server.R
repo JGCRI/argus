@@ -53,7 +53,7 @@ server <- function(input, output, session) {
                     "scenariosSelect",
                     "scenarioRefSelect",
                     "paramsSelect")
-  
+
   # Create Modal for Settings Download and Loading
   observeEvent(input$loadsetting, {
     showModal(
@@ -1569,10 +1569,8 @@ server <- function(input, output, session) {
     print(rv$pcount)
     return(cowplot::plot_grid(plotlist=plist,ncol=1,align = "v"))
 
-  output$mapBase <- renderPlot({
-      mapBase(dataMapx())
-    },
-    height=function(){300*(5)}
+  }#,
+  #height=function(){300*(rv$pcount)}
   )
 
   #---------------------------
