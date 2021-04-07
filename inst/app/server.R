@@ -553,25 +553,22 @@ server <- function(input, output, session) {
         easyClose = FALSE,
         footer = NULL,
         fluidRow(
-                column(
-                  6,
-                  div(actionLink(inputId='append',
-                                 #style = "display: flex; justify-content: center;align-items: center;",
-                                 label='Append Incoming Data',
-                                 class = "btn btn-default shiny-download-link download_button"
-                                 # icon = icon("cog","fa-1x")
-                  )
-                ),
-                column(6,
-                       div(actionLink(inputId='close',
-                                      label='Close',
-                                      class = "btn btn-default shiny-download-link download_button"
-                                      # icon = icon("cog","fa-1x")
-                                      ))
-                )
-
+          column(6,
+                 div(actionLink(
+                   inputId='append',
+                   label="Append Input",
+                   class = "btn btn-default shiny-download-link download_button"),
+                   style = "float:center"
+                 ))
+          ,
+          column(6,
+                 div(actionLink(inputId='close',
+                                label='Overwrite Input',
+                                class = "btn btn-default shiny-download-link download_button"
+                 )
+                 )
+          )
         )
-      )
     ))
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
   #---------------------------
