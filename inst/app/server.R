@@ -428,7 +428,7 @@ server <- function(input, output, session) {
   rv$mapflag = 0;
   rv$subRegTypelist = c()
   rv$selectedBase = 0;
-  rv$data <- dataDefault %>% dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+  rv$data2 <- dataDefault %>% dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
   # Charts initializing abs, percDiff, and absDiff
   rv$absChart = 1;
   rv$percDiffChart = 0;
@@ -489,6 +489,25 @@ server <- function(input, output, session) {
 
   data <- reactive({
     # Aggregate across classes
+    # tblAggsums <- data_raw() %>%
+    #   dplyr::filter(aggregate == "sum") %>%
+    #   dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+    #   dplyr::group_by_at(dplyr::vars(-value)) %>%
+    #   dplyr::summarize_at(c("value"), list( ~ sum(.)))
+    # tblAggmeans <- data_raw() %>%
+    #   dplyr::filter(aggregate == "mean") %>%
+    #   dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+    #   dplyr::group_by_at(dplyr::vars(-value)) %>%
+    #   dplyr::summarize_at(c("value"), list( ~ mean(.)))
+    #
+    # print("oof")
+    #
+    # tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    # rv$data2 <- dplyr::bind_rows(rv$data, tbl)
+    return(rv$data2)
+  })
+
+  observeEvent(input$append, {
     tblAggsums <- data_raw() %>%
       dplyr::filter(aggregate == "sum") %>%
       dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
@@ -501,40 +520,59 @@ server <- function(input, output, session) {
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
     tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-    rv$data2 <- dplyr::bind_rows(rv$data, tbl)
-    rv$data <- NULL
-    return(rv$data2)
-  })
-
-  observeEvent(input$append, {
-    rv$data <- rv$data2
-    print("rv data")
-    print(rv$data)
+    rv$data2 <- dplyr::bind_rows(rv$data2, tbl)
+    print("apend")
     removeModal()
   }, ignoreInit = TRUE)
 
   observeEvent(input$close, {
+    rv$data2 <- NULL
+    tblAggsums <- data_raw() %>%
+      dplyr::filter(aggregate == "sum") %>%
+      dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ sum(.)))
+    tblAggmeans <- data_raw() %>%
+      dplyr::filter(aggregate == "mean") %>%
+      dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+    tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    rv$data2 <- dplyr::bind_rows(rv$data2, tbl)
+    print("close")
     removeModal()
-  })
+  }, ignoreInit = TRUE)
+
 
   observeEvent(input$filedata, {
     print("oof")
     showModal(
       modalDialog(
         size = "s",
-        easyClose = TRUE,
+        easyClose = FALSE,
         footer = NULL,
         fluidRow(
-                 div(actionLink(inputId='append',
-                                style = "display: flex; justify-content: center;align-items: center;",
-                                label='Append Incoming Data',
-                                class = "btn btn-default shiny-download-link download_button"
-                                # icon = icon("cog","fa-1x")
+                column(
+                  6,
+                  div(actionLink(inputId='append',
+                                 #style = "display: flex; justify-content: center;align-items: center;",
+                                 label='Append Incoming Data',
+                                 class = "btn btn-default shiny-download-link download_button"
+                                 # icon = icon("cog","fa-1x")
                   )
-                 )
+                ),
+                column(6,
+                       div(actionLink(inputId='close',
+                                      label='Close',
+                                      class = "btn btn-default shiny-download-link download_button"
+                                      # icon = icon("cog","fa-1x")
+                                      ))
+                )
+
         )
       )
-    )
+    ))
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
   #---------------------------
   # Scenarios Select
