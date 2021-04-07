@@ -81,7 +81,7 @@
       readgcam <- function(reReadData = T,
                            gcamdatabase = NULL,
                            queryFile = NULL,
-                           dataProjFile = "projFile",
+                           dataProjFile = "projFile.proj",
                            scenOrigNames = "All",
                            scenNewNames = NULL,
                            dirOutputs = paste(getwd(), "/outputs", sep = ""),

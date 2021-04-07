@@ -320,23 +320,66 @@ server <- function(input, output, session) {
   # Data File (GCAM)
   #---------------------------
 
-  gcamdatabasepathx <- reactive({
-    if (dir.exists(input$gcamdatabasepath)) {
-      input$gcamdatabasepath
-    } else {
-      "GCAM database entered does not exist."
-    }
+  roots <- getVolumes()()
+
+  shinyDirChoose(
+    input,
+    id = 'gcamdir',
+    roots = roots,
+    filetypes = c('')
+  )
+
+  shinyFileChoose(
+    input,
+    id = 'proj',
+    roots = roots,
+    filetypes = c('', 'proj')
+  )
+
+  #------------------------------------------------------
+  # Creating a reactive environment to choose gcamdatabase
+  # Based on folder input or text input
+  #------------------------------------------------------
+  rv_gcam <- reactiveValues()
+  rv_gcam$gcamdatabasepathx = ""
+  rv_gcam$gcamprojpathx = ""
+
+  observeEvent(input$gcamdir,{
+    rv_gcam$gcamdatabasepathx <-gsub("\\\\","/",parseDirPath(roots, input$gcamdir))
+    rv_gcam$gcamprojpathx <- ""
   })
 
-  #output$text <- renderText({print(dataGCAMx())})
+  observeEvent(input$gcamdirfilepath,{
+    rv_gcam$gcamdatabasepathx <-gsub("\\\\","/",input$gcamdirfilepath)
+    rv_gcam$gcamprojpathx <- ""
+  })
 
+  observeEvent(input$proj,{
+    rv_gcam$gcamprojpathx <-gsub("\\\\","/",(parseFilePaths(roots, input$proj))$datapath)
+    rv_gcam$gcamdatabasepathx <- ""
+  })
 
-  # Get names of scenarios in GCAM database.....................
+  observeEvent(input$gcamprojfilepath,{
+    rv_gcam$gcamprojpathx <-gsub("\\\\","/",input$gcamprojfilepath)
+    rv_gcam$gcamdatabasepathx <- ""
+  })
+
+  output$gcamdirtext <- renderText({
+    if(rv_gcam$gcamdatabasepathx != ""){
+    paste0("Reading GCAM data from: ", rv_gcam$gcamdatabasepathx)}
+  })
+
+  output$gcamprojtext <- renderText({
+    if(rv_gcam$gcamprojpathx != ""){
+    paste0("Reading GCAM Proj File from: ", rv_gcam$gcamprojpathx)}
+  })
+
+  #.........................................
+  # Get names of scenarios in GCAM database
+  #.........................................
   gcamScenariosx <- reactive({
-
-    if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
-      gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",gcamdatabasepathx())); gcamdatabasePath_dir
-      gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', gcamdatabasepathx()); gcamdatabasePath_file
+      gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",rv_gcam$gcamdatabasepathx)); gcamdatabasePath_dir
+      gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', rv_gcam$gcamdatabasepathx); gcamdatabasePath_file
       # Save Message from rgcam::localDBConn to a text file and then extract names
       zz <- file(paste(getwd(),"/test.txt",sep=""), open = "wt")
       sink(zz,type="message")
@@ -354,16 +397,17 @@ server <- function(input, output, session) {
       s1 <- gsub(".*:","",first_line);s1
       s2 <- gsub(" ","",s1);s2
       as.vector(unlist(strsplit(s2,",")))
-    }else{
-      gcamdatabasepathx()
-    }
   })
 
+  gcamScenariosxProj <- reactive({
+    names(rgcam::loadProject(rv_gcam$gcamprojpathx))
+  })
+
+
   output$gcamScenarios = renderUI({
-    if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
-      pickerInput(
+    pickerInput(
         inputId = "gcamScenariosSelected",
-        label = "Select Available GCAM Scenarios",
+        label = "Select Available GCAM Database Scenarios",
         choices = unique(gcamScenariosx()),
         selected = unique(gcamScenariosx()),
         multiple = TRUE,
@@ -373,33 +417,107 @@ server <- function(input, output, session) {
           `select-all-text` = "All",
           `none-selected-text` = "None Selected"
         )
-      )}else{
-        NULL
-      }
+      )
+  })
+
+  output$gcamScenariosProj = renderUI({
+    pickerInput(
+      inputId = "gcamProjScenariosSelected",
+      label = "Select Available GCAM Proj File Scenarios",
+      choices = unique(gcamScenariosxProj()),
+      selected = unique(gcamScenariosxProj()),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `deselect-all-text` = "None",
+        `select-all-text` = "All",
+        `none-selected-text` = "None Selected"
+      )
+    )
+  })
+
+  #.........................................
+  # GCAM parameters
+  #.........................................
+
+  gcamParamsx <- reactive({
+    unique((argus::mappings()$mapParamQuery)$param)
+  })
+
+  output$gcamParams = renderUI({
+    pickerInput(
+      inputId = "gcamParamsSelected",
+      label = "Select Available GCAM Parameters",
+      choices = c(gcamParamsx(),"All"),
+      selected = c("pop","gdp"),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `deselect-all-text` = "None",
+        `select-all-text` = "All",
+        `none-selected-text` = "None Selected"
+      )
+    )
+  })
+
+  #.........................................
+  # GCAM Regions
+  #.........................................
+
+  gcamRegionsx <- reactive({
+   unique((argus::mappings()$countryToGCAMReg32)$region)
+  })
+
+  output$gcamRegions = renderUI({
+    pickerInput(
+      inputId = "gcamRegionsSelected",
+      label = "Select Available GCAM Regions",
+      choices = c(gcamRegionsx(),"All"),
+      selected = c(gcamRegionsx(),"All"),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `deselect-all-text` = "None",
+        `select-all-text` = "All",
+        `none-selected-text` = "None Selected"
+      )
+    )
   })
 
   #...................................
   # Create data table from database
-  dataGCAMx <- reactive({
-
-    if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
+  dataGCAMx <- eventReactive(input$readgcambutton, {
       tempdir <- paste(getwd(),"/tempdir",sep="")
       dir.create(tempdir)
-      gcamdatabasepath_i <- gcamdatabasepathx()
-      scenOrigNames_i <- input$gcamScenariosSelected
-      scenNewNames_i <- paste(input$gcamScenariosSelected,"NEW",sep="")
-      regionsSelect_i <- "Southeast Asia"
-      paramsSelect_i <- c("gdp","pop","agProdByCrop")
+      gcamdatabasepath_i <- rv_gcam$gcamdatabasepathx
+      if(rv_gcam$gcamprojpathx!=""){
+        reReadData_i <- F
+        dataProjFile_i <- rv_gcam$gcamprojpathx
+        scenOrigNames_i <- input$gcamProjScenariosSelected
+        gcamdatabasepath_i <- NULL
+      } else {
+        reReadData_i <- T
+        dataProjFile_i <- "projFile.proj"
+        scenOrigNames_i <- input$gcamScenariosSelected
+      }
+      if(any("All" %in% input$gcamParamsSelected)){
+      paramsSelect_i <- unique(gcamParamsx())} else {
+        paramsSelect_i <- input$gcamParamsSelected
+      }
+      if(any("All" %in% input$gcamParamsSelected)){
+        regionsSelect_i <- unique(gcamRegionsx())} else {
+          regionsSelect_i <- input$gcamRegionsSelected
+        }
 
-      dataGCAMraw <- argus::readgcam(reReadData = T,
+      dataGCAMraw <- argus::readgcam(reReadData = reReadData_i,
                                         dirOutputs = tempdir,
                                         gcamdatabase = gcamdatabasepath_i,
                                         scenOrigNames = scenOrigNames_i,
-                                        scenNewNames = scenNewNames_i,
-                                        dataProj = "projFile",
-                                        #dataProjPath = dataProjPath_i,
+                                        #scenNewNames = scenNewNames_i,
+                                        dataProjFile = dataProjFile_i,
                                         regionsSelect = regionsSelect_i,
-                                        paramsSelect= paramsSelect_i)
+                                        paramsSelect= paramsSelect_i,
+                                        saveData = F)
 
       unlink(tempdir, recursive = T)
 
@@ -410,9 +528,6 @@ server <- function(input, output, session) {
         dplyr::rename(class=class1)-> dataGCAM
 
       dataGCAM
-    } else {
-      NULL
-    }
   })
 
 

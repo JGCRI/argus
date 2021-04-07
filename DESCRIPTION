@@ -16,6 +16,7 @@ Imports:
     rgcam,
     tools,
     shiny,
+	shinyFiles,
     knitr (>= 1.20),
     dplyr,
     magrittr,
