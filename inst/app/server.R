@@ -75,7 +75,7 @@ server <- function(input, output, session) {
                    label="Save Settings",
                    download = "settings.csv",
                    class = "download_button"),
-                   style = "float:center"
+                   style = "float:center;"
                  ))
           ,
           column(6,
@@ -428,7 +428,7 @@ server <- function(input, output, session) {
   rv$mapflag = 0;
   rv$subRegTypelist = c()
   rv$selectedBase = 0;
-  rv$data2 <- dataDefault %>% dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+  rv$data <- dataDefault %>% dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
   # Charts initializing abs, percDiff, and absDiff
   rv$absChart = 1;
   rv$percDiffChart = 0;
@@ -466,10 +466,19 @@ server <- function(input, output, session) {
       rv$filedatax <- NULL
       rv$urlfiledatax <- NULL
     } else if(!is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
-      return(argus::addMissing(
-        argus::parse_local(input$filedata$datapath, inpu$urlfiledata$datapath)%>%
-          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-      ))
+      print(rv$filedatax)
+      # res <- argus::parse_local(input$filedata$datapath[1], inpu$urlfiledata$datapath)%>%
+      #   dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+      res <- NULL
+      for (i in 1:length(input$filedata$datapath)){
+        print("lllllllllll")
+        print(input$filedata$datapath[i])
+        res <- dplyr::bind_rows(res, argus::addMissing(
+          argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath)%>%
+            dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+        ))
+      }
+      return(res)
       rv$filedatax <- NULL
       rv$urlfiledatax <- NULL
     } else if(is.null(rv$filedatax) & !is.null(dataGCAMx()) & ("" == rv$urlfiledatax)){
@@ -488,23 +497,7 @@ server <- function(input, output, session) {
   })
 
   data <- reactive({
-    # Aggregate across classes
-    # tblAggsums <- data_raw() %>%
-    #   dplyr::filter(aggregate == "sum") %>%
-    #   dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
-    #   dplyr::group_by_at(dplyr::vars(-value)) %>%
-    #   dplyr::summarize_at(c("value"), list( ~ sum(.)))
-    # tblAggmeans <- data_raw() %>%
-    #   dplyr::filter(aggregate == "mean") %>%
-    #   dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
-    #   dplyr::group_by_at(dplyr::vars(-value)) %>%
-    #   dplyr::summarize_at(c("value"), list( ~ mean(.)))
-    #
-    # print("oof")
-    #
-    # tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-    # rv$data2 <- dplyr::bind_rows(rv$data, tbl)
-    return(rv$data2)
+    return(rv$data)
   })
 
   observeEvent(input$append, {
@@ -520,13 +513,13 @@ server <- function(input, output, session) {
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
     tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-    rv$data2 <- dplyr::bind_rows(rv$data2, tbl)
+    rv$data <- dplyr::bind_rows(rv$data, tbl)
     print("apend")
     removeModal()
   }, ignoreInit = TRUE)
 
   observeEvent(input$close, {
-    rv$data2 <- NULL
+    rv$data <- NULL
     tblAggsums <- data_raw() %>%
       dplyr::filter(aggregate == "sum") %>%
       dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
@@ -539,7 +532,7 @@ server <- function(input, output, session) {
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
     tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-    rv$data2 <- dplyr::bind_rows(rv$data2, tbl)
+    rv$data <- dplyr::bind_rows(rv$data, tbl)
     print("close")
     removeModal()
   }, ignoreInit = TRUE)
