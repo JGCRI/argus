@@ -428,6 +428,7 @@ server <- function(input, output, session) {
   rv$mapflag = 0;
   rv$subRegTypelist = c()
   rv$selectedBase = 0;
+  rv$data <- dataDefault %>% dplyr::select(scenario, subRegion, param, aggregate, class, x, value) %>% top_n(value, 2)
   # Charts initializing abs, percDiff, and absDiff
   rv$absChart = 1;
   rv$percDiffChart = 0;
@@ -499,9 +500,17 @@ server <- function(input, output, session) {
       dplyr::group_by_at(dplyr::vars(-value)) %>%
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
-    dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-
+    tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    rv$data2 <- dplyr::bind_rows(rv$data, tbl)
+    return(rv$data2)
   })
+
+  observeEvent(input$filedata, {
+    print("oof")
+    rv$data <- rv$data2
+    print("rv data")
+    print(rv$data)
+  }, ignoreNULL = FALSE)
 
   #---------------------------
   # Scenarios Select
