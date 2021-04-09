@@ -25,7 +25,7 @@ library(mvbutils)
 # Options
 #---------------------------
 options(shiny.maxRequestSize=100*1024^2)
-# options(shiny.trace = TRUE)
+#options(shiny.trace = TRUE)
 pal_all <- argus::mappings()$pal_all
 
 #---------------------------
@@ -55,6 +55,98 @@ server <- function(input, output, session) {
                     "paramsSelect")
 
   # Create Modal for Settings Download and Loading
+  
+  observeEvent(input$inputz, {
+    if (input$inputz == "csv"){
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+          br(),
+          # CSV Data -------------------------------------
+          fileInput(
+            inputId = "filedata",
+            label = "Upload csv or zip file",
+            accept = c(".csv", ".zip"),
+            multiple = TRUE,
+            width = "100%"
+          )
+          ))
+    }else if(input$inputz == "url"){
+     showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL, 
+          br(),
+          textInput(
+            inputId = "urlfiledata",
+            label = "Enter url to csv or zip file",
+            placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"),
+          br(),
+          width = "100%"
+        ))
+    }else if (input$inputz == "gcam"){
+     showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,    
+          br(),
+          p("*Note: Only for Argus run on local computer.", style="color:#cc0000"),
+          tabsetPanel(
+            type = "tabs",
+            id="gcamtabs",
+            tabPanel(
+              "gcamdatabase",
+              br(),
+              shinyDirButton(id = "gcamdir",
+                             label = "Choose GCAM directory",
+                             title = "Select"),
+              br(),
+              textInput(
+                inputId = "gcamdirfilepath",
+                label = NULL,
+                placeholder =  "OR Enter path to GCAM directory")
+            ),
+            tabPanel(
+              ".PROJ",
+              br(),
+              shinyFilesButton(id = "proj",
+                             label = "Choose GCAM .proj file",
+                             title = "Select",
+                             multiple=F),
+              br(),
+              textInput(
+                inputId = "gcamprojfilepath",
+                label = NULL,
+                placeholder =  "OR Enter path to GCAM .proj file")
+            )
+          ),
+          br(),
+          verbatimTextOutput("gcamdirtext", placeholder = FALSE),
+          br(),
+          verbatimTextOutput("gcamprojtext", placeholder = FALSE),
+          br(),
+          uiOutput('gcamScenarios'),
+          br(),
+          uiOutput('gcamScenariosProj'),
+          br(),
+          uiOutput('gcamParams'),
+          br(),
+          uiOutput('gcamRegions'),
+          br(),
+          actionButton(inputId = "readgcambutton",
+                       label = "Read GCAM Data"),
+          width = "100%"
+        )
+      )
+      }
+      updateSelectInput(session, "inputz", selected = "")
+    })
+
+  
   observeEvent(input$loadsetting, {
     showModal(
       modalDialog(

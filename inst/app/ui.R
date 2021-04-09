@@ -73,82 +73,30 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       # style="position: fixed; width:30%",
-      tabsetPanel(
-        type = "tabs",
-        id="tabs",
-        tabPanel(
-          "csv",
-          br(),
-          # CSV Data -------------------------------------
-          fileInput(
-            inputId = "filedata",
-            label = "Upload csv or zip file",
-            accept = c(".csv", ".zip"),
-            multiple = TRUE,
-            width = "100%"
-          )),
-        tabPanel(
-          "url",
-          br(),
-          textInput(
-            inputId = "urlfiledata",
-            label = "Enter url to csv or zip file",
-            placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"),
-          br(),
-          width = "100%"
-        ),
-        tabPanel(
-          "GCAM",
-          br(),
-          p("*Note: Only for Argus run on local computer.", style="color:#cc0000"),
-          tabsetPanel(
-            type = "tabs",
-            id="gcamtabs",
-            tabPanel(
-              "gcamdatabase",
-              br(),
-              shinyDirButton(id = "gcamdir",
-                             label = "Choose GCAM directory",
-                             title = "Select"),
-              br(),
-              textInput(
-                inputId = "gcamdirfilepath",
-                label = NULL,
-                placeholder =  "OR Enter path to GCAM directory")
-            ),
-            tabPanel(
-              ".PROJ",
-              br(),
-              shinyFilesButton(id = "proj",
-                             label = "Choose GCAM .proj file",
-                             title = "Select",
-                             multiple=F),
-              br(),
-              textInput(
-                inputId = "gcamprojfilepath",
-                label = NULL,
-                placeholder =  "OR Enter path to GCAM .proj file")
-            )
-          ),
-          br(),
-          verbatimTextOutput("gcamdirtext", placeholder = FALSE),
-          br(),
-          verbatimTextOutput("gcamprojtext", placeholder = FALSE),
-          br(),
-          uiOutput('gcamScenarios'),
-          br(),
-          uiOutput('gcamScenariosProj'),
-          br(),
-          uiOutput('gcamParams'),
-          br(),
-          uiOutput('gcamRegions'),
-          br(),
-          actionButton(inputId = "readgcambutton",
-                       label = "Read GCAM Data"),
-          width = "100%"
-        )
-      ),
-
+  
+      #fluidRow(
+        #column(3,
+          #actionButton("csv", "csv", width="100%")
+         # ),
+        #column(3,
+        # actionButton("url", "url", width="100%")
+        #  ),
+        #column(3,
+        #actionButton("gcam", "gcam", width="100%")
+        #  ),
+        #column(3)
+        #),
+        #class="action-button shiny-bound-input"
+      
+      selectInput(
+        inputId = "inputz",
+        label = "Input",
+        choices = c("url","csv","gcam", ""),
+        selected = "",
+        multiple = FALSE,
+        selectize = TRUE,
+        width = "100%"),
+      
       # Reactive Input Choices Based on Input File-------------------------
 
       # Scenarios
