@@ -168,7 +168,7 @@ server <- function(input, output, session) {
                    label="Save Settings",
                    download = "settings.csv",
                    class = "download_button"),
-                   style = "float:center"
+                   style = "float:center;"
                  ))
           ,
           column(6,
@@ -657,6 +657,7 @@ server <- function(input, output, session) {
   rv$mapflag = 0;
   rv$subRegTypelist = c()
   rv$selectedBase = 0;
+  rv$data <- dataDefault %>% dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
   # Charts initializing abs, percDiff, and absDiff
   rv$absChart = 1;
   rv$percDiffChart = 0;
@@ -692,6 +693,7 @@ server <- function(input, output, session) {
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
+<<<<<<< HEAD
     } else if(!is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
       return(argus::addMissing(
         argus::parse_local(input$filedata$datapath, inpu$urlfiledata$datapath)%>%
@@ -709,7 +711,10 @@ server <- function(input, output, session) {
   })
 
   data <- reactive({
-    # Aggregate across classes
+    return(rv$data)
+  })
+
+  observeEvent(input$append, {
     tblAggsums <- data_raw() %>%
       dplyr::filter(aggregate == "sum") %>%
       dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
@@ -721,10 +726,58 @@ server <- function(input, output, session) {
       dplyr::group_by_at(dplyr::vars(-value)) %>%
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
-    dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    rv$data <- dplyr::bind_rows(rv$data, tbl)
+    print("apend")
+    removeModal()
+  }, ignoreInit = TRUE)
 
-  })
+  observeEvent(input$close, {
+    rv$data <- NULL
+    tblAggsums <- data_raw() %>%
+      dplyr::filter(aggregate == "sum") %>%
+      dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ sum(.)))
+    tblAggmeans <- data_raw() %>%
+      dplyr::filter(aggregate == "mean") %>%
+      dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
+    tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    rv$data <- dplyr::bind_rows(rv$data, tbl)
+    print("close")
+    removeModal()
+  }, ignoreInit = TRUE)
+
+
+  observeEvent(input$filedata, {
+    print("oof")
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = FALSE,
+        footer = NULL,
+        fluidRow(
+          column(6,
+                 div(actionLink(
+                   inputId='append',
+                   label="Append Input",
+                   class = "btn btn-default shiny-download-link download_button"),
+                   style = "float:center"
+                 ))
+          ,
+          column(6,
+                 div(actionLink(inputId='close',
+                                label='Overwrite Input',
+                                class = "btn btn-default shiny-download-link download_button"
+                 )
+                 )
+          )
+        )
+    ))
+  }, ignoreNULL = FALSE, ignoreInit = TRUE)
   #---------------------------
   # Scenarios Select
   #---------------------------
