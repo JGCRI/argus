@@ -72,7 +72,7 @@ server <- function(input, output, session) {
             multiple = TRUE,
             width = "100%"
           )
-          ))
+      ))
     }else if(input$inputz == "url"){
      showModal(
       modalDialog(
@@ -86,7 +86,7 @@ server <- function(input, output, session) {
             placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"),
           br(),
           width = "100%"
-        ))
+    ))
     }else if (input$inputz == "gcam"){
      showModal(
       modalDialog(
@@ -140,6 +140,7 @@ server <- function(input, output, session) {
           br(),
           actionButton(inputId = "readgcambutton",
                        label = "Read GCAM Data"),
+          br(),
           width = "100%"
         )
       )
@@ -693,12 +694,22 @@ server <- function(input, output, session) {
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
-<<<<<<< HEAD
     } else if(!is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
-      return(argus::addMissing(
-        argus::parse_local(input$filedata$datapath, inpu$urlfiledata$datapath)%>%
-          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-      ))
+      print(rv$filedatax)
+      # res <- argus::parse_local(input$filedata$datapath[1], inpu$urlfiledata$datapath)%>%
+      #   dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+      res <- NULL
+      for (i in 1:length(input$filedata$datapath)){
+        print("lllllllllll")
+        print(input$filedata$datapath[i])
+        argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) -> a
+        print(a)
+        z<-argus::addMissing(
+          argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath))
+        print("oofz")
+        res <- dplyr::bind_rows(res, z)
+      }
+      return(res)
     } else if(is.null(rv$filedatax) & !is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))){
       return(rv$dataGCAM %>%
         dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
@@ -751,33 +762,6 @@ server <- function(input, output, session) {
     removeModal()
   }, ignoreInit = TRUE)
 
-
-  observeEvent(input$filedata, {
-    print("oof")
-    showModal(
-      modalDialog(
-        size = "s",
-        easyClose = FALSE,
-        footer = NULL,
-        fluidRow(
-          column(6,
-                 div(actionLink(
-                   inputId='append',
-                   label="Append Input",
-                   class = "btn btn-default shiny-download-link download_button"),
-                   style = "float:center"
-                 ))
-          ,
-          column(6,
-                 div(actionLink(inputId='close',
-                                label='Overwrite Input',
-                                class = "btn btn-default shiny-download-link download_button"
-                 )
-                 )
-          )
-        )
-    ))
-  }, ignoreNULL = FALSE, ignoreInit = TRUE)
   #---------------------------
   # Scenarios Select
   #---------------------------
