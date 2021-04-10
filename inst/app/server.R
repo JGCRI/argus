@@ -25,7 +25,7 @@ library(mvbutils)
 # Options
 #---------------------------
 options(shiny.maxRequestSize=100*1024^2)
-#options(shiny.trace = TRUE)
+options(shiny.trace = TRUE)
 pal_all <- argus::mappings()$pal_all
 
 #---------------------------
@@ -55,7 +55,7 @@ server <- function(input, output, session) {
                     "paramsSelect")
 
   # Create Modal for Settings Download and Loading
-  
+
   observeEvent(input$inputz, {
     if (input$inputz == "csv"){
     showModal(
@@ -78,7 +78,7 @@ server <- function(input, output, session) {
       modalDialog(
         size = "s",
         easyClose = TRUE,
-        footer = NULL, 
+        footer = NULL,
           br(),
           textInput(
             inputId = "urlfiledata",
@@ -90,9 +90,9 @@ server <- function(input, output, session) {
     }else if (input$inputz == "gcam"){
      showModal(
       modalDialog(
-        size = "s",
+        size = "m",
         easyClose = TRUE,
-        footer = NULL,    
+        footer = NULL,
           br(),
           p("*Note: Only for Argus run on local computer.", style="color:#cc0000"),
           tabsetPanel(
@@ -146,7 +146,7 @@ server <- function(input, output, session) {
       updateSelectInput(session, "inputz", selected = "")
     })
 
-  
+
   observeEvent(input$loadsetting, {
     showModal(
       modalDialog(
@@ -578,7 +578,10 @@ server <- function(input, output, session) {
 
   #...................................
   # Create data table from database
-  dataGCAMx <- eventReactive(input$readgcambutton, {
+
+
+  #dataGCAMx <- eventReactive(input$readgcambutton, {
+  observeEvent(input$readgcambutton, {
       tempdir <- paste(getwd(),"/tempdir",sep="")
       dir.create(tempdir)
       gcamdatabasepath_i <- rv_gcam$gcamdatabasepathx
@@ -619,8 +622,8 @@ server <- function(input, output, session) {
                       value) %>%
         dplyr::rename(class=class1)-> dataGCAM
 
-      dataGCAM
-  })
+      rv$dataGCAM <- dataGCAM
+  }, ignoreInit = TRUE)
 
 
   #---------------------------
@@ -629,7 +632,6 @@ server <- function(input, output, session) {
 
   # Create your own reactive values that you can modify because input is read only
   rv <- reactiveValues()
-
 
   rv$pcount = 1;
   rv$mapflag = 0;
@@ -664,32 +666,25 @@ server <- function(input, output, session) {
 
   # Read in Raw Data
   data_raw <- reactive({
-    if (is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
+    print("oof")
+    if (is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
       return(argus::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
-      rv$filedatax <- NULL
-      rv$urlfiledatax <- NULL
-    } else if(!is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
+    } else if(!is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
       return(argus::addMissing(
         argus::parse_local(input$filedata$datapath, inpu$urlfiledata$datapath)%>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
-      rv$filedatax <- NULL
-      rv$urlfiledatax <- NULL
-    } else if(is.null(rv$filedatax) & !is.null(dataGCAMx()) & ("" == rv$urlfiledatax)){
-      return(dataGCAMx() %>%
+    } else if(is.null(rv$filedatax) & !is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))){
+      return(rv$dataGCAM %>%
         dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
-      rv$filedatax <- NULL
-      rv$urlfiledatax <- NULL
     }else{
       return(argus::addMissing(
         argus::parse_remote(input$urlfiledata)%>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
-      rv$filedatax <- NULL
-      rv$urlfiledatax <- NULL
     }
   })
 
