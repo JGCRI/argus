@@ -108,7 +108,11 @@ server <- function(input, output, session) {
               textInput(
                 inputId = "gcamdirfilepath",
                 label = NULL,
-                placeholder =  "OR Enter path to GCAM directory")
+                placeholder =  "OR Enter path to GCAM directory"),
+              br(),
+              verbatimTextOutput("gcamdirtext", placeholder = FALSE),
+              br(),
+              uiOutput('gcamScenarios'),
             ),
             tabPanel(
               ".PROJ",
@@ -121,17 +125,14 @@ server <- function(input, output, session) {
               textInput(
                 inputId = "gcamprojfilepath",
                 label = NULL,
-                placeholder =  "OR Enter path to GCAM .proj file")
+                placeholder =  "OR Enter path to GCAM .proj file"),
+              br(),
+              verbatimTextOutput("gcamprojtext", placeholder = FALSE),
+              br(),
+              uiOutput('gcamScenariosProj'),
             )
           ),
-          br(),
-          verbatimTextOutput("gcamdirtext", placeholder = FALSE),
-          br(),
-          verbatimTextOutput("gcamprojtext", placeholder = FALSE),
-          br(),
-          uiOutput('gcamScenarios'),
-          br(),
-          uiOutput('gcamScenariosProj'),
+
           br(),
           uiOutput('gcamParams'),
           br(),
@@ -457,13 +458,19 @@ server <- function(input, output, session) {
   })
 
   output$gcamdirtext <- renderText({
-    if(rv_gcam$gcamdatabasepathx != ""){
+    if(rv_gcam$gcamdatabasepathx != "" & rv$validGCAM){
     paste0("Reading GCAM data from: ", rv_gcam$gcamdatabasepathx)}
+    else{
+      "Awaiting Valid Data Input"
+    }
   })
 
   output$gcamprojtext <- renderText({
-    if(rv_gcam$gcamprojpathx != ""){
+    if(rv_gcam$gcamprojpathx != "" & rv$validGCAM){
     paste0("Reading GCAM Proj File from: ", rv_gcam$gcamprojpathx)}
+    else{
+      return("Awaiting Valid Data Input")
+    }
   })
 
   #.........................................
@@ -492,7 +499,13 @@ server <- function(input, output, session) {
   })
 
   gcamScenariosxProj <- reactive({
-    names(rgcam::loadProject(rv_gcam$gcamprojpathx))
+    scens <- (names(rgcam::loadProject(rv_gcam$gcamprojpathx)))
+    if (!is.null(scens)){
+      rv$validGCAM <- TRUE
+    }else{
+      rv$validGCAM <- FALSE
+    }
+    return(scens)
   })
 
 
@@ -633,6 +646,7 @@ server <- function(input, output, session) {
   # Create your own reactive values that you can modify because input is read only
   rv <- reactiveValues()
 
+  rv$validGcam <- FALSE
   rv$pcount = 1;
   rv$mapflag = 0;
   rv$subRegTypelist = c()
