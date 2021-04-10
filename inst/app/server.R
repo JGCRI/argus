@@ -495,7 +495,13 @@ server <- function(input, output, session) {
       # Extract scenario names from saved line
       s1 <- gsub(".*:","",first_line);s1
       s2 <- gsub(" ","",s1);s2
-      as.vector(unlist(strsplit(s2,",")))
+      b <- as.vector(unlist(strsplit(s2,",")))
+      if (!is.null(b)){
+        rv$validGCAM <- TRUE
+      }else{
+        rv$validGCAM <- FALSE
+      }
+      return(b)
   })
 
   gcamScenariosxProj <- reactive({
