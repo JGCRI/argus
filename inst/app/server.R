@@ -71,7 +71,10 @@ server <- function(input, output, session) {
             accept = c(".csv", ".zip"),
             multiple = TRUE,
             width = "100%"
-          )
+          ),
+          br(),
+          actionButton(inputId = "readfilebutton",
+                       label = "Read File Data")
       ))
     }else if(input$inputz == "url"){
      showModal(
@@ -85,7 +88,10 @@ server <- function(input, output, session) {
             label = "Enter url to csv or zip file",
             placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"),
           br(),
-          width = "100%"
+          width = "100%",
+          br(),
+          actionButton(inputId = "readurlbutton",
+                       label = "Read Url Data")
     ))
     }else if (input$inputz == "gcam"){
      showModal(
@@ -148,6 +154,37 @@ server <- function(input, output, session) {
       updateSelectInput(session, "inputz", selected = "")
     })
 
+
+  observeEvent(
+    {input$readgcambutton
+    input$readurlbutton
+    input$readfilebutton}, {
+    req(data_raw())
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = FALSE,
+        footer = NULL,
+        fluidRow(
+            column(6,
+              div(actionLink(
+                  inputId='append',
+                  label="Append to Input",
+                  class = "btn btn-default shiny-download-link download_button"),
+                  style = "float:center"
+                ))
+        ,
+        column(6,
+                div(actionLink(inputId='close',
+                                label='Overwrite Input',
+                                class = "btn btn-default shiny-download-link download_button",
+                                style="float:right;!important"
+               )
+                 )
+          )
+        )
+    ))
+    }, ignoreInit=TRUE)
 
   observeEvent(input$loadsetting, {
     showModal(
@@ -686,6 +723,71 @@ server <- function(input, output, session) {
   eventReactive(input$urlfiledata, {
     rv$filedatax=NULL})
 
+  addMissing<-function(data){
+      NULL -> year -> aggregate -> scenario -> subRegion -> param -> x -> value
+      print("iif")
+      print(names(data))
+    if(!any(grepl("\\<scenario\\>",names(data),ignore.case = T))){
+      data<-data%>%dplyr::mutate(scenario="scenario")
+    }else{
+      data <- data %>% dplyr::rename(!!"scenario" := (names(data)[grepl("\\<scenario\\>",names(data),ignore.case = T)])[1])
+      for (i in 1:length(names(data))){
+        print(typeof(names(data)))
+        }
+            #browser()
+      data<-data%>%dplyr::mutate(scenario=dplyr::case_when(is.na(scenario)~"scenario",TRUE~as.character(scenario)))
+    }
+    print("xiif")
+    if(!any(grepl("\\<scenarios\\>",names(data),ignore.case = T))){}else{
+      data <- data %>% dplyr::rename(!!"scenario" := (names(data)[grepl("\\<scenarios\\>",names(data),ignore.case = T)])[1])
+      data<-data%>%dplyr::mutate(scenario=dplyr::case_when(is.na(scenario)~"scenario",TRUE~as.character(scenario)))}
+    if(!any(grepl("\\<subRegion\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(subRegion="subRegion")}else{
+      data <- data %>% dplyr::rename(!!"subRegion" := (names(data)[grepl("\\<subRegion\\>",names(data),ignore.case = T)])[1])
+      data<-data%>%dplyr::mutate(subRegion=dplyr::case_when(is.na(subRegion)~"subRegion",TRUE~as.character(subRegion)))}
+    if(!any(grepl("\\<subRegions\\>",names(data),ignore.case = T))){}else{
+      data <- data %>% dplyr::rename(!!"subRegion" := (names(data)[grepl("\\<subRegions\\>",names(data),ignore.case = T)])[1])
+      data<-data%>%dplyr::mutate(subRegion=dplyr::case_when(is.na(subRegion)~"subRegion",TRUE~as.character(subRegion)))}
+    if(!any(grepl("\\<param\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(param="param")}else{
+      data <- data %>% dplyr::rename(!!"param" := (names(data)[grepl("\\<param\\>",names(data),ignore.case = T)])[1])
+      data<-data%>%dplyr::mutate(param=dplyr::case_when(is.na(param)~"param",TRUE~as.character(param)))}
+    if(!any(grepl("\\<params\\>",names(data),ignore.case = T))){}else{
+      data <- data %>% dplyr::rename(!!"param" := (names(data)[grepl("\\<params\\>",names(data),ignore.case = T)])[1])
+      data<-data%>%dplyr::mutate(param=dplyr::case_when(is.na(param)~"param",TRUE~as.character(param)))}
+    if(!any(grepl("\\<value\\>",names(data),ignore.case = T))){stop("Data must have 'value' column.")}else{
+      data <- data %>% dplyr::rename(!!"value" := (names(data)[grepl("\\<value\\>",names(data),ignore.case = T)])[1])
+      data$value = as.numeric(data$value)
+      data<-data%>%dplyr::mutate(value=dplyr::case_when(is.na(value)~0,TRUE~value))}
+    if(!any(grepl("\\<values\\>",names(data),ignore.case = T))){}else{
+      data <- data %>% dplyr::rename(!!"value" := (names(data)[grepl("\\<values\\>",names(data),ignore.case = T)])[1])
+      data$value = as.numeric(data$value)
+      data<-data%>%dplyr::mutate(value=dplyr::case_when(is.na(value)~0,TRUE~value))}
+    if(!any(grepl("\\<unit\\>",names(data),ignore.case = T))){}else{
+      data <- data %>% dplyr::rename(!!"units" := (names(data)[grepl("\\<unit\\>",names(data),ignore.case = T)])[1])
+      data<-data%>%dplyr::mutate(units=dplyr::case_when(is.na(units)~"units",TRUE~as.character(units)))}
+    if(!any(grepl("\\<units\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(units="units")}else{
+      data <- data %>% dplyr::rename(!!"units" := (names(data)[grepl("\\<units\\>",names(data),ignore.case = T)])[1])
+      data<-data%>%dplyr::mutate(units=dplyr::case_when(is.na(units)~"units",TRUE~as.character(units)))}
+    if(!"x"%in%names(data)){
+      if("year"%in%names(data)){
+        data<-data%>%dplyr::mutate(x=year)}else{data<-data%>%dplyr::mutate(x="x")}}
+    if(!any(grepl("\\<aggregate\\>",names(data),ignore.case = T))){
+    if(is.null(aggregate)){data<-data%>%dplyr::mutate(aggregate="sum")}else{
+        data<-data%>%dplyr::mutate(aggregate="sum")}
+    }else{
+      data <- data %>% dplyr::rename(!!"aggregate" := (names(data)[grepl("\\<aggregate\\>",names(data),ignore.case = T)])[1])
+      data<-data%>%dplyr::mutate(aggregate=dplyr::case_when(is.na(aggregate)~"sum",
+                                                          TRUE~as.character(aggregate)))}
+    if(!any(grepl("\\<class\\>",names(data),ignore.case = T))){
+      if(!any(grepl("\\<class\\>",names(data),ignore.case = T))){
+        data<-data%>%dplyr::mutate(class="class")}else{data<-data%>%dplyr::mutate(class=class)}}else{
+          data <- data %>% dplyr::rename(!!"class" := (names(data)[grepl("\\<class\\>",names(data),ignore.case = T)])[1])
+          data<-data%>%dplyr::mutate(class=dplyr::case_when(is.na(class)~"class",TRUE~as.character(class)))}
+
+    data <- data %>%
+      dplyr::select(scenario,subRegion,param,class,x,aggregate,value)
+      return(data)
+  }
+
   # Read in Raw Data
   data_raw <- reactive({
     print("oof")
@@ -703,7 +805,7 @@ server <- function(input, output, session) {
         print("lllllllllll")
         print(input$filedata$datapath[i])
         argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) -> a
-        z<-argus::addMissing(a)
+        z<-addMissing(a)
         print("oofz")
         res <- dplyr::bind_rows(res, a)
       }
@@ -742,7 +844,6 @@ server <- function(input, output, session) {
   }, ignoreInit = TRUE)
 
   observeEvent(input$close, {
-    rv$data <- NULL
     tblAggsums <- data_raw() %>%
       dplyr::filter(aggregate == "sum") %>%
       dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
@@ -755,9 +856,10 @@ server <- function(input, output, session) {
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
     tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-    rv$data <- dplyr::bind_rows(rv$data, tbl)
+    rv$data <- dplyr::bind_rows(tbl)
     print("close")
     removeModal()
+    browser()
   }, ignoreInit = TRUE)
 
   #---------------------------

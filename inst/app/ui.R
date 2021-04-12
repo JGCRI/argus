@@ -96,24 +96,6 @@ ui <- fluidPage(
         multiple = FALSE,
         selectize = TRUE,
         width = "100%"),
-       fluidRow(
-            column(6,
-              div(actionLink(
-                  inputId='append',
-                  label="Append to Input",
-                  class = "btn btn-default shiny-download-link download_button"),
-                  style = "float:center"
-                ))
-        ,
-        column(6,
-                div(actionLink(inputId='close',
-                                label='Overwrite Input',
-                                class = "btn btn-default shiny-download-link download_button",
-                                style="float:right;!important"
-               )
-                 )
-          )
-        ),
       # Reactive Input Choices Based on Input File-------------------------
 
       # Scenarios
