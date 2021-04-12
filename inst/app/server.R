@@ -857,10 +857,9 @@ server <- function(input, output, session) {
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
     tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-    rv$data <- tbl
+    rv$data <- dplyr::bind_rows(rv$data[0,], tbl)
     print("close")
     removeModal()
-    browser()
   }, ignoreInit = TRUE)
 
   #---------------------------
@@ -901,6 +900,7 @@ server <- function(input, output, session) {
   # Parameters Select
   #---------------------------
   output$selectParams = renderUI({
+      browser()
     pickerInput(
       inputId = "paramsSelected",
       label = "Select Params",
