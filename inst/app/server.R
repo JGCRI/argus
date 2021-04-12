@@ -703,11 +703,9 @@ server <- function(input, output, session) {
         print("lllllllllll")
         print(input$filedata$datapath[i])
         argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) -> a
-        print(a)
-        z<-argus::addMissing(
-          argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath))
+        z<-argus::addMissing(a)
         print("oofz")
-        res <- dplyr::bind_rows(res, z)
+        res <- dplyr::bind_rows(res, a)
       }
       return(res)
     } else if(is.null(rv$filedatax) & !is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))){
