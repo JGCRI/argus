@@ -159,6 +159,7 @@ server <- function(input, output, session) {
     {input$readgcambutton
     input$readurlbutton
     input$readfilebutton}, {
+    removeModal()
     req(data_raw())
     showModal(
       modalDialog(
@@ -175,11 +176,10 @@ server <- function(input, output, session) {
                 ))
         ,
         column(6,
-                div(actionLink(inputId='close',
+                div(actionLink(inputId="close",
                                 label='Overwrite Input',
-                                class = "btn btn-default shiny-download-link download_button",
+                                class = "btn btn-default shiny-download-link download_button"),
                                 style="float:right;!important"
-               )
                  )
           )
         )
@@ -804,7 +804,8 @@ server <- function(input, output, session) {
       for (i in 1:length(input$filedata$datapath)){
         print("lllllllllll")
         print(input$filedata$datapath[i])
-        argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) -> a
+        argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) %>%
+            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
         z<-addMissing(a)
         print("oofz")
         res <- dplyr::bind_rows(res, a)
@@ -856,7 +857,7 @@ server <- function(input, output, session) {
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
     tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-    rv$data <- dplyr::bind_rows(tbl)
+    rv$data <- tbl
     print("close")
     removeModal()
     browser()
