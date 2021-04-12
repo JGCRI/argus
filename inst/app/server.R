@@ -85,7 +85,7 @@ server <- function(input, output, session) {
           br(),
           textInput(
             inputId = "urlfiledata",
-            label = "Enter url to csv or zip file",
+            label = "Enter url to csv or zip file, seperated by ',' between url",
             placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"),
           br(),
           width = "100%",
@@ -878,19 +878,27 @@ server <- function(input, output, session) {
             dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
         z<-argus::addMissing(a)
         print("oofz")
-        res <- dplyr::bind_rows(res, a)
+        res <- dplyr::bind_rows(res, z)
       }
       return(res)
     } else if(is.null(rv$filedatax) & !is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))){
       return(argus::addMissing(rv$dataGCAM %>%
         dplyr::select(scenario, subRegion, param, aggregate, class, x, value)))
     }else{
-      return(argus::addMissing(
-        argus::parse_remote(input$urlfiledata)%>%
-          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-      ))
+      z <- strsplit(rv$urlfiledatax, ",")
+      res <- NULL
+      for (i in 1:length(z[[1]])){
+        print(z[[1]])
+        print("lllllllllll")
+        print(z[[1]][i])
+          argus::parse_remote(z[[1]][i])%>%
+            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
+        res <- dplyr::bind_rows(res, a)
+      }
+      return(res)
     }
   })
+
 
   data <- reactive({
     return(rv$data)

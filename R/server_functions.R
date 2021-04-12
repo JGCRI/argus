@@ -92,6 +92,7 @@ parse_zip <- function(file){
 #' @importFrom magrittr %>%
 #' @export
 parse_remote <- function(urlfiledata){
+  print(urlfiledata)
   if (tools::file_ext(urlfiledata) == ""){
     if (grepl("./$",urlfiledata)){
       #GCAM
@@ -114,7 +115,7 @@ parse_remote <- function(urlfiledata){
   }else if (tools::file_ext(urlfiledata) == "csv"){
     temp <- tempfile()
     utils::download.file(urlfiledata, temp)
-    return(utils::read.csv(urlfiledata) %>%
+    return(utils::read.csv(temp) %>%
              as.data.frame())
   }else{
     return(NULL)
