@@ -499,7 +499,7 @@ server <- function(input, output, session) {
     if(rv_gcam$gcamdatabasepathx != "" & rv$validGCAM){
     paste0("Reading GCAM data from: ", rv_gcam$gcamdatabasepathx)}
     else{
-      "Awaiting Valid Data Input"
+      "Awaiting Valid Input"
     }
   })
 
@@ -507,23 +507,27 @@ server <- function(input, output, session) {
     if(rv_gcam$gcamprojpathx != "" & rv$validGCAM){
     paste0("Reading GCAM Proj File from: ", rv_gcam$gcamprojpathx)}
     else{
-      return("Awaiting Valid Data Input")
+      return("Awaiting Valid Input")
     }
   })
 
   #.........................................
   # Get names of scenarios in GCAM database
-  #.........................................
+  #......................................... 
   gcamScenariosx <- reactive({
+
+
       gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",rv_gcam$gcamdatabasepathx)); gcamdatabasePath_dir
       gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', rv_gcam$gcamdatabasepathx); gcamdatabasePath_file
       # Save Message from rgcam::localDBConn to a text file and then extract names
       zz <- file(paste(getwd(),"/test.txt",sep=""), open = "wt")
       sink(zz,type="message")
+      
       rgcam::localDBConn(gcamdatabasePath_dir,gcamdatabasePath_file)
       sink()
       closeAllConnections()
       # Read temp file
+      
       con <- file(paste(getwd(),"/test.txt",sep=""),open = "r")
       first_line <- readLines(con,n=1); first_line
       closeAllConnections()
@@ -633,12 +637,19 @@ server <- function(input, output, session) {
     )
   })
 
+
+
   #...................................
   # Create data table from database
 
 
   #dataGCAMx <- eventReactive(input$readgcambutton, {
   observeEvent(input$readgcambutton, {
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      progress$set(message = "Reading from GCAM database", value = 0)
+      
+      
       tempdir <- paste(getwd(),"/tempdir",sep="")
       dir.create(tempdir)
       gcamdatabasepath_i <- rv_gcam$gcamdatabasepathx
@@ -660,7 +671,7 @@ server <- function(input, output, session) {
         regionsSelect_i <- unique(gcamRegionsx())} else {
           regionsSelect_i <- input$gcamRegionsSelected
         }
-
+      progress$inc(1/3, detail = paste("Connecting to Database", 1))
       dataGCAMraw <- argus::readgcam(reReadData = reReadData_i,
                                         dirOutputs = tempdir,
                                         gcamdatabase = gcamdatabasepath_i,
@@ -670,7 +681,7 @@ server <- function(input, output, session) {
                                         regionsSelect = regionsSelect_i,
                                         paramsSelect= paramsSelect_i,
                                         saveData = F)
-
+      progress$inc(1/3, detail = paste("Unlinking", 2))
       unlink(tempdir, recursive = T)
 
       dataGCAMraw$data %>% as_tibble() %>%
@@ -678,7 +689,7 @@ server <- function(input, output, session) {
                       class1, class2, x, vintage, aggregate, units,
                       value) %>%
         dplyr::rename(class=class1)-> dataGCAM
-
+      progress$inc(1/3, detail = paste("Load Complete", 3))
       rv$dataGCAM <- dataGCAM
   }, ignoreInit = TRUE)
 
