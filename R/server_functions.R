@@ -131,7 +131,7 @@ parse_remote <- function(urlfiledata){
 #' @importFrom magrittr %>%
 #' @export
 parse_local <- function(inputdatapath, urlfiledatadatapath){
-  print(inputdata)
+  print(inputdatapath)
   if (tools::file_ext(inputdatapath) == ""){
     if (grepl("./$",urlfiledatadatapath)){
       utils::read.csv(inputdatapath) %>%
