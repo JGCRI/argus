@@ -876,7 +876,7 @@ server <- function(input, output, session) {
         print(input$filedata$datapath[i])
         argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) %>%
             dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
-        #z<-argus::addMissing(a)
+        z<-argus::addMissing(a)
         print("oofz")
         res <- dplyr::bind_rows(res, z)
       }
