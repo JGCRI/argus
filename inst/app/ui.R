@@ -4,6 +4,7 @@
 # Libraries Needed (Also add to DESCRIPTION)
 #---------------------------
 library(shiny)
+library(shinyFiles)
 library(shinythemes)
 library(leaflet)
 library(DT)
@@ -72,46 +73,30 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       # style="position: fixed; width:30%",
-      tabsetPanel(
-        type = "tabs",
-        id="tabs",
-        tabPanel(
-          "csv",
-          br(),
-          # CSV Data -------------------------------------
-          fileInput(
-            inputId = "filedata",
-            label = "Upload csv or zip file",
-            accept = c(".csv", ".zip"),
-            multiple = TRUE,
-            width = "100%"
-          )),
-        tabPanel(
-          "url",
-          br(),
-          textInput(
-            inputId = "urlfiledata",
-            label = "Enter url to csv or zip file",
-            placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"),
-          br(),
-          width = "100%"
-        ),
-        tabPanel(
-          "GCAM",
-          br(),
-          textInput(
-            inputId = "gcamdatabasepath",
-            label = "Enter full path to GCAM database",
-            placeholder =  "C://example_local_folder/example_database_basexdb"),
-          br(),
-          width = "100%"
-        )
-      ),
-
+  
+      #fluidRow(
+        #column(3,
+          #actionButton("csv", "csv", width="100%")
+         # ),
+        #column(3,
+        # actionButton("url", "url", width="100%")
+        #  ),
+        #column(3,
+        #actionButton("gcam", "gcam", width="100%")
+        #  ),
+        #column(3)
+        #),
+        #class="action-button shiny-bound-input"
+      
+      selectInput(
+        inputId = "inputz",
+        label = "Input",
+        choices = c("url","csv","gcam", ""),
+        selected = "",
+        multiple = FALSE,
+        selectize = TRUE,
+        width = "100%"),
       # Reactive Input Choices Based on Input File-------------------------
-      # GCAM Scenarios
-      textOutput("text"),
-      uiOutput('gcamScenarios'),
 
       # Scenarios
       uiOutput('selectScenarios'),
@@ -119,8 +104,7 @@ ui <- fluidPage(
       uiOutput('selectRefScenarios'),
       # Params
       uiOutput('selectParams'),
-      # Regions
-      #uiOutput('selectRegions')
+      br(),
       tabsetPanel(
         type = "tabs",
         id="tabs",

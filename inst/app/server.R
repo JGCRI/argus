@@ -25,7 +25,7 @@ library(mvbutils)
 # Options
 #---------------------------
 options(shiny.maxRequestSize=100*1024^2)
-# options(shiny.trace = TRUE)
+options(shiny.trace = TRUE)
 pal_all <- argus::mappings()$pal_all
 
 #---------------------------
@@ -55,6 +55,165 @@ server <- function(input, output, session) {
                     "paramsSelect")
 
   # Create Modal for Settings Download and Loading
+
+  observeEvent(input$inputz, {
+    if (input$inputz == "csv"){
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+          br(),
+          # CSV Data -------------------------------------
+          fileInput(
+            inputId = "filedata",
+            label = "Upload csv or zip file",
+            accept = c(".csv", ".zip"),
+            multiple = TRUE,
+            width = "100%"
+          ),
+          br(),
+          actionButton(inputId = "readfilebutton",
+                       label = "Read File Data")
+      ))
+    }else if(input$inputz == "url"){
+     showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+          br(),
+          textInput(
+            inputId = "urlfiledata",
+            label = "Enter url to csv or zip file, seperated by ',' between url",
+            placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"),
+          br(),
+          width = "100%",
+          br(),
+          actionButton(inputId = "readurlbutton",
+                       label = "Read Url Data")
+    ))
+    }else if (input$inputz == "gcam"){
+     showModal(
+      modalDialog(
+        size = "m",
+        easyClose = TRUE,
+        footer = NULL,
+          br(),
+          p("*Note: Only for Argus run on local computer.", style="color:#cc0000"),
+          tabsetPanel(
+            type = "tabs",
+            id="gcamtabs",
+            tabPanel(
+              "gcamdatabase",
+              br(),
+              shinyDirButton(id = "gcamdir",
+                             label = "Choose GCAM directory",
+                             title = "Select"),
+              br(),
+              textInput(
+                inputId = "gcamdirfilepath",
+                label = NULL,
+                placeholder =  "OR Enter path to GCAM directory"),
+              br(),
+              verbatimTextOutput("gcamdirtext", placeholder = FALSE),
+              br(),
+              uiOutput('gcamScenarios'),
+            ),
+            tabPanel(
+              ".PROJ",
+              br(),
+              shinyFilesButton(id = "proj",
+                             label = "Choose GCAM .proj file",
+                             title = "Select",
+                             multiple=F),
+              br(),
+              textInput(
+                inputId = "gcamprojfilepath",
+                label = NULL,
+                placeholder =  "OR Enter path to GCAM .proj file"),
+              br(),
+              verbatimTextOutput("gcamprojtext", placeholder = FALSE),
+              br(),
+              uiOutput('gcamScenariosProj'),
+            )
+          ),
+
+          br(),
+          uiOutput('gcamParams'),
+          br(),
+          uiOutput('gcamRegions'),
+          br(),
+          actionButton(inputId = "readgcambutton",
+                       label = "Read GCAM Data"),
+          br(),
+          width = "100%"
+        )
+      )
+      }
+      updateSelectInput(session, "inputz", selected = "")
+    })
+
+
+  observeEvent(input$readurlbutton, {
+    removeModal()
+    #req(input$urlfiledata)
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = FALSE,
+        footer = NULL,
+        fluidRow(
+          column(6,
+                 div(actionLink(
+                   inputId='append',
+                   label="Append to Input",
+                   class = "btn btn-default shiny-download-link download_button"),
+                   style = "float:center"
+                 ))
+          ,
+          column(6,
+                 div(actionLink(inputId="close",
+                                label='Overwrite Input',
+                                class = "btn btn-default shiny-download-link download_button"),
+                     style="float:right;!important"
+                 )
+          )
+        )
+      ))
+  })
+
+
+  observeEvent(
+    input$readfilebutton, {
+      print("oof")
+      removeModal()
+      #req(input$filedata)
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = FALSE,
+        footer = NULL,
+        fluidRow(
+            column(6,
+              div(actionLink(
+                  inputId='append',
+                  label="Append to Input",
+                  class = "btn btn-default shiny-download-link download_button"),
+                  style = "float:center"
+                ))
+        ,
+        column(6,
+                div(actionLink(inputId="close",
+                                label='Overwrite Input',
+                                class = "btn btn-default shiny-download-link download_button"),
+                                style="float:right;!important"
+                 )
+          )
+        )
+    ))
+    }, ignoreInit=TRUE)
+
   observeEvent(input$loadsetting, {
     showModal(
       modalDialog(
@@ -75,7 +234,7 @@ server <- function(input, output, session) {
                    label="Save Settings",
                    download = "settings.csv",
                    class = "download_button"),
-                   style = "float:center"
+                   style = "float:center;"
                  ))
           ,
           column(6,
@@ -320,30 +479,86 @@ server <- function(input, output, session) {
   # Data File (GCAM)
   #---------------------------
 
-  gcamdatabasepathx <- reactive({
-    if (dir.exists(input$gcamdatabasepath)) {
-      input$gcamdatabasepath
-    } else {
-      "GCAM database entered does not exist."
+  roots <- getVolumes()()
+
+  shinyDirChoose(
+    input,
+    id = 'gcamdir',
+    roots = roots,
+    filetypes = c('')
+  )
+
+  shinyFileChoose(
+    input,
+    id = 'proj',
+    roots = roots,
+    filetypes = c('', 'proj')
+  )
+
+  #------------------------------------------------------
+  # Creating a reactive environment to choose gcamdatabase
+  # Based on folder input or text input
+  #------------------------------------------------------
+  rv_gcam <- reactiveValues()
+  rv_gcam$gcamdatabasepathx = ""
+  rv_gcam$gcamprojpathx = ""
+
+  observeEvent(input$gcamdir,{
+    rv_gcam$gcamdatabasepathx <-gsub("\\\\","/",parseDirPath(roots, input$gcamdir))
+    rv_gcam$gcamprojpathx <- ""
+  })
+
+  observeEvent(input$gcamdirfilepath,{
+    rv_gcam$gcamdatabasepathx <-gsub("\\\\","/",input$gcamdirfilepath)
+    rv_gcam$gcamprojpathx <- ""
+  })
+
+  observeEvent(input$proj,{
+    rv_gcam$gcamprojpathx <-gsub("\\\\","/",(parseFilePaths(roots, input$proj))$datapath)
+    rv_gcam$gcamdatabasepathx <- ""
+  })
+
+  observeEvent(input$gcamprojfilepath,{
+    rv_gcam$gcamprojpathx <-gsub("\\\\","/",input$gcamprojfilepath)
+    rv_gcam$gcamdatabasepathx <- ""
+  })
+
+  output$gcamdirtext <- renderText({
+    if(rv_gcam$gcamdatabasepathx != "" & rv$validGCAM){
+    paste0("Reading GCAM data from: ", rv_gcam$gcamdatabasepathx)}
+    else{
+      "Awaiting Valid Input"
     }
   })
 
-  #output$text <- renderText({print(dataGCAMx())})
+  output$gcamprojtext <- renderText({
+    if(rv_gcam$gcamprojpathx != "" & rv$validGCAM){
+    paste0("Reading GCAM Proj File from: ", rv_gcam$gcamprojpathx)}
+    else{
+      return("Awaiting Valid Input")
+    }
+  })
 
-
-  # Get names of scenarios in GCAM database.....................
+  #.........................................
+  # Get names of scenarios in GCAM database
+  #.........................................
   gcamScenariosx <- reactive({
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      progress$set(message = "Extracting scenarios from GCAM database", value = 0)
+      progress$inc(1/3, detail = paste("Parsing Path", 1))
 
-    if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
-      gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",gcamdatabasepathx())); gcamdatabasePath_dir
-      gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', gcamdatabasepathx()); gcamdatabasePath_file
+      gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",rv_gcam$gcamdatabasepathx)); gcamdatabasePath_dir
+      gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', rv_gcam$gcamdatabasepathx); gcamdatabasePath_file
       # Save Message from rgcam::localDBConn to a text file and then extract names
       zz <- file(paste(getwd(),"/test.txt",sep=""), open = "wt")
       sink(zz,type="message")
+      #progress$inc(1/3, detail = paste("Connecting to Database", 2))
       rgcam::localDBConn(gcamdatabasePath_dir,gcamdatabasePath_file)
       sink()
       closeAllConnections()
       # Read temp file
+      #progress$inc(1/3, detail = paste("Reading temp file", 2))
       con <- file(paste(getwd(),"/test.txt",sep=""),open = "r")
       first_line <- readLines(con,n=1); first_line
       closeAllConnections()
@@ -351,19 +566,38 @@ server <- function(input, output, session) {
       print(first_line)
       if(file.exists(paste(getwd(),"/test.txt",sep=""))){unlink(paste(getwd(),"/test.txt",sep=""))}
       # Extract scenario names from saved line
+      #progress$inc(1/3, detail = paste("Extracting Scenario names from saved line", 2))
       s1 <- gsub(".*:","",first_line);s1
       s2 <- gsub(" ","",s1);s2
-      as.vector(unlist(strsplit(s2,",")))
-    }else{
-      gcamdatabasepathx()
-    }
+      b <- as.vector(unlist(strsplit(s2,",")))
+      if (!is.null(b)){
+        rv$validGCAM <- TRUE
+      }else{
+        rv$validGCAM <- FALSE
+      }
+      return(b)
   })
 
+  gcamScenariosxProj <- reactive({
+    progress <- shiny::Progress$new()
+    on.exit(progress$close())
+    progress$set(message = "Extracting scenarios from GCAM database", value = 0)
+    progress$inc(1/2, detail = paste("Loading project...", 1))
+    scens <- (names(rgcam::loadProject(rv_gcam$gcamprojpathx)))
+    if (!is.null(scens)){
+      rv$validGCAM <- TRUE
+    }else{
+      rv$validGCAM <- FALSE
+    }
+    progress$inc(1/2, detail = paste("Completed", 1))
+    return(scens)
+  })
+
+
   output$gcamScenarios = renderUI({
-    if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
-      pickerInput(
+    pickerInput(
         inputId = "gcamScenariosSelected",
-        label = "Select Available GCAM Scenarios",
+        label = "Select Available GCAM Database Scenarios",
         choices = unique(gcamScenariosx()),
         selected = unique(gcamScenariosx()),
         multiple = TRUE,
@@ -373,34 +607,120 @@ server <- function(input, output, session) {
           `select-all-text` = "All",
           `none-selected-text` = "None Selected"
         )
-      )}else{
-        NULL
-      }
+      )
   })
+
+  output$gcamScenariosProj = renderUI({
+    pickerInput(
+      inputId = "gcamProjScenariosSelected",
+      label = "Select Available GCAM Proj File Scenarios",
+      choices = unique(gcamScenariosxProj()),
+      selected = unique(gcamScenariosxProj()),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `deselect-all-text` = "None",
+        `select-all-text` = "All",
+        `none-selected-text` = "None Selected"
+      )
+    )
+  })
+
+  #.........................................
+  # GCAM parameters
+  #.........................................
+
+  gcamParamsx <- reactive({
+    unique((argus::mappings()$mapParamQuery)$param)
+  })
+
+  output$gcamParams = renderUI({
+    pickerInput(
+      inputId = "gcamParamsSelected",
+      label = "Select Available GCAM Parameters",
+      choices = c(gcamParamsx(),"All"),
+      selected = c("pop","gdp"),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `deselect-all-text` = "None",
+        `select-all-text` = "All",
+        `none-selected-text` = "None Selected"
+      )
+    )
+  })
+
+  #.........................................
+  # GCAM Regions
+  #.........................................
+
+  gcamRegionsx <- reactive({
+   unique((argus::mappings()$countryToGCAMReg32)$region)
+  })
+
+  output$gcamRegions = renderUI({
+    pickerInput(
+      inputId = "gcamRegionsSelected",
+      label = "Select Available GCAM Regions",
+      choices = c(gcamRegionsx(),"All"),
+      selected = c(gcamRegionsx(),"All"),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `deselect-all-text` = "None",
+        `select-all-text` = "All",
+        `none-selected-text` = "None Selected"
+      )
+    )
+  })
+
+
 
   #...................................
   # Create data table from database
-  dataGCAMx <- reactive({
 
-    if(!is.null(gcamdatabasepathx()) & gcamdatabasepathx()!="GCAM database entered does not exist."){
+
+  #dataGCAMx <- eventReactive(input$readgcambutton, {
+  observeEvent(input$readgcambutton, {
+      if(rv$validGCAM != TRUE){
+        return(0)
+      }
+      progress <- shiny::Progress$new()
+      on.exit(progress$close())
+      progress$set(message = "Reading from GCAM database", value = 0)
+
       tempdir <- paste(getwd(),"/tempdir",sep="")
       dir.create(tempdir)
-      gcamdatabasepath_i <- gcamdatabasepathx()
-      scenOrigNames_i <- input$gcamScenariosSelected
-      scenNewNames_i <- paste(input$gcamScenariosSelected,"NEW",sep="")
-      regionsSelect_i <- "Southeast Asia"
-      paramsSelect_i <- c("gdp","pop","agProdByCrop")
-
-      dataGCAMraw <- argus::readgcam(reReadData = T,
+      gcamdatabasepath_i <- rv_gcam$gcamdatabasepathx
+      if(rv_gcam$gcamprojpathx!=""){
+        reReadData_i <- F
+        dataProjFile_i <- rv_gcam$gcamprojpathx
+        scenOrigNames_i <- input$gcamProjScenariosSelected
+        gcamdatabasepath_i <- NULL
+      } else {
+        reReadData_i <- T
+        dataProjFile_i <- "projFile.proj"
+        scenOrigNames_i <- input$gcamScenariosSelected
+      }
+      if(any("All" %in% input$gcamParamsSelected)){
+      paramsSelect_i <- unique(gcamParamsx())} else {
+        paramsSelect_i <- input$gcamParamsSelected
+      }
+      if(any("All" %in% input$gcamParamsSelected)){
+        regionsSelect_i <- unique(gcamRegionsx())} else {
+          regionsSelect_i <- input$gcamRegionsSelected
+        }
+      progress$inc(1/3, detail = paste("Connecting to Database", 1))
+      dataGCAMraw <- argus::readgcam(reReadData = reReadData_i,
                                         dirOutputs = tempdir,
                                         gcamdatabase = gcamdatabasepath_i,
                                         scenOrigNames = scenOrigNames_i,
-                                        scenNewNames = scenNewNames_i,
-                                        dataProj = "projFile",
-                                        #dataProjPath = dataProjPath_i,
+                                        #scenNewNames = scenNewNames_i,
+                                        dataProjFile = dataProjFile_i,
                                         regionsSelect = regionsSelect_i,
-                                        paramsSelect= paramsSelect_i)
-
+                                        paramsSelect= paramsSelect_i,
+                                        saveData = F)
+      progress$inc(1/3, detail = paste("Unlinking", 2))
       unlink(tempdir, recursive = T)
 
       dataGCAMraw$data %>% as_tibble() %>%
@@ -408,12 +728,32 @@ server <- function(input, output, session) {
                       class1, class2, x, vintage, aggregate, units,
                       value) %>%
         dplyr::rename(class=class1)-> dataGCAM
-
-      dataGCAM
-    } else {
-      NULL
-    }
-  })
+      progress$inc(1/3, detail = paste("Load Complete", 3))
+      rv$dataGCAM <- dataGCAM
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = FALSE,
+          footer = NULL,
+          fluidRow(
+            column(6,
+                   div(actionLink(
+                     inputId='append',
+                     label="Append to Input",
+                     class = "btn btn-default shiny-download-link download_button"),
+                     style = "float:center"
+                   ))
+            ,
+            column(6,
+                   div(actionLink(inputId="close",
+                                  label='Overwrite Input',
+                                  class = "btn btn-default shiny-download-link download_button"),
+                       style="float:right;!important"
+                   )
+            )
+          )
+        ))
+  }, ignoreInit = TRUE, once = TRUE)
 
 
   #---------------------------
@@ -423,11 +763,12 @@ server <- function(input, output, session) {
   # Create your own reactive values that you can modify because input is read only
   rv <- reactiveValues()
 
-
+  rv$validGcam <- FALSE
   rv$pcount = 1;
   rv$mapflag = 0;
   rv$subRegTypelist = c()
   rv$selectedBase = 0;
+  rv$data <- dataDefault %>% dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
   # Charts initializing abs, percDiff, and absDiff
   rv$absChart = 1;
   rv$percDiffChart = 0;
@@ -455,39 +796,119 @@ server <- function(input, output, session) {
   eventReactive(input$urlfiledata, {
     rv$filedatax=NULL})
 
+  # addMissing<-function(data){
+  #     NULL -> year -> aggregate -> scenario -> subRegion -> param -> x -> value
+  #     print("iif")
+  #     print(names(data))
+  #   if(!any(grepl("\\<scenario\\>",names(data),ignore.case = T))){
+  #     data<-data%>%dplyr::mutate(scenario="scenario")
+  #   }else{
+  #     data <- data %>% dplyr::rename(!!"scenario" := (names(data)[grepl("\\<scenario\\>",names(data),ignore.case = T)])[1])
+  #     for (i in 1:length(names(data))){
+  #       print(typeof(names(data)))
+  #       }
+  #           #browser()
+  #     data<-data%>%dplyr::mutate(scenario=dplyr::case_when(is.na(scenario)~"scenario",TRUE~as.character(scenario)))
+  #   }
+  #   print("xiif")
+  #   if(!any(grepl("\\<scenarios\\>",names(data),ignore.case = T))){}else{
+  #     data <- data %>% dplyr::rename(!!"scenario" := (names(data)[grepl("\\<scenarios\\>",names(data),ignore.case = T)])[1])
+  #     data<-data%>%dplyr::mutate(scenario=dplyr::case_when(is.na(scenario)~"scenario",TRUE~as.character(scenario)))}
+  #   if(!any(grepl("\\<subRegion\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(subRegion="subRegion")}else{
+  #     data <- data %>% dplyr::rename(!!"subRegion" := (names(data)[grepl("\\<subRegion\\>",names(data),ignore.case = T)])[1])
+  #     data<-data%>%dplyr::mutate(subRegion=dplyr::case_when(is.na(subRegion)~"subRegion",TRUE~as.character(subRegion)))}
+  #   if(!any(grepl("\\<subRegions\\>",names(data),ignore.case = T))){}else{
+  #     data <- data %>% dplyr::rename(!!"subRegion" := (names(data)[grepl("\\<subRegions\\>",names(data),ignore.case = T)])[1])
+  #     data<-data%>%dplyr::mutate(subRegion=dplyr::case_when(is.na(subRegion)~"subRegion",TRUE~as.character(subRegion)))}
+  #   if(!any(grepl("\\<param\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(param="param")}else{
+  #     data <- data %>% dplyr::rename(!!"param" := (names(data)[grepl("\\<param\\>",names(data),ignore.case = T)])[1])
+  #     data<-data%>%dplyr::mutate(param=dplyr::case_when(is.na(param)~"param",TRUE~as.character(param)))}
+  #   if(!any(grepl("\\<params\\>",names(data),ignore.case = T))){}else{
+  #     data <- data %>% dplyr::rename(!!"param" := (names(data)[grepl("\\<params\\>",names(data),ignore.case = T)])[1])
+  #     data<-data%>%dplyr::mutate(param=dplyr::case_when(is.na(param)~"param",TRUE~as.character(param)))}
+  #   if(!any(grepl("\\<value\\>",names(data),ignore.case = T))){stop("Data must have 'value' column.")}else{
+  #     data <- data %>% dplyr::rename(!!"value" := (names(data)[grepl("\\<value\\>",names(data),ignore.case = T)])[1])
+  #     data$value = as.numeric(data$value)
+  #     data<-data%>%dplyr::mutate(value=dplyr::case_when(is.na(value)~0,TRUE~value))}
+  #   if(!any(grepl("\\<values\\>",names(data),ignore.case = T))){}else{
+  #     data <- data %>% dplyr::rename(!!"value" := (names(data)[grepl("\\<values\\>",names(data),ignore.case = T)])[1])
+  #     data$value = as.numeric(data$value)
+  #     data<-data%>%dplyr::mutate(value=dplyr::case_when(is.na(value)~0,TRUE~value))}
+  #   if(!any(grepl("\\<unit\\>",names(data),ignore.case = T))){}else{
+  #     data <- data %>% dplyr::rename(!!"units" := (names(data)[grepl("\\<unit\\>",names(data),ignore.case = T)])[1])
+  #     data<-data%>%dplyr::mutate(units=dplyr::case_when(is.na(units)~"units",TRUE~as.character(units)))}
+  #   if(!any(grepl("\\<units\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(units="units")}else{
+  #     data <- data %>% dplyr::rename(!!"units" := (names(data)[grepl("\\<units\\>",names(data),ignore.case = T)])[1])
+  #     data<-data%>%dplyr::mutate(units=dplyr::case_when(is.na(units)~"units",TRUE~as.character(units)))}
+  #   if(!"x"%in%names(data)){
+  #     if("year"%in%names(data)){
+  #       data<-data%>%dplyr::mutate(x=year)}else{data<-data%>%dplyr::mutate(x="x")}}
+  #   if(!any(grepl("\\<aggregate\\>",names(data),ignore.case = T))){
+  #   if(is.null(aggregate)){data<-data%>%dplyr::mutate(aggregate="sum")}else{
+  #       data<-data%>%dplyr::mutate(aggregate="sum")}
+  #   }else{
+  #     data <- data %>% dplyr::rename(!!"aggregate" := (names(data)[grepl("\\<aggregate\\>",names(data),ignore.case = T)])[1])
+  #     data<-data%>%dplyr::mutate(aggregate=dplyr::case_when(is.na(aggregate)~"sum",
+  #                                                         TRUE~as.character(aggregate)))}
+  #   if(!any(grepl("\\<class\\>",names(data),ignore.case = T))){
+  #     if(!any(grepl("\\<class\\>",names(data),ignore.case = T))){
+  #       data<-data%>%dplyr::mutate(class="class")}else{data<-data%>%dplyr::mutate(class=class)}}else{
+  #         data <- data %>% dplyr::rename(!!"class" := (names(data)[grepl("\\<class\\>",names(data),ignore.case = T)])[1])
+  #         data<-data%>%dplyr::mutate(class=dplyr::case_when(is.na(class)~"class",TRUE~as.character(class)))}
+  #
+  #   data <- data %>%
+  #     dplyr::select(scenario,subRegion,param,class,x,aggregate,value)
+  #     return(data)
+  # }
+
   # Read in Raw Data
   data_raw <- reactive({
-    if (is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
+    print("oof")
+    if (is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
       return(argus::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
-      rv$filedatax <- NULL
-      rv$urlfiledatax <- NULL
-    } else if(!is.null(rv$filedatax) & is.null(dataGCAMx()) & ("" == rv$urlfiledatax)) {
-      return(argus::addMissing(
-        argus::parse_local(input$filedata$datapath, inpu$urlfiledata$datapath)%>%
-          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-      ))
-      rv$filedatax <- NULL
-      rv$urlfiledatax <- NULL
-    } else if(is.null(rv$filedatax) & !is.null(dataGCAMx()) & ("" == rv$urlfiledatax)){
-      return(dataGCAMx() %>%
-        dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
-      rv$filedatax <- NULL
-      rv$urlfiledatax <- NULL
+    } else if(!is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
+      print(rv$filedatax)
+      # res <- argus::parse_local(input$filedata$datapath[1], inpu$urlfiledata$datapath)%>%
+      #   dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+      res <- NULL
+      for (i in 1:length(input$filedata$datapath)){
+        print("lllllllllll")
+        print(input$filedata$datapath[i])
+        argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) %>%
+            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
+        z<-argus::addMissing(a)
+        print("oofz")
+        res <- dplyr::bind_rows(res, z)
+      }
+      return(res)
+    } else if(is.null(rv$filedatax) & !is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))){
+      return(argus::addMissing(rv$dataGCAM %>%
+        dplyr::select(scenario, subRegion, param, aggregate, class, x, value)))
     }else{
-      return(argus::addMissing(
-        argus::parse_remote(input$urlfiledata)%>%
-          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-      ))
-      rv$filedatax <- NULL
-      rv$urlfiledatax <- NULL
+      z <- strsplit(rv$urlfiledatax, ",")
+      res <- NULL
+      for (i in 1:length(z[[1]])){
+        print(z[[1]])
+        print("lllllllllll")
+        print(z[[1]][i])
+          argus::parse_remote(gsub(" ", "", z[[1]][i], fixed = TRUE))%>%
+            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
+        res <- dplyr::bind_rows(res, a)
+      }
+      return(res)
     }
   })
 
+
   data <- reactive({
-    # Aggregate across classes
+    return(rv$data)
+  })
+
+  observeEvent(input$append, {
+    print("ooof")
     tblAggsums <- data_raw() %>%
       dplyr::filter(aggregate == "sum") %>%
       dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
@@ -499,9 +920,35 @@ server <- function(input, output, session) {
       dplyr::group_by_at(dplyr::vars(-value)) %>%
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
-    dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    rv$data <- dplyr::bind_rows(rv$data, tbl)
+    print("apend")
+    rv$filedatax<-NULL
+    rv$dataGCAM<-NULL
+    rv$urlfiledatax<-NULL
+    removeModal()
+  }, ignoreInit = TRUE)
 
-  })
+  observeEvent(input$close, {
+    tblAggsums <- data_raw() %>%
+      dplyr::filter(aggregate == "sum") %>%
+      dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ sum(.)))
+    tblAggmeans <- data_raw() %>%
+      dplyr::filter(aggregate == "mean") %>%
+      dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+    tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    rv$data <- dplyr::bind_rows(NULL, tbl)
+    print("close")
+    rv$filedatax<-NULL
+    rv$dataGCAM<-NULL
+    rv$urlfiledatax<-NULL
+    removeModal()
+  }, ignoreInit = TRUE)
 
   #---------------------------
   # Scenarios Select
@@ -727,7 +1174,6 @@ server <- function(input, output, session) {
       leafletProxy("mymap") %>% hideGroup(i)
       leafletProxy("mymap") %>% showGroup(i)
     }
-    return(0)
   }
 
 
