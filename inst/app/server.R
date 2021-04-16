@@ -891,7 +891,7 @@ server <- function(input, output, session) {
         print(z[[1]])
         print("lllllllllll")
         print(z[[1]][i])
-          argus::parse_remote(z[[1]][i])%>%
+          argus::parse_remote(gsub(" ", "", z[[1]][i], fixed = TRUE))%>%
             dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
         res <- dplyr::bind_rows(res, a)
       }
