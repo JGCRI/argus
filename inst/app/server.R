@@ -553,12 +553,12 @@ server <- function(input, output, session) {
       # Save Message from rgcam::localDBConn to a text file and then extract names
       zz <- file(paste(getwd(),"/test.txt",sep=""), open = "wt")
       sink(zz,type="message")
-      progress$inc(1/3, detail = paste("Connecting to Database", 2))
+      #progress$inc(1/3, detail = paste("Connecting to Database", 2))
       rgcam::localDBConn(gcamdatabasePath_dir,gcamdatabasePath_file)
       sink()
       closeAllConnections()
       # Read temp file
-      progress$inc(1/3, detail = paste("Reading temp file", 2))
+      #progress$inc(1/3, detail = paste("Reading temp file", 2))
       con <- file(paste(getwd(),"/test.txt",sep=""),open = "r")
       first_line <- readLines(con,n=1); first_line
       closeAllConnections()
@@ -566,7 +566,7 @@ server <- function(input, output, session) {
       print(first_line)
       if(file.exists(paste(getwd(),"/test.txt",sep=""))){unlink(paste(getwd(),"/test.txt",sep=""))}
       # Extract scenario names from saved line
-      progress$inc(1/3, detail = paste("Extracting Scenario names from saved line", 2))
+      #progress$inc(1/3, detail = paste("Extracting Scenario names from saved line", 2))
       s1 <- gsub(".*:","",first_line);s1
       s2 <- gsub(" ","",s1);s2
       b <- as.vector(unlist(strsplit(s2,",")))
