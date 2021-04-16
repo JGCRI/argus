@@ -682,6 +682,9 @@ server <- function(input, output, session) {
 
   #dataGCAMx <- eventReactive(input$readgcambutton, {
   observeEvent(input$readgcambutton, {
+      if(rv$validGCAM != TRUE){
+        return(0)
+      }
       progress <- shiny::Progress$new()
       on.exit(progress$close())
       progress$set(message = "Reading from GCAM database", value = 0)
@@ -750,7 +753,7 @@ server <- function(input, output, session) {
             )
           )
         ))
-  }, ignoreInit = TRUE)
+  }, ignoreInit = TRUE, once = TRUE)
 
 
   #---------------------------
@@ -1171,7 +1174,6 @@ server <- function(input, output, session) {
       leafletProxy("mymap") %>% hideGroup(i)
       leafletProxy("mymap") %>% showGroup(i)
     }
-    return(0)
   }
 
 
