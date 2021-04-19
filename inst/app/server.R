@@ -1325,7 +1325,6 @@ server <- function(input, output, session) {
       dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
     dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-
   })
 
   # Filter Data after Reactive Choices
@@ -1443,33 +1442,28 @@ server <- function(input, output, session) {
     # Calculate Diff Values
     tbl_pd <- dataChartx() %>%
       dplyr::filter(scenario == scenRef_i)
+
     for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
                                             scenRef_i]) {
+
       tbl_temp <- dataChartx() %>%
-        dplyr::filter(scenario %in% c(scenRef_i, k))
-      # print("tbl_temp")
-      # print(tbl_temp)
-      # print("tbl_temp$value")
-      # print(tbl_temp$value)
+        dplyr::filter(scenario %in% c(scenRef_i, k))  %>%
+        dplyr::filter(!(is.na(class) & value==0))%>%
+        dplyr::mutate(class=if_else(is.na(class),"NA",class))
+
+      print(tbl_temp$value)
       tbl_temp <- tbl_temp %>%
         tidyr::spread(scenario, value)
-      # print("tbl_temp post spread")
-      # print(tbl_temp)
 
       tbl_temp[is.na(tbl_temp)] <- 0
 
       tbl_temp <- tbl_temp %>%
         dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
         dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
-      # print("tbl temp post mute")
-      # print(tbl_temp)
       tbl_temp <- tbl_temp %>%
         tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
-      # print("tidyr")
-      # print(tbl_temp)
       tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
-      # print("bind_rows")
-      # print(tbl_pd)
+
     }
 
     tbl_pd <- tbl_pd %>%
@@ -1521,11 +1515,17 @@ server <- function(input, output, session) {
     # Calculate Diff Values
     tbl_pd <- dataChartx() %>%
       dplyr::filter(scenario == scenRef_i)
+
     for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
                                             scenRef_i]) {
+
       print(k)
       tbl_temp <- dataChartx() %>%
-        dplyr::filter(scenario %in% c(scenRef_i, k))
+        dplyr::filter(scenario %in% c(scenRef_i, k))  %>%
+        dplyr::filter(!(is.na(class) & value==0))%>%
+        dplyr::mutate(class=if_else(is.na(class),"NA",class))
+
+
       tbl_temp <- tbl_temp %>%
         tidyr::spread(scenario, value)
 
@@ -1808,7 +1808,7 @@ server <- function(input, output, session) {
   #---------------------------
 
   output$plotDiff <- renderPlot({
-    argus::plotDiff(dataDiffAbsx(), input$scenarioRefSelected)
+    argus::plotDiffAbs(dataDiffAbsx(), input$scenarioRefSelected)
   },
   height=function(){300*length(unique(dataChartx()$param))},
   width=function(){max(600, 400*length(unique(data()$scenario)))}
@@ -1892,13 +1892,11 @@ server <- function(input, output, session) {
   # }
 
   output$plotPerc <- renderPlot({
-    argus::plotDiff(dataPrcntAbsx(), input$scenarioRefSelected)
+    argus::plotDiffPrcnt(dataPrcntAbsx(), input$scenarioRefSelected)
   },
   height=function(){300*length(unique(dataChartx()$param))},
   width=function(){max(600, 400*length(unique(data()$scenario)))}
   )
-
-
 
 
   #---------------------------

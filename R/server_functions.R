@@ -757,7 +757,7 @@ summaryPlot <- function(aspectratio,
 #' @param scenarioRefSelected scenarioRefSeleceted
 #' @importFrom magrittr %>%
 #' @export
-plotDiff<- function(dataChartPlot, scenarioRefSelected){
+plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
 
   NULL -> filter -> param -> scenario -> input -> value
 
@@ -769,17 +769,22 @@ plotDiff<- function(dataChartPlot, scenarioRefSelected){
   x = 1
 
   for(i in 1:length(unique(dataChartPlot$param))){
+
+    dataChartPlot <- dataChartPlot %>%
+      dplyr::filter(!(is.na(class) & value==0))%>%
+      dplyr::mutate(class=if_else(is.na(class),"NA",class))
+
     # Check Color Palettes
-    palAdd <- c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise")
+    palAdd <- rep(c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise"),1000)
 
     missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
-                                               names(argus::mappings()$pal_all)]
+                                               names(jgcricolors::jgcricol()$pal_all)]
     if (length(missNames) > 0) {
       palAdd <- palAdd[1:length(missNames)]
       names(palAdd) <- missNames
-      palCharts <- c(argus::mappings()$pal_all, palAdd)
+      palCharts <- c(jgcricolors::jgcricol()$pal_all, palAdd)
     } else{
-      palCharts <- argus::mappings()$pal_all
+      palCharts <- jgcricolors::jgcricol()$pal_all
     }
     print(palCharts)
 
@@ -791,7 +796,7 @@ plotDiff<- function(dataChartPlot, scenarioRefSelected){
                                        dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != scenarioRefSelected)%>%
                                        droplevels(),
                                      aes(x=x,y=value,
-                                         group=scenario,
+                                         group=class,
                                          fill=class))+
       ggplot2::theme_bw() +
       xlab(NULL) +
@@ -815,7 +820,97 @@ plotDiff<- function(dataChartPlot, scenarioRefSelected){
     plist[[z]] <-  ggplot2::ggplot(chartz%>%
                                      droplevels(),
                                    aes(x=x,y=value,
-                                       group=scenario,
+                                       group=class,
+                                       fill=class))+
+      ggplot2::theme_bw()  +
+      xlab(NULL) +
+      ylab(unique(dataChartPlot$param)[i])+
+      scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+      scale_y_continuous(position = "left")+
+      geom_bar(position="stack", stat="identity") +
+      facet_grid(param~scenario, scales="free",switch="y")+
+      theme(legend.position="bottom",
+            strip.text.y = element_blank(),
+            legend.title = element_blank(),
+            legend.margin=margin(0,0,0,0,"pt"),
+            legend.key.height=unit(0, "cm"),
+            text = element_text(size = 12.5),
+            plot.margin=margin(20,0,20,0,"pt"))
+  }
+  cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
+}
+
+#' plotDiff
+#'
+#' generate chart plot for absolute difference and percent difference
+#' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
+#' @param scenarioRefSelected scenarioRefSeleceted
+#' @importFrom magrittr %>%
+#' @export
+plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
+
+  NULL -> filter -> param -> scenario -> input -> value
+
+  g <- 2
+
+  print("abs diff")
+
+  plist <- list()
+  x = 1
+
+  for(i in 1:length(unique(dataChartPlot$param))){
+
+    dataChartPlot <- dataChartPlot %>%
+      dplyr::filter(!(is.na(class) & value==0))%>%
+      dplyr::mutate(class=if_else(is.na(class),"NA",class))
+
+    # Check Color Palettes
+    palAdd <- rep(c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise"),1000)
+
+    missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
+                                               names(jgcricolors::jgcricol()$pal_all)]
+    if (length(missNames) > 0) {
+      palAdd <- palAdd[1:length(missNames)]
+      names(palAdd) <- missNames
+      palCharts <- c(jgcricolors::jgcricol()$pal_all, palAdd)
+    } else{
+      palCharts <- jgcricolors::jgcricol()$pal_all
+    }
+    print(palCharts)
+
+    chartz <- dataChartPlot %>%
+      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == scenarioRefSelected)
+    z<-x
+
+    plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
+                                       dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != scenarioRefSelected)%>%
+                                       droplevels(),
+                                     aes(x=x,y=value,
+                                         group=class,
+                                         color=class))+
+      ggplot2::theme_bw() +
+      xlab(NULL) +
+      ylab(NULL) +
+      scale_color_manual(breaks=names(palCharts),values=palCharts) +
+      scale_y_continuous(position = "left")+
+      #geom_bar(position="stack", stat="identity") +
+      geom_line()+
+      # geom_point()+
+      facet_grid(param~scenario, scales="free",switch="y") +
+      theme(legend.position="bottom",
+            legend.title = element_blank(),
+            strip.text.y = element_blank(),
+            legend.margin=margin(0,0,0,0,"pt"),
+            legend.key.height=unit(0, "cm"),
+            text = element_text(size = 12.5),
+            plot.margin=margin(20,20,20,0,"pt"))
+    x = x+2
+
+
+    plist[[z]] <-  ggplot2::ggplot(chartz%>%
+                                     droplevels(),
+                                   aes(x=x,y=value,
+                                       group=class,
                                        fill=class))+
       ggplot2::theme_bw()  +
       xlab(NULL) +
@@ -852,17 +947,22 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected){
   plist <- list()
   x = 1
   for(i in 1:length(unique(dataChartPlot$param))){
+
+    dataChartPlot <- dataChartPlot %>%
+      dplyr::filter(!(is.na(class) & value==0))%>%
+      dplyr::mutate(class=if_else(is.na(class),"NA",class))
+
     # Check Color Palettes
-    palAdd <- c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise")
+    palAdd <- rep(c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise"),10000)
 
     missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
-                                               names(argus::mappings()$pal_all)]
+                                               names(jgcricolors::jgcricol()$pal_all)]
     if (length(missNames) > 0) {
       palAdd <- palAdd[1:length(missNames)]
       names(palAdd) <- missNames
-      palCharts <- c(argus::mappings()$pal_all, palAdd)
+      palCharts <- c(jgcricolors::jgcricol()$pal_all, palAdd)
     } else{
-      palCharts <- argus::mappings()$pal_all
+      palCharts <- jgcricolors::jgcricol()$pal_all
     }
     print(palCharts)
 
