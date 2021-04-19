@@ -1,6 +1,6 @@
 <!-- badges: start -->
-![R-CMD](https://github.com/JGCRI/argus/workflows/R-CMD/badge.svg)
-![pkgdown](https://github.com/JGCRI/argus/workflows/pkgdown/badge.svg)
+[![build](https://github.com/JGCRI/argus/actions/workflows/build.yml/badge.svg)](https://github.com/JGCRI/argus/actions/workflows/build.yml)
+[![pkgdown](https://github.com/JGCRI/argus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/JGCRI/argus/actions/workflows/pkgdown.yaml)
 [![codecov](https://codecov.io/gh/JGCRI/argus/branch/dev/graph/badge.svg?token=NDE0ZK7OHN)](https://codecov.io/gh/JGCRI/argus)
 <!-- badges: end -->
 
