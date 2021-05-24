@@ -13,6 +13,7 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Imports: 
+    rmap,
     rgcam,
     jgcricolors,
     gcamextractor,
@@ -36,6 +37,7 @@ Imports:
     markdown,
 	rmarkdown
 Remotes: 
+    github::JGCRI/rmap,
     github::JGCRI/rgcam,
     github::JGCRI/jgcricolors,
     github::JGCRI/gcamextractor
