@@ -3,8 +3,7 @@
 \docType{data}
 \name{exampleData}
 \alias{exampleData}
-\title{data
-exampleData}
+\title{exampleData}
 \format{
 R table or .csv
 }
@@ -15,7 +14,6 @@ An example GCAM run
 exampleData
 }
 \description{
-data
 exampleData
 }
 \examples{

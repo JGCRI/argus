@@ -4,7 +4,7 @@
 \alias{breaks}
 \title{breaks}
 \usage{
-breaks(dataMap_raw_param, breaks_n)
+breaks(dataMap_raw_param = NULL, breaks_n = 7)
 }
 \arguments{
 \item{dataMap_raw_param}{Input dataframe}

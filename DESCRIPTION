@@ -15,6 +15,7 @@ RoxygenNote: 7.1.1
 Imports: 
     rgcam,
 	jgcricolors,
+	gcamextractor,
     tools,
     shiny,
 	shinyFiles,
@@ -35,7 +36,8 @@ Imports:
 	markdown
 Remotes: 
 	github::JGCRI/rgcam,
-	github::JGCRI/jgcricolors
+	github::JGCRI/jgcricolors,
+    github::JGCRI/gcamextractor
 VignetteBuilder: 
     knitr
 Depends: 
