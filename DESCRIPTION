@@ -14,11 +14,11 @@ LazyData: true
 RoxygenNote: 7.1.1
 Imports: 
     rgcam,
-	jgcricolors,
-	gcamextractor,
+    jgcricolors,
+    gcamextractor,
     tools,
     shiny,
-	shinyFiles,
+    shinyFiles,
     knitr (>= 1.20),
     dplyr,
     magrittr,
@@ -28,15 +28,16 @@ Imports:
     stringr,
     tibble,
     tidyr,
-	cowplot,
-	ggplot2,
-	xfun,
-	scales,
-	mvbutils,
-	markdown
+    cowplot,
+    ggplot2,
+    xfun,
+    scales,
+    mvbutils,
+    markdown,
+	rmarkdown
 Remotes: 
-	github::JGCRI/rgcam,
-	github::JGCRI/jgcricolors,
+    github::JGCRI/rgcam,
+    github::JGCRI/jgcricolors,
     github::JGCRI/gcamextractor
 VignetteBuilder: 
     knitr
