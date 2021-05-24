@@ -1,0 +1,13 @@
+name: argus
+title: argus
+username:
+account: jgcri
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4178628
+bundleId: 4634902
+url: https://jgcri.shinyapps.io/argus/
+when: 1621890766.14652
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: test.txt
