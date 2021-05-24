@@ -8,6 +8,12 @@ library(usethis)
 library(broom)
 library(dplyr)
 
+#---------------------------
+# Example gcam data table
+#---------------------------
+example_GCAMv5p3_SSP235 <- data.table::fread(paste(getwd(),"/inst/extdata/example_GCAMv5p3_SSP235.csv",sep=""),skip=0,encoding="Latin-1")%>%tibble::as_tibble()
+usethis::use_data(example_GCAMv5p3_SSP235, overwrite=T)
+
 
 #---------------------------
 # Example gcam data file from metis.readgcam()

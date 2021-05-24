@@ -1,8 +1,8 @@
 #' server
 
-#---------------------------
+#...........................
 # Libraries Needed
-#---------------------------
+#...........................
 
 library(shiny)
 library(ggplot2)
@@ -20,31 +20,35 @@ library(rgcam)
 #library(plyr)
 library(broom)
 library(mvbutils)
+library(RColorBrewer)
+library(grDevices)
+library(rmap)
+library(plotly)
 
-#---------------------------
+#...........................
 # Options
-#---------------------------
+#...........................
+
 options(shiny.maxRequestSize=100*1024^2)
 options(shiny.trace = TRUE)
 pal_all <- argus::mappings()$pal_all
 
-#---------------------------
+#...........................
 # Server object
-#---------------------------
+#...........................
 
 server <- function(input, output, session) {
 
-  #---------------------------
-  # Load Default Datasets from argus
-  #---------------------------
-  dataDefault <- argus::exampleData
-  ggplottheme <- ggplot2::theme_bw()
-  # session$sendCustomMessage("setsetting", c("data", unique(dataSum()$scenario)))
+  # NOTE:
+  # To collapse code for easy reading place cursor here and enter: ALT+0
+  # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
 
 
-  #---------------------------
-  # Settings
-  #---------------------------
+  #...........................
+  # Initial Settings
+  #...........................
+
+  if(T){ # Initial Settings
 
   # Initialize Settings
   settings <- reactive({data.frame()})
@@ -55,7 +59,6 @@ server <- function(input, output, session) {
                     "paramsSelect")
 
   # Create Modal for Settings Download and Loading
-
   observeEvent(input$inputz, {
     if (input$inputz == "csv"){
     showModal(
@@ -64,7 +67,7 @@ server <- function(input, output, session) {
         easyClose = TRUE,
         footer = NULL,
           br(),
-          # CSV Data -------------------------------------
+          # CSV Data ....................................-
           fileInput(
             inputId = "filedata",
             label = "Upload csv or zip file",
@@ -154,7 +157,6 @@ server <- function(input, output, session) {
       updateSelectInput(session, "inputz", selected = "")
     })
 
-
   observeEvent(input$readurlbutton, {
     removeModal()
     #req(input$urlfiledata)
@@ -183,9 +185,7 @@ server <- function(input, output, session) {
       ))
   })
 
-
-  observeEvent(
-    input$readfilebutton, {
+  observeEvent(input$readfilebutton, {
       print("oof")
       removeModal()
       #req(input$filedata)
@@ -250,7 +250,6 @@ server <- function(input, output, session) {
     )
   })
 
-
   observeEvent(input$help,{
     session$sendCustomMessage("handler1", unique(data()$subRegion))
   })
@@ -292,19 +291,6 @@ server <- function(input, output, session) {
 
     # Update All Reactive Inputs Based on Settings Loaded
     if(nrow(settings())>0){
-
-      # URL Update
-      # settingsURL <- unlist(
-      #   strsplit(
-      #     (settings()%>%dplyr::filter(variable=="urlSelect"))$value
-      #     ,split=";")
-      # )
-      # updateTextInput(
-      #     session=session,
-      #     inputId = "urlfiledata",
-      #     value = settingsURL,
-      #   )
-
 
       # Regions Update
       settingsRegions <- unlist(
@@ -390,8 +376,6 @@ server <- function(input, output, session) {
   }
   })
 
-
-
   # Attempt to read settings if selected
   observeEvent(input$settingdata,
                if(!is.null(input$settingdata)){
@@ -413,24 +397,24 @@ server <- function(input, output, session) {
                           dplyr::mutate(value="Default"))
     })
 
-    #---------------------------
+    #...........................
     # Update input File to Default (NULL)
-    #---------------------------
+    #...........................
     rv$filedatax <- NULL
     rv$selectedx <- NULL
 
-    #---------------------------
+    #...........................
     # Scenarios Select
-    #---------------------------
+    #...........................
    updatePickerInput(
         inputId = "scenariosSelected",
         session=session,
         choices = unique(data()$scenario),
         selected = unique(data()$scenario))
 
-    #---------------------------
+    #...........................
     # Ref Scenario Select
-    #---------------------------
+    #...........................
     updatePickerInput(
         inputId = "scenarioRefSelected",
         session=session,
@@ -439,27 +423,27 @@ server <- function(input, output, session) {
         selected = (unique(data()$scenario)[unique(data()$scenario)
                                                %in% scenariosSelectedx()])[1])
 
-    #---------------------------
+    #...........................
     # Parameters Select
-    #---------------------------
+    #...........................
     updatePickerInput(
         inputId = "paramsSelected",
         session=session,
         choices = c("Chosen Mix", unique(data()$param)),
         selected = unique(data()$param)[1:5])
 
-    #---------------------------
+    #...........................
     # Regions Select
-    #---------------------------
+    #...........................
     updatePickerInput(
         inputId = "regionsSelected",
         session=session,
         choices = unique(data()$subRegion),
         selected = unique(data()$subRegion))
 
-    #---------------------------
+    #...........................
     # Subset Regions Selected
-    #---------------------------
+    #...........................
     updatePickerInput(
         inputId = "subsetRegions",
         session=session,
@@ -473,11 +457,65 @@ server <- function(input, output, session) {
                  removeModal()
                })
 
+  # Toggle Sidebar
+  observeEvent(input$toggleSidebar, {
+    shinyjs::toggle(id = "Sidebar")
 
+    if (input$toggleSidebar %% 2 == 1) {
+      icon <-  icon("caret-down","fa-1x")
+    } else {
+      icon <-  icon("caret-up","fa-1x")
+    }
+    updateActionButton(session,
+                       "toggleSidebar",
+                       icon = icon)
 
-  #---------------------------
-  # Data File (GCAM)
-  #---------------------------
+  })
+
+  # Load Default Datasets from argus
+  dataDefault <- argus::example_GCAMv5p3_SSP235
+  ggplottheme <- ggplot2::theme_bw()
+
+  } # Initial Setting
+
+  #...........................
+  # Reactive Values
+  #...........................
+
+  if(T){ # Reactive Values
+
+  # Create your own reactive values that you can modify because input is read only
+  rv <- reactiveValues()
+
+  rv$validGcam <- FALSE
+  rv$pcount = 1;
+  rv$mapflag = 0;
+  rv$subRegTypelist = c()
+  rv$selectedBase = 0;
+  rv$data <- dataDefault %>% dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
+  # Charts initializing abs, percDiff, and absDiff
+  rv$absChart = 1;
+  rv$percDiffChart = 0;
+  rv$absDiffChart = 0;
+
+  # Maps initializing abs, percDiff, and absDiff
+  rv$absMap = 1;
+  rv$percDiffMap = 0;
+  rv$absDiffMap = 0;
+
+  } # Reactive values
+
+  #...........................
+  # INPUTS
+  #...........................
+
+  if(T){ # Read in Inputs
+
+  #...........................
+  # GCAM INPUTS
+  #...........................
+
+  if(T){ # GCAM Inputs
 
   roots <- getVolumes()()
 
@@ -495,10 +533,11 @@ server <- function(input, output, session) {
     filetypes = c('', 'proj')
   )
 
-  #------------------------------------------------------
+  #......................................................
   # Creating a reactive environment to choose gcamdatabase
   # Based on folder input or text input
-  #------------------------------------------------------
+  #......................................................
+
   rv_gcam <- reactiveValues()
   rv_gcam$gcamdatabasepathx = ""
   rv_gcam$gcamprojpathx = ""
@@ -542,6 +581,7 @@ server <- function(input, output, session) {
   #.........................................
   # Get names of scenarios in GCAM database
   #.........................................
+
   gcamScenariosx <- reactive({
       progress <- shiny::Progress$new()
       on.exit(progress$close())
@@ -592,7 +632,6 @@ server <- function(input, output, session) {
     progress$inc(1/2, detail = paste("Completed", 1))
     return(scens)
   })
-
 
   output$gcamScenarios = renderUI({
     pickerInput(
@@ -674,11 +713,8 @@ server <- function(input, output, session) {
     )
   })
 
-
-
   #...................................
   # Create data table from database
-
 
   #dataGCAMx <- eventReactive(input$readgcambutton, {
   observeEvent(input$readgcambutton, {
@@ -711,7 +747,7 @@ server <- function(input, output, session) {
           regionsSelect_i <- input$gcamRegionsSelected
         }
       progress$inc(1/3, detail = paste("Connecting to Database", 1))
-      dataGCAMraw <- argus::readgcam(reReadData = reReadData_i,
+      dataGCAMraw <- gcamextractor::readgcam(reReadData = reReadData_i,
                                         dirOutputs = tempdir,
                                         gcamdatabase = gcamdatabasepath_i,
                                         scenOrigNames = scenOrigNames_i,
@@ -755,33 +791,15 @@ server <- function(input, output, session) {
         ))
   }, ignoreInit = TRUE, once = TRUE)
 
+  } # GCAM Inputs
 
-  #---------------------------
-  # Data File (CSV)
-  #---------------------------
+  #...........................
+  # CSV / URL Inputs
+  #...........................
 
-  # Create your own reactive values that you can modify because input is read only
-  rv <- reactiveValues()
+  if(T){ # CSV / URL Inputs
 
-  rv$validGcam <- FALSE
-  rv$pcount = 1;
-  rv$mapflag = 0;
-  rv$subRegTypelist = c()
-  rv$selectedBase = 0;
-  rv$data <- dataDefault %>% dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-  # Charts initializing abs, percDiff, and absDiff
-  rv$absChart = 1;
-  rv$percDiffChart = 0;
-  rv$absDiffChart = 0;
-
-
-  # Maps initializing abs, percDiff, and absDiff
-  rv$absMap = 1;
-  rv$percDiffMap = 0;
-  rv$absDiffMap = 0;
-
-
-    # Observe File Inputs
+  # Observe File Inputs
   observeEvent(input$filedata, {
     rv$filedatax=input$filedata
     # URL Update
@@ -795,71 +813,6 @@ server <- function(input, output, session) {
     rv$urlfiledatax=input$urlfiledata})
   eventReactive(input$urlfiledata, {
     rv$filedatax=NULL})
-
-  # addMissing<-function(data){
-  #     NULL -> year -> aggregate -> scenario -> subRegion -> param -> x -> value
-  #     print("iif")
-  #     print(names(data))
-  #   if(!any(grepl("\\<scenario\\>",names(data),ignore.case = T))){
-  #     data<-data%>%dplyr::mutate(scenario="scenario")
-  #   }else{
-  #     data <- data %>% dplyr::rename(!!"scenario" := (names(data)[grepl("\\<scenario\\>",names(data),ignore.case = T)])[1])
-  #     for (i in 1:length(names(data))){
-  #       print(typeof(names(data)))
-  #       }
-  #           #browser()
-  #     data<-data%>%dplyr::mutate(scenario=dplyr::case_when(is.na(scenario)~"scenario",TRUE~as.character(scenario)))
-  #   }
-  #   print("xiif")
-  #   if(!any(grepl("\\<scenarios\\>",names(data),ignore.case = T))){}else{
-  #     data <- data %>% dplyr::rename(!!"scenario" := (names(data)[grepl("\\<scenarios\\>",names(data),ignore.case = T)])[1])
-  #     data<-data%>%dplyr::mutate(scenario=dplyr::case_when(is.na(scenario)~"scenario",TRUE~as.character(scenario)))}
-  #   if(!any(grepl("\\<subRegion\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(subRegion="subRegion")}else{
-  #     data <- data %>% dplyr::rename(!!"subRegion" := (names(data)[grepl("\\<subRegion\\>",names(data),ignore.case = T)])[1])
-  #     data<-data%>%dplyr::mutate(subRegion=dplyr::case_when(is.na(subRegion)~"subRegion",TRUE~as.character(subRegion)))}
-  #   if(!any(grepl("\\<subRegions\\>",names(data),ignore.case = T))){}else{
-  #     data <- data %>% dplyr::rename(!!"subRegion" := (names(data)[grepl("\\<subRegions\\>",names(data),ignore.case = T)])[1])
-  #     data<-data%>%dplyr::mutate(subRegion=dplyr::case_when(is.na(subRegion)~"subRegion",TRUE~as.character(subRegion)))}
-  #   if(!any(grepl("\\<param\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(param="param")}else{
-  #     data <- data %>% dplyr::rename(!!"param" := (names(data)[grepl("\\<param\\>",names(data),ignore.case = T)])[1])
-  #     data<-data%>%dplyr::mutate(param=dplyr::case_when(is.na(param)~"param",TRUE~as.character(param)))}
-  #   if(!any(grepl("\\<params\\>",names(data),ignore.case = T))){}else{
-  #     data <- data %>% dplyr::rename(!!"param" := (names(data)[grepl("\\<params\\>",names(data),ignore.case = T)])[1])
-  #     data<-data%>%dplyr::mutate(param=dplyr::case_when(is.na(param)~"param",TRUE~as.character(param)))}
-  #   if(!any(grepl("\\<value\\>",names(data),ignore.case = T))){stop("Data must have 'value' column.")}else{
-  #     data <- data %>% dplyr::rename(!!"value" := (names(data)[grepl("\\<value\\>",names(data),ignore.case = T)])[1])
-  #     data$value = as.numeric(data$value)
-  #     data<-data%>%dplyr::mutate(value=dplyr::case_when(is.na(value)~0,TRUE~value))}
-  #   if(!any(grepl("\\<values\\>",names(data),ignore.case = T))){}else{
-  #     data <- data %>% dplyr::rename(!!"value" := (names(data)[grepl("\\<values\\>",names(data),ignore.case = T)])[1])
-  #     data$value = as.numeric(data$value)
-  #     data<-data%>%dplyr::mutate(value=dplyr::case_when(is.na(value)~0,TRUE~value))}
-  #   if(!any(grepl("\\<unit\\>",names(data),ignore.case = T))){}else{
-  #     data <- data %>% dplyr::rename(!!"units" := (names(data)[grepl("\\<unit\\>",names(data),ignore.case = T)])[1])
-  #     data<-data%>%dplyr::mutate(units=dplyr::case_when(is.na(units)~"units",TRUE~as.character(units)))}
-  #   if(!any(grepl("\\<units\\>",names(data),ignore.case = T))){data<-data%>%dplyr::mutate(units="units")}else{
-  #     data <- data %>% dplyr::rename(!!"units" := (names(data)[grepl("\\<units\\>",names(data),ignore.case = T)])[1])
-  #     data<-data%>%dplyr::mutate(units=dplyr::case_when(is.na(units)~"units",TRUE~as.character(units)))}
-  #   if(!"x"%in%names(data)){
-  #     if("year"%in%names(data)){
-  #       data<-data%>%dplyr::mutate(x=year)}else{data<-data%>%dplyr::mutate(x="x")}}
-  #   if(!any(grepl("\\<aggregate\\>",names(data),ignore.case = T))){
-  #   if(is.null(aggregate)){data<-data%>%dplyr::mutate(aggregate="sum")}else{
-  #       data<-data%>%dplyr::mutate(aggregate="sum")}
-  #   }else{
-  #     data <- data %>% dplyr::rename(!!"aggregate" := (names(data)[grepl("\\<aggregate\\>",names(data),ignore.case = T)])[1])
-  #     data<-data%>%dplyr::mutate(aggregate=dplyr::case_when(is.na(aggregate)~"sum",
-  #                                                         TRUE~as.character(aggregate)))}
-  #   if(!any(grepl("\\<class\\>",names(data),ignore.case = T))){
-  #     if(!any(grepl("\\<class\\>",names(data),ignore.case = T))){
-  #       data<-data%>%dplyr::mutate(class="class")}else{data<-data%>%dplyr::mutate(class=class)}}else{
-  #         data <- data %>% dplyr::rename(!!"class" := (names(data)[grepl("\\<class\\>",names(data),ignore.case = T)])[1])
-  #         data<-data%>%dplyr::mutate(class=dplyr::case_when(is.na(class)~"class",TRUE~as.character(class)))}
-  #
-  #   data <- data %>%
-  #     dplyr::select(scenario,subRegion,param,class,x,aggregate,value)
-  #     return(data)
-  # }
 
   # Read in Raw Data
   data_raw <- reactive({
@@ -901,7 +854,6 @@ server <- function(input, output, session) {
       return(res)
     }
   })
-
 
   data <- reactive({
     return(rv$data)
@@ -950,825 +902,808 @@ server <- function(input, output, session) {
     removeModal()
   }, ignoreInit = TRUE)
 
-  #---------------------------
-  # Scenarios Select
-  #---------------------------
-  output$selectScenarios = renderUI({
-    pickerInput(
-      inputId = "scenariosSelected",
-      label = "Select Scenarios",
-      choices = unique(data()$scenario),
-      selected = unique(data()$scenario),
-      multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `deselect-all-text` = "None",
-        `select-all-text` = "All",
-        `none-selected-text` = "None Selected"
-      )
-    )
-  })
+  } # CSV / URL Inputs
 
-  #---------------------------
-  # Ref Scenario Select
-  #---------------------------
-  output$selectRefScenarios = renderUI({
-    pickerInput(
-      inputId = "scenarioRefSelected",
-      label = "Select Ref Scenario",
-      choices = unique(data()$scenario)[unique(data()$scenario)
-                                           %in% scenariosSelectedx()],
-      selected = (unique(data()$scenario)[unique(data()$scenario)
-                                             %in% scenariosSelectedx()])[1],
-      multiple = F
-    )
-  })
+  #...........................
+  # Selection of Reactive Inputs
+  #...........................
 
-  #---------------------------
-  # Parameters Select
-  #---------------------------
-  output$selectParams = renderUI({
-    pickerInput(
-      inputId = "paramsSelected",
-      label = "Select Params",
-      choices = c("Chosen Mix", unique(data()$param)),
-      selected = unique(data()$param)[1:5],
-      multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `deselect-all-text` = "None",
-        `select-all-text` = "All",
-        `none-selected-text` = "None Selected"
-      )
-    )
-  })
+  if(T){ # Select Reactive Inputs
 
-  #---------------------------
-  # Regions Select
-  #---------------------------
-  output$selectRegions = renderUI({
-    pickerInput(
-      inputId = "regionsSelected",
-      label = "Select Regions",
-      choices = unique(data()$subRegion),
-      selected = unique(data()$subRegion),
-      multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `deselect-all-text` = "None",
-        `select-all-text` = "All",
-        `none-selected-text` = "None Selected"
-      )
-    )
-  })
-
- output$mymapBase <- renderLeaflet({
-    dataMap_raw <- data() %>% dplyr::ungroup() %>%
-      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-      dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                        TRUE~subRegion)) %>%
-      dplyr::select(-subRegionMap)
-
-    plist <- list()
-    pcount = 1
-    subRegTypelist <- c()
-    z <- leaflet(height = "100vh") %>% addTiles()
-    for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
-      dataMap_raw_regions <- dataMap_raw %>%
-        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-        dplyr::filter(param == i) %>%
-        dplyr::select(subRegion) %>%
-        unique(); dataMap_raw_regions
-
-      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
-        dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
-        dplyr::group_by(subRegion) %>%
-        dplyr::mutate(minLong = min(long),
-                      negLongSum = sum(long[which(long<=0)], na.rm=T),
-                      maxLong = max(long),
-                      posLongSum = sum(long[which(long>=0)], na.rm=T),
-                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
-                                       TRUE~0),
-                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                       TRUE~long))%>%
-        dplyr::ungroup()
-      if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
-          subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
-          pcount = pcount+1
-          #a <-  dataMapPlot %>% group_by(subRegion) %>% group_split()
-          a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
-          #z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-          if (length(a) >= 2){
-            for (i in 1:length(a)){#group =unique(a[[i]]$subRegion),
-              pal <- colorNumeric(
-                palette = c("green", "red"),
-                domain = 1:length(a))
-            z <- z %>% addPolygons(data=a[[i]],  label = unique(a[[i]]$subRegion), group=~unique(subRegionType),lat=~lat, lng=~long, fillColor = ~pal(i), stroke = TRUE, weight = 0.5)
-            #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
-              }
-            }
-        }
-    }
-    z <- z%>%
-        addLayersControl(
-          overlayGroups = unique(subRegTypelist),
-          options = layersControlOptions(collapsed = FALSE)
+    # Scenario Select
+    output$selectScenarios = renderUI({
+      pickerInput(
+        inputId = "scenariosSelected",
+        label = "Select Scenarios",
+        choices = unique(data()$scenario),
+        selected = unique(data()$scenario),
+        multiple = TRUE,
+        options = list(
+          `actions-box` = TRUE,
+          `deselect-all-text` = "None",
+          `select-all-text` = "All",
+          `none-selected-text` = "None Selected"
         )
-    #z<-leaflet() %>% addTiles() %>% addPolygons(data=base, layerId = ~group, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-    return(z)
-  })
-
-
-  output$mymap <- renderLeaflet({
-    dataMap_raw <- data() %>% dplyr::ungroup() %>%
-      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion")
-
-    dataMap_raw <- dataMap_raw %>%  dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                        TRUE~subRegion)) %>%
-      dplyr::select(-subRegionMap)
-
-    plist <- list()
-    pcount = 1
-    subRegTypelist <- c()
-    z <- leaflet(height = "100vh") %>% addTiles()
-    for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
-      dataMap_raw_regions <- dataMap_raw %>%
-        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-        dplyr::filter(param == i) %>%
-        dplyr::select(subRegion) %>%
-        unique(); dataMap_raw_regions
-
-      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
-        dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
-        dplyr::group_by(subRegion) %>%
-        dplyr::mutate(minLong = min(long),
-                      negLongSum = sum(long[which(long<=0)], na.rm=T),
-                      maxLong = max(long),
-                      posLongSum = sum(long[which(long>=0)], na.rm=T),
-                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
-                                       TRUE~0),
-                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                       TRUE~long))%>%
-        dplyr::ungroup()
-      if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
-          subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
-          pcount = pcount+1
-          #a <-  dataMapPlot %>% group_by(subRegion) %>% group_split()
-          dict <- argus::mappings("mappingGCAMBasins")
-          dict$subRegion <- argus::mappings("mappingGCAMBasins")$subRegionMap
-          dict$subRegionMap <- argus::mappings("mappingGCAMBasins")$subRegion
-          dataMapPlot <- dataMapPlot %>% dplyr::left_join(dict,by="subRegion") %>%  dplyr::mutate(subRegionMap=case_when(is.na(subRegionMap)~subRegion, TRUE~subRegionMap))
-          a <-  dataMapPlot %>% group_by(subRegion, piece) %>% group_split()
-          #z <- z %>% addPolygons(data=base, label = unique(base$subRegion), lat=~lat, lng=~long, fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-             # palx <- colorFactor(
-             #   palette = c("green", "red"),
-             #   dataMapPlot$subRegionType)
-          if (length(a) >= 2){
-            for (i in 1:length(a)){#group =unique(a[[i]]$subRegion)
-              pal <- colorNumeric(
-                palette = c("green", "red"),
-                domain = 1:length(a))
-              z <- z %>% addPolygons(data=a[[i]],  group=~unique(subRegionMap), label = ~unique(subRegionMap), lat=~lat, lng=~long, fillColor = ~pal(i), stroke = FALSE)
-            #base <- base %>% add_row(lat=NA, long=NA) %>% bind_rows(d)
-            }
-            for (i in 1:(length(a))){
-              tem<-a[[i]] %>% dplyr::mutate(subRegionA =paste(subRegionMap, sep="", piece))
-              z <- z %>% addPolygons(data=tem, group= ~unique(subRegionType), layerId = ~unique(subRegionA), label = ~unique(subRegionMap), lat=~lat, lng=~long, color = "#4287f5", stroke=TRUE, weight = 0.5)
-            }
-            }
-
-        }
-    }
-    z <- z%>%
-       addLayersControl(
-         baseGroups = unique(subRegTypelist),
-         # overlayGroups = unique(subRegTypelist),
-         options = layersControlOptions(collapsed = FALSE)
-       )
-    rv$subRegTypelist = subRegTypelist
-    rv$mapflag = 1
-    rv$selectedBase = subRegTypelist[1]
-    return(z)
-  })
-
-  observe({
-    if(rv$mapflag == 1){
-      check()
-      rv$mapflag = 0
-    }
-  })
-
-  check <- function(){
-    hidden_group <- data()$subRegion[which(!data()$subRegion %in% reactiveValuesToList(input)$regionsSelected)]
-    for (i in unique(hidden_group)){
-      print(paste("hiding", " ", i))
-      leafletProxy("mymap") %>% hideGroup(i)
-    }
-    for (i in unique(reactiveValuesToList(input)$regionsSelected)){
-      print(paste("showing", " ", i))
-      leafletProxy("mymap") %>% showGroup(i)
-    }
-    for (i in unique(rv$selectedBase)){
-      leafletProxy("mymap") %>% hideGroup(i)
-      leafletProxy("mymap") %>% showGroup(i)
-    }
-  }
-
-
-  observeEvent(input$regionsSelected, {
-    check()
-  }, ignoreNULL = FALSE)
-
-  observeEvent(input$mymap_groups,{
-    print(input$mymap_groups)
-    rv$selectedBase = (reactiveValuesToList(input)$mymap_groups)[which((reactiveValuesToList(input)$mymap_groups) %in%   rv$subRegTypelist)]
-    print(rv$selectedBase)
-  })
-
-  observeEvent(input$mymap_shape_click,{
-    print(input$mymap_shape_click)
-    if (is.null(input$mymap_shape_click$id)){
-      return(0)
-    }
-    l = strsplit(input$mymap_shape_click$id, "[[:digit:]]")[[1]][[1]]
-    selectedx <- reactiveValuesToList(input)$regionsSelected
-    print(selectedx)
-    print(input$regionsSelected)
-    if (l %in% selectedx){
-      leafletProxy("mymap") %>% hideGroup(l)
-      selectedx =  selectedx[!(selectedx %in% l)]
-    }else{
-      leafletProxy("mymap") %>% showGroup(l)
-      leafletProxy("mymap") %>% hideGroup(input$mymap_shape_click$group)
-      leafletProxy("mymap") %>% showGroup(input$mymap_shape_click$group)
-      selectedx =  append(selectedx, l)
-    }
-    # session$sendCustomMessage("rhm_clic", selectedx)
-    updatePickerInput(
-     inputId = "regionsSelected",
-     session=session,
-     choices = unique(data()$subRegion),
-     selected = unique(selectedx)
-     )
-  })
-
-  #---------------------------
-  # Subset Regions Selected
-  #---------------------------
-  output$subsetRegions = renderUI({
-    pickerInput(
-      inputId = "subsetRegions",
-      label = "Select Regions to Compare",
-      choices = unique(dataMapx()$subRegion),
-      selected = unique(dataMapx()$subRegion)[1:4],
-      multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `deselect-all-text` = "None",
-        `select-all-text` = "All",
-        `none-selected-text` = "None Selected"
-      ))
-  })
-
-
-  #---------------------------
-  # Select Years for Map
-  #---------------------------
-  output$selectMapYear = renderUI({
-    sliderInput("mapYear", label = h3("Select Year"), min = min(dataMapx()$x),
-                max = max(dataMapx()$x), step = 5,
-                value=sort(unique(dataMapx()$x))[round(length(sort(unique(dataMapx()$x)))/2)], sep="",
-                animate =F)
-  })
-
-  #---------------------------
-  # Reactive Regions Select based on inputs
-  #---------------------------
-  subsetRegionsx <- reactive({
-    if (input$subsetRegions == "All" && length(input$subsetRegions) == 1) {
-      return(unique(regionsSelectedx()))
-    } else if (is.null(input$subsetRegions)){
-      return(unique(regionsSelectedx())[1:4])
-    } else{
-      return(input$subsetRegions)
-    }
-  })
-
-
-  #---------------------------
-  # Reactive Reference Scenario Select
-  #---------------------------
-  scenarioRefSelectedx <- reactive({
-    input$scenarioRefSelected
-  })
-  #---------------------------
-  # Reactive Regions Select based on inputs
-  #---------------------------
-  regionsSelectedx <- reactive({
-    if (input$regionsSelected == "All" && length(input$regionsSelected) == 1) {
-      return(unique(data()$subRegion))
-    } else {
-      return(input$regionsSelected)
-    }
-  })
-
-  #---------------------------
-  # Reactive Params based on inputs
-  #---------------------------
-  paramsSelectedx <- reactive({
-    if (any(input$paramsSelected == "Chosen Mix") &&
-        length(input$paramsSelected) == 1) {
-      paramsCheck <- unique(data()$param)[unique(data()$param) %in%
-                                            argus::constants()$chosenMix]
-      if (length(paramsCheck) >= 1) {
-        paramsCheck
-      } else{
-        unique(data()$param)
-      }
-    }else{
-      input$paramsSelected
-    }
-  })
-
-  #---------------------------
-  # Reactive Scenarios based on inputs
-  #---------------------------
-  scenariosSelectedx <- reactive({
-    if (input$scenariosSelected == "All" && length(input$scenariosSelected) > 0) {
-      return(unique(dataSum()$scenario))
-    } else{
-      return(input$scenariosSelected)
-    }
-  })
-
-  #---------------------------
-  # Data Summary
-  #---------------------------
-  dataSum <- reactive({
-    # Aggregate across classes
-    tblAggsums <- data() %>%
-      dplyr::filter(subRegion %in% regionsSelectedx()) %>%
-      dplyr::mutate(scenario = as.character(scenario)) %>%
-      dplyr::filter(aggregate == "sum") %>%
-      dplyr::select(scenario, param, x, value) %>%
-      dplyr::group_by_at(dplyr::vars(-value)) %>%
-      dplyr::summarize_at(c("value"), list( ~ sum(.)))
-    tblAggmeans <- data() %>%
-      dplyr::filter(subRegion %in% regionsSelectedx()) %>%
-      dplyr::select(-class) %>%
-      dplyr::mutate(scenario = as.character(scenario)) %>%
-      dplyr::filter(aggregate == "mean") %>%
-      dplyr::select(scenario, param, x, value) %>%
-      dplyr::group_by_at(dplyr::vars(-value)) %>%
-      dplyr::summarize_at(c("value"), list( ~ mean(.)))
-
-    dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-  })
-
-  # Filter Data after Reactive Choices
-  #---------------------------
-  dataSumx <- reactive({
-    # print(unique(scenariosSelectedx()))
-    # print(paramsSelectedx())
-    x <- dataSum() %>%
-      dplyr::filter(scenario %in% scenariosSelectedx(),
-                    param %in% paramsSelectedx())
-    return(x)
-  })
-
-  #---------------------------
-  # Data Map
-  #---------------------------
-  dataMap <- reactive({
-    # Aggregate across classes
-    tblAggsums <- data() %>%
-      dplyr::filter(subRegion %in% regionsSelectedx()) %>%
-      dplyr::mutate(scenario = as.character(scenario)) %>%
-      dplyr::filter(aggregate == "sum") %>%
-      dplyr::select(scenario, param, subRegion, x, value) %>%
-      dplyr::group_by_at(dplyr::vars(-value)) %>%
-      dplyr::summarize_at(c("value"), list( ~ sum(.)))
-    tblAggmeans <- data() %>%
-      dplyr::filter(subRegion %in% regionsSelectedx()) %>%
-      dplyr::select(-class) %>%
-      dplyr::mutate(scenario = as.character(scenario)) %>%
-      dplyr::filter(aggregate == "mean") %>%
-      dplyr::select(scenario, param, subRegion, x, value) %>%
-      dplyr::group_by_at(dplyr::vars(-value)) %>%
-      dplyr::summarize_at(c("value"), list( ~ mean(.)))
-
-    dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-
-  })
-  #---------------------------
-  # Filter Data after Reactive Choices
-  #---------------------------
-  dataMapx <- reactive({
-    dataMap() %>%
-      dplyr::filter(scenario %in% input$scenariosSelected,
-                    param %in% paramsSelectedx())
-  })
-
-
-  #---------------------------
-  # Data Chart
-  #---------------------------
-  dataChartx <- reactive({
-    # Aggregate across classes
-    tblAggsums <- data() %>%
-      dplyr::filter(
-        scenario %in% input$scenariosSelected,
-        param %in% paramsSelectedx(),
-        subRegion %in% regionsSelectedx()
-      ) %>%
-      dplyr::mutate(scenario = as.character(scenario)) %>%
-      dplyr::filter(aggregate == "sum") %>%
-      dplyr::select(scenario, param, class, x, value) %>%
-      dplyr::group_by_at(dplyr::vars(-value)) %>%
-      dplyr::summarize_at(c("value"), list( ~ sum(.)))
-    tblAggmeans <- data() %>%
-      dplyr::filter(
-        scenario %in% input$scenariosSelected,
-        param %in% paramsSelectedx(),
-        subRegion %in% regionsSelectedx()
-      ) %>%
-      dplyr::mutate(scenario = as.character(scenario)) %>%
-      dplyr::filter(aggregate == "mean") %>%
-      dplyr::select(scenario, param, class, x, value) %>%
-      dplyr::group_by_at(dplyr::vars(-value)) %>%
-      dplyr::summarize_at(c("value"), list( ~ mean(.)))
-
-    dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-  })
-
-  #---------------------------
-  # Data Chart Absolute Diff
-  #---------------------------
-  dataDiffAbsx <- reactive({
-    diffText <- " Diff Abs"
-
-    if (is.null(input$scenarioRefSelected)) {
-      print(paste("No reference scenario provided", sep = ""))
-      print(paste(
-        "Using ",
-        unique(dataChartx()$scenario)[1],
-        " as reference",
-        sep = ""
-      ))
-      scenRef_i = unique(dataChartx()$scenario)[1]
-    } else{
-      if (!input$scenarioRefSelected %in% unique(dataChartx()$scenario)) {
-        print(paste(
-          "scenario ",
-          input$scenarioRefSelected,
-          " not in scenarios",
-          sep = ""
-        ))
-        print(paste(
-          "Using ",
-          unique(dataChartx()$scenario)[1],
-          " as reference",
-          sep = ""
-        ))
-        scenRef_i = unique(dataChartx()$scenario)[1]
-      } else{
-        scenRef_i <- input$scenarioRefSelected
-        print(scenRef_i)
-      }
-    } # Check if Ref Scenario Chosen
-
-    # Calculate Diff Values
-    tbl_pd <- dataChartx() %>%
-      dplyr::filter(scenario == scenRef_i)
-
-    for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
-                                            scenRef_i]) {
-
-      tbl_temp <- dataChartx() %>%
-        dplyr::filter(scenario %in% c(scenRef_i, k))  %>%
-        dplyr::filter(!(is.na(class) & value==0))%>%
-        dplyr::mutate(class=if_else(is.na(class),"NA",class))
-
-      print(tbl_temp$value)
-      tbl_temp <- tbl_temp %>%
-        tidyr::spread(scenario, value)
-
-      tbl_temp[is.na(tbl_temp)] <- 0
-
-      tbl_temp <- tbl_temp %>%
-        dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
-        dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
-      tbl_temp <- tbl_temp %>%
-        tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
-      tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
-
-    }
-
-    tbl_pd <- tbl_pd %>%
-      dplyr::mutate(scenario = factor(scenario,
-                                      levels = c(scenRef_i,
-                                                 unique(
-                                                   tbl_pd$scenario
-                                                 )[unique(tbl_pd$scenario) != scenRef_i])))
-    # print(tbl_pd)
-    tbl_pd
-  })
-
-  #---------------------------
-  # Data Chart Absolute Diff
-  #---------------------------
-  dataPrcntAbsx <- reactive({
-    diffText <- " Prcent Abs"
-
-    if (is.null(input$scenarioRefSelected)) {
-      print(paste("No reference scenario provided", sep = ""))
-      print(paste(
-        "Using ",
-        unique(dataChartx()$scenario)[1],
-        " as reference",
-        sep = ""
-      ))
-      scenRef_i = unique(dataChartx()$scenario)[1]
-    } else{
-      if (!input$scenarioRefSelected %in% unique(dataChartx()$scenario)) {
-        print(paste(
-          "scenario ",
-          input$scenarioRefSelected,
-          " not in scenarios",
-          sep = ""
-        ))
-        print(paste(
-          "Using ",
-          unique(dataChartx()$scenario)[1],
-          " as reference",
-          sep = ""
-        ))
-        scenRef_i = unique(dataChartx()$scenario)[1]
-      } else{
-        scenRef_i <- input$scenarioRefSelected
-        print(scenRef_i)
-      }
-    } # Check if Ref Scenario Chosen
-
-    # Calculate Diff Values
-    tbl_pd <- dataChartx() %>%
-      dplyr::filter(scenario == scenRef_i)
-
-    for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
-                                            scenRef_i]) {
-
-      print(k)
-      tbl_temp <- dataChartx() %>%
-        dplyr::filter(scenario %in% c(scenRef_i, k))  %>%
-        dplyr::filter(!(is.na(class) & value==0))%>%
-        dplyr::mutate(class=if_else(is.na(class),"NA",class))
-
-
-      tbl_temp <- tbl_temp %>%
-        tidyr::spread(scenario, value)
-
-      tbl_temp[is.na(tbl_temp)] <- 0
-
-      #Important Code
-
-      tbl_temp <- tbl_temp %>%
-        dplyr::mutate(!!paste(k, diffText, sep = "") := 100*((get(k)/get(scenRef_i))-1)) %>%
-        dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
-      tbl_temp <- tbl_temp %>%
-        tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
-      tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
-    }
-
-    tbl_pd <- tbl_pd %>%
-      dplyr::mutate(scenario = factor(scenario,
-                                      levels = c(scenRef_i,
-                                                 unique(
-                                                   tbl_pd$scenario
-                                                 )[unique(tbl_pd$scenario) != scenRef_i])))
-    print(dplyr::filter(tbl_pd, scenario %in% c(paste(k, diffText, sep = ""))))
-    tbl_pd
-  })
-
-
-
-  #---------------------------
-  # Data Map Absolute Diff
-  #---------------------------
-
-  dataDiffAbsMapx <- reactive({
-    diffText <- " Diff Abs"
-
-    if (is.null(input$scenarioRefSelected)) {
-      print(paste("No reference scenario provided", sep = ""))
-      print(paste(
-        "Using ",
-        unique(dataMapx()$scenario)[1],
-        " as reference",
-        sep = ""
-      ))
-      scenRef_i = unique(dataMapx()$scenario)[1]
-    } else{
-      if (!input$scenarioRefSelected %in% unique(dataMapx()$scenario)) {
-        print(paste(
-          "scenario ",
-          input$scenarioRefSelected,
-          " not in scenarios",
-          sep = ""
-        ))
-        print(paste(
-          "Using ",
-          unique(dataMapx()$scenario)[1],
-          " as reference",
-          sep = ""
-        ))
-        scenRef_i = unique(dataMapx()$scenario)[1]
-      } else{
-        scenRef_i <- input$scenarioRefSelected
-        print(scenRef_i)
-      }
-    } # Check if Ref Scenario Chosen
-
-    # Calculate Diff Values
-    tbl_pd <- dataMapx() %>%
-      dplyr::filter(scenario == scenRef_i)
-    for (k in unique(dataMapx()$scenario)[unique(dataMapx()$scenario) !=
-                                            scenRef_i]) {
-      tbl_temp <- dataMapx() %>%
-        dplyr::filter(scenario %in% c(scenRef_i, k))
-      # print("tbl_temp")
-      # print(tbl_temp)
-      # print("tbl_temp$value")
-      # print(tbl_temp$value)
-      tbl_temp <- tbl_temp %>%
-        tidyr::spread(scenario, value)
-      # print("tbl_temp post spread")
-      # print(tbl_temp)
-
-      tbl_temp[is.na(tbl_temp)] <- 0
-
-      tbl_temp <- tbl_temp %>%
-        dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
-        dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
-      # print("tbl temp post mute")
-      # print(tbl_temp)
-      tbl_temp <- tbl_temp %>%
-        tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
-      # print("tidyr")
-      # print(tbl_temp)
-      tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
-      # print("bind_rows")
-      # print(tbl_pd)
-    }
-
-    tbl_pd <- tbl_pd %>%
-      dplyr::mutate(scenario = factor(scenario,
-                                      levels = c(scenRef_i,
-                                                 unique(
-                                                   tbl_pd$scenario
-                                                 )[unique(tbl_pd$scenario) != scenRef_i])))
-    # print(tbl_pd)
-    tbl_pd
-  })
-
-  #---------------------------
-  # Data Map Absolute Diff
-  #---------------------------
-  dataPrcntAbsMapx <- reactive({
-    diffText <- " Prcent Abs"
-
-    if (is.null(input$scenarioRefSelected)) {
-      print(paste("No reference scenario provided", sep = ""))
-      print(paste(
-        "Using ",
-        unique(dataMapx()$scenario)[1],
-        " as reference",
-        sep = ""
-      ))
-      scenRef_i = unique(dataMapx()$scenario)[1]
-    } else{
-      if (!input$scenarioRefSelected %in% unique(dataMapx()$scenario)) {
-        print(paste(
-          "scenario ",
-          input$scenarioRefSelected,
-          " not in scenarios",
-          sep = ""
-        ))
-        print(paste(
-          "Using ",
-          unique(dataMapx()$scenario)[1],
-          " as reference",
-          sep = ""
-        ))
-        scenRef_i = unique(dataMapx()$scenario)[1]
-      } else{
-        scenRef_i <- input$scenarioRefSelected
-        print(scenRef_i)
-      }
-    } # Check if Ref Scenario Chosen
-
-    # Calculate Diff Values
-    tbl_pd <- dataMapx() %>%
-      dplyr::filter(scenario == scenRef_i)
-    for (k in unique(dataMapx()$scenario)[unique(dataMapx()$scenario) !=
-                                            scenRef_i]) {
-      print(k)
-      tbl_temp <- dataMapx() %>%
-        dplyr::filter(scenario %in% c(scenRef_i, k))
-      tbl_temp <- tbl_temp %>%
-        tidyr::spread(scenario, value)
-
-      tbl_temp[is.na(tbl_temp)] <- 0
-
-      #Important Code
-
-      tbl_temp <- tbl_temp %>%
-        dplyr::mutate(!!paste(k, diffText, sep = "") := 100*((get(k)/get(scenRef_i))-1)) %>%
-        dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
-      tbl_temp <- tbl_temp %>%
-        tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
-      tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
-    }
-
-    tbl_pd <- tbl_pd %>%
-      dplyr::mutate(scenario = factor(scenario,
-                                      levels = c(scenRef_i,
-                                                 unique(
-                                                   tbl_pd$scenario
-                                                 )[unique(tbl_pd$scenario) != scenRef_i])))
-    print(dplyr::filter(tbl_pd, scenario %in% c(paste(k, diffText, sep = ""))))
-    tbl_pd
-  })
-
-
-  #---------------------------
-  # Summary Plot
-  #---------------------------
-  # summaryPlot <- function(aspectratio, textsize, titletext){
-  #   ggplot2::ggplot(dataSumx(),
-  #                   aes(x=x,y=value,
-  #                       group=scenario,
-  #                       color=scenario))+
-  #     geom_line(size=1.25) +
-  #     ggplottheme +
-  #     geom_line() +
-  #     ylab(NULL) +  xlab(NULL) +
-  #     facet_wrap(.~param, scales="free", ncol = 3,
-  #                labeller = labeller(param = label_wrap_gen(15)))+
-  #     theme(legend.position="top",
-  #           legend.text=element_text(size=titletext),
-  #           legend.title = element_blank(),
-  #           plot.margin=margin(20,20,20,0,"pt"),
-  #           text=element_text(size=textsize),
-  #           aspect.ratio = aspectratio
-  #     )
-  # }
-
-  output$summary <- renderPlot({
-    argus::summaryPlot(NULL, 17.5, 20, dataSumx())
-  },
-  height=function(){
-    if (length(unique(dataChartx()$param))%%3==0){
-      return(((length(unique(dataChartx()$param))%/%3))*250)
-    }else{
-      return(((length(unique(dataChartx()$param))%/%3)+1)*250)
-    }
-  },
-  width=function(){
-    if (length(unique(dataChartx()$param))==1){
-      return(300)
-    }else if (length(unique(dataChartx()$param))==2){
-      return(500)
-    }else{
-      return("auto")
-    }
-    }
-  )
-
-  output$downloadPlotSum <- downloadHandler(
-    filename = "summaryChart.png",
-    content = function(filename) {
-      ggsave(
-        filename,
-        plot=argus::summaryPlot(0.75, 10, 10, dataSumx()),
-        #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-        height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
-        width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
-        units="in"
       )
     })
 
+    # Ref Scenario Select
+    output$selectRefScenarios = renderUI({
+      pickerInput(
+        inputId = "scenarioRefSelected",
+        label = "Select Ref Scenario",
+        choices = unique(data()$scenario)[unique(data()$scenario)
+                                          %in% scenariosSelectedx()],
+        selected = (unique(data()$scenario)[unique(data()$scenario)
+                                            %in% scenariosSelectedx()])[1],
+        multiple = F
+      )
+    })
 
-  #---------------------------
+    # Parameters Select
+    output$selectParams = renderUI({
+      pickerInput(
+        inputId = "paramsSelected",
+        label = "Select Params",
+        choices = c("Chosen Mix", unique(data()$param)),
+        selected = unique(data()$param)[1:5],
+        multiple = TRUE,
+        options = list(
+          `actions-box` = TRUE,
+          `deselect-all-text` = "None",
+          `select-all-text` = "All",
+          `none-selected-text` = "None Selected"
+        )
+      )
+    })
+
+    # Regions Select
+    output$selectRegions = renderUI({
+      pickerInput(
+        inputId = "regionsSelected",
+        label = "Select Regions",
+        choices = unique(data()$subRegion),
+        selected = unique(data()$subRegion),
+        multiple = TRUE,
+        options = list(
+          `actions-box` = TRUE,
+          `deselect-all-text` = "None",
+          `select-all-text` = "All",
+          `none-selected-text` = "None Selected"
+        )
+      )
+    })
+
+    # Subset Regions Selected
+    output$subsetRegions = renderUI({
+      pickerInput(
+        inputId = "subsetRegions",
+        label = "Select Regions to Compare",
+        choices = unique(dataMap()$subRegion),
+        selected = unique(dataMap()$subRegion)[1:4],
+        multiple = TRUE,
+        options = list(
+          `actions-box` = TRUE,
+          `deselect-all-text` = "None",
+          `select-all-text` = "All",
+          `none-selected-text` = "None Selected"
+        ))
+    })
+
+    # Select Years for Map
+    output$selectMapYear = renderUI({
+      sliderInput("mapYear", label ="Year", min = min(dataMap()$x),
+                  max = max(dataMap()$x), step = 5,
+                  value=sort(unique(dataMap()$x))[round(length(sort(unique(dataMap()$x)))/2)], sep="",
+                  animate =F)
+    })
+
+    # Reactive Regions Select based on inputs
+    subsetRegionsx <- reactive({
+      if (input$subsetRegions == "All" && length(input$subsetRegions) == 1) {
+        return(unique(regionsSelectedx()))
+      } else if (is.null(input$subsetRegions)){
+        return(unique(regionsSelectedx())[1:4])
+      } else{
+        return(input$subsetRegions)
+      }
+    })
+
+    # Reactive Reference Scenario Select
+    scenarioRefSelectedx <- reactive({
+      input$scenarioRefSelected
+    })
+
+    # Reactive Regions Select based on inputs
+    regionsSelectedx <- reactive({
+      if (input$regionsSelected == "All" && length(input$regionsSelected) == 1) {
+        return(unique(data()$subRegion))
+      } else {
+        return(input$regionsSelected)
+      }
+    })
+
+    # Reactive Params based on inputs
+    paramsSelectedx <- reactive({
+      if (any(input$paramsSelected == "Chosen Mix") &&
+          length(input$paramsSelected) == 1) {
+        paramsCheck <- unique(data()$param)[unique(data()$param) %in%
+                                              argus::constants()$chosenMix]
+        if (length(paramsCheck) >= 1) {
+          paramsCheck
+        } else{
+          unique(data()$param)
+        }
+      }else{
+        input$paramsSelected
+      }
+    })
+
+    # Reactive Scenarios based on inputs
+    scenariosSelectedx <- reactive({
+      if (input$scenariosSelected == "All" && length(input$scenariosSelected) > 0) {
+        return(unique(dataSum()$scenario))
+      } else{
+        return(input$scenariosSelected)
+      }
+    })
+
+    # Focus maps Inputs
+    # Scenario Select
+    output$selectFocusMapScenario = renderUI({
+      pickerInput(
+        inputId = "focusMapScenarioSelected",
+        label = "Scenario",
+        choices = unique(dataMapx()$scenario),
+        selected = unique(dataMapx()$scenario)[1],
+        multiple = FALSE)
+    })
+
+    # Parameters Select
+    output$selectFocusMapParam = renderUI({
+      pickerInput(
+        inputId = "focusMapParamSelected",
+        label = "Parameter",
+        choices =  unique(dataMapx()$param),
+        selected = unique(dataMapx()$param)[1],
+        multiple = FALSE)
+    })
+
+    # Select Years for Map
+    output$selectFocusMapYear = renderUI({
+      sliderInput(inputId = "focusMapYearSelected",
+                  label ="Year",
+                  min = min(data()$x),
+                  max = max(data()$x), step = 5,
+                  value=sort(unique(dataMap()$x))[round(length(sort(unique(dataMap()$x)))/2)], sep="",
+                  animate =F)
+    })
+
+  } # Select Reactive Inputs
+
+  #...........................
+  # Subsetting Data for Outputs
+  #...........................
+
+  if(T){ # Subsetting Data for Outputs
+
+    dataSum <- reactive({
+      # Aggregate across classes
+      tblAggsums <- data() %>%
+        dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+        dplyr::mutate(scenario = as.character(scenario)) %>%
+        dplyr::filter(aggregate == "sum") %>%
+        dplyr::select(scenario, param, x, value) %>%
+        dplyr::group_by_at(dplyr::vars(-value)) %>%
+        dplyr::summarize_at(c("value"), list( ~ sum(.)))
+      tblAggmeans <- data() %>%
+        dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+        dplyr::select(-class) %>%
+        dplyr::mutate(scenario = as.character(scenario)) %>%
+        dplyr::filter(aggregate == "mean") %>%
+        dplyr::select(scenario, param, x, value) %>%
+        dplyr::group_by_at(dplyr::vars(-value)) %>%
+        dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+      dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    })
+
+    # Data for summary chart
+    dataSumx <- reactive({
+      # print(unique(scenariosSelectedx()))
+      # print(paramsSelectedx())
+      x <- dataSum() %>%
+        dplyr::filter(scenario %in% scenariosSelectedx(),
+                      param %in% paramsSelectedx())
+      return(x)
+    })
+
+    # Data for Bar Chart
+    dataChartx <- reactive({
+      # Aggregate across classes
+      tblAggsums <- data() %>%
+        dplyr::filter(
+          scenario %in% input$scenariosSelected,
+          param %in% paramsSelectedx(),
+          subRegion %in% regionsSelectedx()
+        ) %>%
+        dplyr::mutate(scenario = as.character(scenario)) %>%
+        dplyr::filter(aggregate == "sum") %>%
+        dplyr::select(scenario, param, class, x, value) %>%
+        dplyr::group_by_at(dplyr::vars(-value)) %>%
+        dplyr::summarize_at(c("value"), list( ~ sum(.)))
+      tblAggmeans <- data() %>%
+        dplyr::filter(
+          scenario %in% input$scenariosSelected,
+          param %in% paramsSelectedx(),
+          subRegion %in% regionsSelectedx()
+        ) %>%
+        dplyr::mutate(scenario = as.character(scenario)) %>%
+        dplyr::filter(aggregate == "mean") %>%
+        dplyr::select(scenario, param, class, x, value) %>%
+        dplyr::group_by_at(dplyr::vars(-value)) %>%
+        dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+      dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+    })
+
+    # Data Bar Chart Absolute Diff
+    dataDiffAbsx <- reactive({
+      diffText <- " Diff Abs"
+
+      if (is.null(input$scenarioRefSelected)) {
+        print(paste("No reference scenario provided", sep = ""))
+        print(paste(
+          "Using ",
+          unique(dataChartx()$scenario)[1],
+          " as reference",
+          sep = ""
+        ))
+        scenRef_i = unique(dataChartx()$scenario)[1]
+      } else{
+        if (!input$scenarioRefSelected %in% unique(dataChartx()$scenario)) {
+          print(paste(
+            "scenario ",
+            input$scenarioRefSelected,
+            " not in scenarios",
+            sep = ""
+          ))
+          print(paste(
+            "Using ",
+            unique(dataChartx()$scenario)[1],
+            " as reference",
+            sep = ""
+          ))
+          scenRef_i = unique(dataChartx()$scenario)[1]
+        } else{
+          scenRef_i <- input$scenarioRefSelected
+          print(scenRef_i)
+        }
+      } # Check if Ref Scenario Chosen
+
+      # Calculate Diff Values
+      tbl_pd <- dataChartx() %>%
+        dplyr::filter(scenario == scenRef_i)
+
+      for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
+                                              scenRef_i]) {
+
+        tbl_temp <- dataChartx() %>%
+          dplyr::filter(scenario %in% c(scenRef_i, k))  %>%
+          dplyr::filter(!(is.na(class) & value==0))%>%
+          dplyr::mutate(class=if_else(is.na(class),"NA",class))
+
+        print(tbl_temp$value)
+        tbl_temp <- tbl_temp %>%
+          tidyr::spread(scenario, value)
+
+        tbl_temp[is.na(tbl_temp)] <- 0
+
+        tbl_temp <- tbl_temp %>%
+          dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
+          dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
+        tbl_temp <- tbl_temp %>%
+          tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
+        tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
+
+      }
+
+      tbl_pd <- tbl_pd %>%
+        dplyr::mutate(scenario = factor(scenario,
+                                        levels = c(scenRef_i,
+                                                   unique(
+                                                     tbl_pd$scenario
+                                                   )[unique(tbl_pd$scenario) != scenRef_i])))
+      # print(tbl_pd)
+      tbl_pd
+    })
+
+    # Data Chart Percent Diff
+    dataPrcntAbsx <- reactive({
+      diffText <- " Prcent Abs"
+
+      if (is.null(input$scenarioRefSelected)) {
+        print(paste("No reference scenario provided", sep = ""))
+        print(paste(
+          "Using ",
+          unique(dataChartx()$scenario)[1],
+          " as reference",
+          sep = ""
+        ))
+        scenRef_i = unique(dataChartx()$scenario)[1]
+      } else{
+        if (!input$scenarioRefSelected %in% unique(dataChartx()$scenario)) {
+          print(paste(
+            "scenario ",
+            input$scenarioRefSelected,
+            " not in scenarios",
+            sep = ""
+          ))
+          print(paste(
+            "Using ",
+            unique(dataChartx()$scenario)[1],
+            " as reference",
+            sep = ""
+          ))
+          scenRef_i = unique(dataChartx()$scenario)[1]
+        } else{
+          scenRef_i <- input$scenarioRefSelected
+          print(scenRef_i)
+        }
+      } # Check if Ref Scenario Chosen
+
+      # Calculate Diff Values
+      tbl_pd <- dataChartx() %>%
+        dplyr::filter(scenario == scenRef_i)
+
+      for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
+                                              scenRef_i]) {
+
+        print(k)
+        tbl_temp <- dataChartx() %>%
+          dplyr::filter(scenario %in% c(scenRef_i, k))  %>%
+          dplyr::filter(!(is.na(class) & value==0))%>%
+          dplyr::mutate(class=if_else(is.na(class),"NA",class))
+
+
+        tbl_temp <- tbl_temp %>%
+          tidyr::spread(scenario, value)
+
+        tbl_temp[is.na(tbl_temp)] <- 0
+
+        #Important Code
+
+        tbl_temp <- tbl_temp %>%
+          dplyr::mutate(!!paste(k, diffText, sep = "") := 100*((get(k)/get(scenRef_i))-1)) %>%
+          dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
+        tbl_temp <- tbl_temp %>%
+          tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
+        tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
+      }
+
+      tbl_pd <- tbl_pd %>%
+        dplyr::mutate(scenario = factor(scenario,
+                                        levels = c(scenRef_i,
+                                                   unique(
+                                                     tbl_pd$scenario
+                                                   )[unique(tbl_pd$scenario) != scenRef_i])))
+      print(dplyr::filter(tbl_pd, scenario %in% c(paste(k, diffText, sep = ""))))
+      tbl_pd
+    })
+
+
+    # Map Data
+    dataMap <- reactive({
+      # Aggregate across classes
+      tblAggsums <- data() %>%
+        dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+        dplyr::mutate(scenario = as.character(scenario)) %>%
+        dplyr::filter(aggregate == "sum") %>%
+        dplyr::select(scenario, param, subRegion, x, value) %>%
+        dplyr::group_by_at(dplyr::vars(-value)) %>%
+        dplyr::summarize_at(c("value"), list( ~ sum(.)))
+      tblAggmeans <- data() %>%
+        dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+        dplyr::select(-class) %>%
+        dplyr::mutate(scenario = as.character(scenario)) %>%
+        dplyr::filter(aggregate == "mean") %>%
+        dplyr::select(scenario, param, subRegion, x, value) %>%
+        dplyr::group_by_at(dplyr::vars(-value)) %>%
+        dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+      dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+
+    })
+
+    # Filter Data After Chocie
+    dataMapx <- reactive({
+      dataMap() %>%
+        dplyr::filter(scenario %in% input$scenariosSelected,
+                      param %in% paramsSelectedx())
+    })
+
+    # Data Map Absolute Diff
+    dataDiffAbsMapx <- reactive({
+      diffText <- " Diff Abs"
+
+      if (is.null(input$scenarioRefSelected)) {
+        print(paste("No reference scenario provided", sep = ""))
+        print(paste(
+          "Using ",
+          unique(dataMapx()$scenario)[1],
+          " as reference",
+          sep = ""
+        ))
+        scenRef_i = unique(dataMapx()$scenario)[1]
+      } else{
+        if (!input$scenarioRefSelected %in% unique(dataMapx()$scenario)) {
+          print(paste(
+            "scenario ",
+            input$scenarioRefSelected,
+            " not in scenarios",
+            sep = ""
+          ))
+          print(paste(
+            "Using ",
+            unique(dataMapx()$scenario)[1],
+            " as reference",
+            sep = ""
+          ))
+          scenRef_i = unique(dataMapx()$scenario)[1]
+        } else{
+          scenRef_i <- input$scenarioRefSelected
+          print(scenRef_i)
+        }
+      } # Check if Ref Scenario Chosen
+
+      # Calculate Diff Values
+      tbl_pd <- dataMapx() %>%
+        dplyr::filter(scenario == scenRef_i)
+      for (k in unique(dataMapx()$scenario)[unique(dataMapx()$scenario) !=
+                                            scenRef_i]) {
+        tbl_temp <- dataMapx() %>%
+          dplyr::filter(scenario %in% c(scenRef_i, k))
+        # print("tbl_temp")
+        # print(tbl_temp)
+        # print("tbl_temp$value")
+        # print(tbl_temp$value)
+        tbl_temp <- tbl_temp %>%
+          tidyr::spread(scenario, value)
+        # print("tbl_temp post spread")
+        # print(tbl_temp)
+
+        tbl_temp[is.na(tbl_temp)] <- 0
+
+        tbl_temp <- tbl_temp %>%
+          dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
+          dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
+        # print("tbl temp post mute")
+        # print(tbl_temp)
+        tbl_temp <- tbl_temp %>%
+          tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
+        # print("tidyr")
+        # print(tbl_temp)
+        tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
+        # print("bind_rows")
+        # print(tbl_pd)
+      }
+
+      tbl_pd <- tbl_pd %>%
+        dplyr::mutate(scenario = factor(scenario,
+                                        levels = c(scenRef_i,
+                                                   unique(
+                                                     tbl_pd$scenario
+                                                   )[unique(tbl_pd$scenario) != scenRef_i])))
+      # print(tbl_pd)
+      tbl_pd
+    })
+
+    # Data Map Percent Diff
+    dataPrcntAbsMapx <- reactive({
+      diffText <- " Prcent Abs"
+
+      if (is.null(input$scenarioRefSelected)) {
+        print(paste("No reference scenario provided", sep = ""))
+        print(paste(
+          "Using ",
+          unique(dataMapx()$scenario)[1],
+          " as reference",
+          sep = ""
+        ))
+        scenRef_i = unique(dataMapx()$scenario)[1]
+      } else{
+        if (!input$scenarioRefSelected %in% unique(dataMapx()$scenario)) {
+          print(paste(
+            "scenario ",
+            input$scenarioRefSelected,
+            " not in scenarios",
+            sep = ""
+          ))
+          print(paste(
+            "Using ",
+            unique(dataMapx()$scenario)[1],
+            " as reference",
+            sep = ""
+          ))
+          scenRef_i = unique(dataMapx()$scenario)[1]
+        } else{
+          scenRef_i <- input$scenarioRefSelected
+          print(scenRef_i)
+        }
+      } # Check if Ref Scenario Chosen
+
+      # Calculate Diff Values
+      tbl_pd <- dataMapx() %>%
+        dplyr::filter(scenario == scenRef_i)
+      for (k in unique(dataMapx()$scenario)[unique(dataMapx()$scenario) !=
+                                            scenRef_i]) {
+        print(k)
+        tbl_temp <- dataMapx() %>%
+          dplyr::filter(scenario %in% c(scenRef_i, k))
+        tbl_temp <- tbl_temp %>%
+          tidyr::spread(scenario, value)
+
+        tbl_temp[is.na(tbl_temp)] <- 0
+
+        #Important Code
+
+        tbl_temp <- tbl_temp %>%
+          dplyr::mutate(!!paste(k, diffText, sep = "") := 100*((get(k)/get(scenRef_i))-1)) %>%
+          dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
+        tbl_temp <- tbl_temp %>%
+          tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
+        tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
+      }
+
+      tbl_pd <- tbl_pd %>%
+        dplyr::mutate(scenario = factor(scenario,
+                                        levels = c(scenRef_i,
+                                                   unique(
+                                                     tbl_pd$scenario
+                                                   )[unique(tbl_pd$scenario) != scenRef_i])))
+      print(dplyr::filter(tbl_pd, scenario %in% c(paste(k, diffText, sep = ""))))
+      tbl_pd
+    })
+
+  } # Subsetting Data For Outputs
+
+  } # Read in Inputs
+
+  #...........................
+  # Outputs
+  #...........................
+
+  if(T){ # Outputs
+
+  #...........................
+  # Plotting Outputs
+  #...........................
+
+  if(T){ # Plotting Outputs
+
+  #...........................
+  # Focus Page
+  #...........................
+
+    if(T){ # Focus Page
+
+  output$focusMap <- renderLeaflet({
+
+    # Read in Raw Data
+    dataMapFocus_raw <- dataMapx() %>%
+      dplyr::ungroup() %>%
+      dplyr::select(x,param,scenario,subRegion,value) %>%
+      filter(param == input$focusMapParamSelected,
+             scenario == input$focusMapScenarioSelected,
+             x == input$focusMapYearSelected) %>%
+        dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
+        dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
+                                                 TRUE~subRegion)) %>%
+        dplyr::select(-subRegionMap) %>%
+      dplyr::filter(subRegion!="South_Pacific_Islands")
+
+     # Prepare for Polygons
+    mapdf <- rmap::mapFind(dataMapFocus_raw)$subRegShapeFound;
+    mapdf <- mapdf[mapdf$subRegion %in% dataMapFocus_raw$subRegion,]; mapdf
+    mapdf@data <- mapdf@data %>%
+      left_join(dataMapFocus_raw %>%
+                  dplyr::select(subRegion,value)) %>%
+      filter(subRegion %in% unique(dataMapFocus_raw$subRegion)) %>%
+      droplevels(); mapdf
+
+    # Create legends and color scales
+    bins <- unique(argus::breaks(dataMapFocus_raw,breaks=7)[[1]]);
+    print("bins")
+    print(bins)
+    pal <- colorBin(grDevices::colorRampPalette(RColorBrewer::brewer.pal(min(9,length(bins)), "YlOrRd"))(length(bins)),
+                    domain = dataMapFocus_raw$value, bins = bins)
+
+    # Plot polygons on Leaflet
+      labels <- sprintf(
+        "<strong>%s</strong><br/>%g",
+        mapdf@data$subRegion, mapdf@data$value
+      ) %>% lapply(htmltools::HTML)
+
+      if(length(bins)>1){
+
+        initial_lat = 0
+        initial_lng = 0
+        initial_zoom = 3
+
+      mapFocus <- leaflet() %>%
+        setView(lat = initial_lat, lng = initial_lng, zoom = initial_zoom) %>%
+        addTiles() %>%
+        addPolygons(data=mapdf,
+                    group=~unique(subRegionType),
+                    fillColor = ~pal(value),
+                    fillOpacity = 0.5,
+                    opacity = 0.5,
+                    stroke = TRUE,
+                    weight = 0.5,
+                    label = labels,
+                    labelOptions = labelOptions(
+                      style = list("font-weight" = "normal", padding = "3px 8px"),
+                      textsize = "15px",
+                      direction = "auto")
+                    ) %>%
+        addLegend(pal = pal,
+                values = mapdf@data$value,
+                opacity = 0.6,
+                title = NULL,
+                position = "bottomright")}
+
+      if(length(bins)==1){
+        mapFocus <- leaflet() %>%
+          addTiles() %>%
+          addPolygons(data=mapdf,
+                      group=~unique(subRegionType),
+                      fillColor = "red",
+                      fillOpacity = 0.5,
+                      opacity = 0.5,
+                      stroke = TRUE,
+                      weight = 0.5,
+                      label = labels,
+                      labelOptions = labelOptions(
+                        style = list("font-weight" = "normal", padding = "3px 8px"),
+                        textsize = "15px",
+                        direction = "auto")
+          ) %>%
+          addLegend(colors = "red",
+                    labels = bins,
+                    opacity = 0.6,
+                    title = NULL,
+                    position = "bottomright")}
+
+    mapFocus
+
+    })
+
+  output$focusChartSum <- renderPlotly({
+
+    #ggplotly()
+    (ggplot2::ggplot(dataSumx() %>%
+                       dplyr::select(scenario, value, param, x)%>%
+                       dplyr::filter(param == input$focusMapParamSelected),
+                     aes(x=x,y=value,
+                         group=scenario,
+                         color=scenario))+
+       geom_line(size=1.25) +
+       ggplottheme +
+       geom_line() +
+       geom_point() +
+       ylab(NULL) +  xlab(NULL) + ggtitle(input$focusMapParamSelected) +
+       theme(legend.position="bottom",
+             legend.title = element_blank(),
+             plot.margin=margin(0,0,0,0,"pt"),
+             text=element_text(size=12),
+             aspect.ratio = NULL,
+             plot.title = element_text(hjust = 0.5)))%>%
+      ggplotly(tooltip = c("x","value"))%>%
+      config(displayModeBar = FALSE) %>%
+      layout(legend = list(orientation = "h", x=0,y=-0.2),
+             hovermode = "x")
+
+  })
+
+  output$focusChartBar <- renderPlotly({
+
+    dataChartPlot <- dataChartx() %>%
+      dplyr::filter(!(is.na(class) & value==0))%>%
+      dplyr::mutate(class=if_else(is.na(class),"NA",class))%>%
+      dplyr::select(scenario, value, param, class, x)%>%
+      dplyr::filter(param == input$focusMapParamSelected,
+                    scenario == input$focusMapScenarioSelected)
+
+    # Check Color Palettes
+    palAdd <- rep(c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise"),10000)
+
+    missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
+                                               names(jgcricolors::jgcricol()$pal_all)]
+    if (length(missNames) > 0) {
+      palAdd <- palAdd[1:length(missNames)]
+      names(palAdd) <- missNames
+      palCharts <- c(jgcricolors::jgcricol()$pal_all, palAdd)
+    } else{
+      palCharts <- jgcricolors::jgcricol()$pal_all
+    }
+    print(palCharts)
+
+    #ggplotly()
+    (ggplot2::ggplot(dataChartPlot,
+                     aes(x=x,y=value,
+                         group=scenario,
+                         fill=class))+
+       ggplottheme +
+       scale_fill_manual(breaks=names(palCharts),values=palCharts) +
+       scale_y_continuous(position = "left")+
+       geom_bar(position="stack", stat="identity") +
+       theme(legend.position="bottom",
+              strip.text.y = element_blank(),
+              legend.title = element_blank(),
+              legend.margin=margin(0,0,0,0,"pt"),
+              legend.key.height=unit(0, "cm"),
+              text = element_text(size = 15),
+              plot.margin=margin(0,0,0,0,"pt")) +
+      ylab(NULL) +  xlab(NULL))%>%
+      ggplotly(tooltip = c("class","x","value"))%>%
+      config(displayModeBar = FALSE) %>%
+      layout(showlegend = TRUE, legend = list(font = list(size = 10)))%>%
+      layout(legend = list(orientation = "h", x=0,y=-0.2))
+
+  })
+
+
+    } # Focus Page
+
+  #...........................
+  # Summary Plot
+  #...........................
+
+    if(T){ # Summary Plot
+
+      output$summary <- renderPlot({
+        argus::summaryPlot(NULL, 17.5, 20, dataSumx())
+      },
+      height=function(){
+        if (length(unique(dataChartx()$param))>3){
+          if(length(unique(dataChartx()$param))%%3==0){
+            multiplier = length(unique(dataChartx()$param))%/%3
+          } else {
+            multiplier = (length(unique(dataChartx()$param))%/%3)+1
+          }
+          return(multiplier*400)
+        }else{
+          return("auto")
+        }
+      }
+      )
+
+      output$downloadPlotSum <- downloadHandler(
+        filename = "summaryChart.png",
+        content = function(filename) {
+          ggsave(
+            filename,
+            plot=argus::summaryPlot(0.75, 10, 10, dataSumx()),
+            #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
+            height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
+            width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+            units="in"
+          )
+        })
+
+    } # Summary Plot
+
+  #...........................
   # Summary Plot Compare Regions
-  #---------------------------
+  #...........................
+
+    if(T){# Summary Plot Compare Regions
 
   output$summaryReg <- renderPlot({
-    summaryPlotReg(10, dataMapx(),ggplottheme, subsetRegionsx())
+    summaryPlotReg(15, dataMapx(),ggplottheme, subsetRegionsx())
   },
-  height=function(){200*length(unique(dataMapx()$param))},
-  width=function(){max(400,200*length(subsetRegionsx())+100)}
+  height=function(){300*length(unique(dataMapx()$param))}#,
+  #width=function(){max(400,300*length(subsetRegionsx())+100)}
   )
 
   output$downloadPlotSumReg <- downloadHandler(
@@ -1780,10 +1715,17 @@ server <- function(input, output, session) {
              units = "in")
     })
 
+    } # Summary Plot Compare Regions
 
-  #---------------------------
-  # Pick between Absolute and Percent Diff
-  #---------------------------
+  #...........................
+  # Bar Charts
+  #...........................
+
+    if(T){ # Bar Charts
+
+    #...........................
+    # Pick Type of Chart
+    #...........................
 
   observeEvent(input$absChart, {
     rv$absChart = 1;
@@ -1803,112 +1745,16 @@ server <- function(input, output, session) {
     rv$absDiffChart = 1;
   })
 
-  #---------------------------
-  # Chart Plot Abs Diff
-  #---------------------------
 
-  output$plotDiff <- renderPlot({
-    argus::plotDiffAbs(dataDiffAbsx(), input$scenarioRefSelected)
-  },
-  height=function(){300*length(unique(dataChartx()$param))},
-  width=function(){max(600, 400*length(unique(data()$scenario)))}
-  )
-
-
-  # #---------------------------
-  # # Chart Plot Perc
-  # #---------------------------
-  # plotPerc <- function(){
-  #   g <- 2
-  #   print("perc diff")
-  #   dataChartPlot <- dataPrcntAbsx()
-  #
-  #   plist <- list()
-  #   x = 1
-  #   for(i in 1:length(unique(dataChartPlot$param))){
-  #     # Check Color Palettes
-  #     palAdd <- c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise")
-  #
-  #     missNames <- unique(dataChartPlot$class)[!unique(dataChartPlot$class) %in%
-  #                                                names(pal_all)]
-  #     if (length(missNames) > 0) {
-  #       palAdd <- palAdd[1:length(missNames)]
-  #       names(palAdd) <- missNames
-  #       palCharts <- c(pal_all, palAdd)
-  #     } else{
-  #       palCharts <- pal_all
-  #     }
-  #     print(palCharts)
-  #
-  #     chartz <- dataChartPlot %>%
-  #       filter(param==unique(dataChartPlot$param)[i], scenario == input$scenarioRefSelected)
-  #     z<-x
-  #     plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
-  #                                        filter(param==unique(dataChartPlot$param)[i], scenario != input$scenarioRefSelected)%>%
-  #                                        droplevels(),
-  #                                      aes(x=x,y=value,
-  #                                          # group=class,
-  #                                          colour=class
-  #                                      )) +
-  #       ggplottheme +
-  #       ylab(NULL) + xlab(NULL) +
-  #       scale_color_manual(breaks=names(palCharts),values=palCharts) +
-  #       # scale_y_continuous(position = "right")+
-  #       # geom_bar(position="stack", stat="identity") +
-  #       geom_line()+
-  #       geom_point()+
-  #       scale_color_manual(breaks=names(palCharts),values=palCharts) +
-  #       facet_grid(param~scenario, scales="free",switch="y")+
-  #       theme(legend.position="bottom",
-  #             strip.text.y = element_blank(),
-  #             legend.title = element_blank(),
-  #             legend.margin=margin(0,0,0,0,"pt"),
-  #             legend.key.height=unit(0, "cm"),
-  #             text = element_text(size = 12.5),
-  #             plot.margin=margin(20,20,20,0,"pt"))
-  #     x = x+2
-  #
-  #     plist[[z]] <-  ggplot2::ggplot(chartz%>%
-  #                                      droplevels(),
-  #                                    aes(x=x,y=value,
-  #                                        group=scenario,
-  #                                        fill=class))+
-  #       ggplottheme +
-  #       xlab(NULL) +
-  #       ylab(unique(dataChartPlot$param)[i])+
-  #       scale_fill_manual(breaks=names(palCharts),values=palCharts) +
-  #       scale_y_continuous(position = "left")+
-  #       geom_bar(position="stack", stat="identity") +
-  #       facet_grid(param~scenario, scales="free",switch="y")+
-  #       theme(legend.position="bottom",
-  #             strip.text.y = element_blank(),
-  #             legend.title = element_blank(),
-  #             legend.margin=margin(0,0,0,0,"pt"),
-  #             legend.key.height=unit(0, "cm"),
-  #             text = element_text(size = 12.5),
-  #             plot.margin=margin(20,0,20,0,"pt"))
-  #   }
-  #   cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
-  # }
-
-  output$plotPerc <- renderPlot({
-    argus::plotDiffPrcnt(dataPrcntAbsx(), input$scenarioRefSelected)
-  },
-  height=function(){300*length(unique(dataChartx()$param))},
-  width=function(){max(600, 400*length(unique(data()$scenario)))}
-  )
-
-
-  #---------------------------
+  #...........................
   # Chart Plot Abs
-  #---------------------------
-
+  #...........................
 
   output$plotAbs <- renderPlot({
     argus::plotAbs(dataChartx(), input$scenarioRefSelected)
   },
-  height=function(){300*length(unique(dataChartx()$param))},
-  width=function(){max(600, 400*length(unique(data()$scenario)))}
+  height=function(){400*length(unique(dataChartx()$param))}#,
+  #width=function(){500*length(unique(data()$scenario))}
   )
 
   output$downloadPlotChart <- downloadHandler(
@@ -1924,103 +1770,57 @@ server <- function(input, output, session) {
       # max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
     })
 
-  #---------------------------
-  # Maps
-  #---------------------------
+  #...........................
+  # Chart Plot Abs Diff
+  #...........................
 
-  #---------------------------
-  # Map Analysis by Base Map
-  #---------------------------
-
-  output$mapBase <- renderPlot({
-
-    dataMap_raw <- dataMapx() %>% dplyr::ungroup() %>%
-      dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
-      dplyr::mutate(subRegion=case_when(!is.na(subRegionMap)~subRegionMap,
-                                        TRUE~subRegion)) %>%
-      dplyr::select(-subRegionMap)
-
-    plist <- list()
-    pcount = 1
-    subRegTypelist <- c()
-    for(i in unique(dataMap_raw$param)[!is.na( unique(dataMap_raw$param))]){
-
-      dataMap_raw_regions <- dataMap_raw %>%
-        dplyr::filter(subRegion!="South_Pacific_Islands")%>%
-        dplyr::filter(param == i) %>%
-        dplyr::select(subRegion) %>%
-        unique(); dataMap_raw_regions
-
-      dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
-        dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
-        dplyr::group_by(subRegion) %>%
-        dplyr::mutate(minLong = min(long),
-                      negLongSum = sum(long[which(long<=0)], na.rm=T),
-                      maxLong = max(long),
-                      posLongSum = sum(long[which(long>=0)], na.rm=T),
-                      flip = case_when(minLong<-160 & maxLong>160 ~ 1,
-                                       TRUE~0),
-                      long = case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                       (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                       TRUE~long))%>%
-        dplyr::ungroup()
-
-      if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
-        subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
-
-        prcntZoom <- 1
-        longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
-        longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
-        latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
-        latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
-
-        prcntZoom <- 0.1
-        longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
-        longLimMax <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMax
-        latLimMin <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMin
-        latLimMax <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMax
-
-        shp_bg <- argus::mapCountriesdf%>%
-          dplyr::filter(long > longLimMinbg,
-                        long < longLimMaxbg,
-                        lat > latLimMinbg,
-                        lat < latLimMaxbg);
-
-        cnames <- aggregate(cbind(long, lat) ~ subRegion, data=dataMapPlot, FUN=mean)
-
-        map <- ggplot() + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)
-        map <- map + geom_polygon(data = dataMapPlot,
-                                  aes(x = long, y = lat, group = group, fill=subRegion),
-                                  colour = "gray10", lwd=0.5, show.legend = F) +
-          coord_fixed(ratio = 1.0,ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
-          theme(panel.grid.major = element_blank(),
-                panel.grid.minor = element_blank()
-          )+
-          theme(plot.margin=margin(20,20,20,20,"pt"),
-                axis.title=element_blank(),
-                axis.text=element_blank(),
-                axis.ticks=element_blank())
-        map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = subRegion),color="black", size = 4)
-        map <- map + theme(panel.background = element_rect(fill="lightblue1")) + ggtitle(unique(dataMapPlot$subRegionType))
-        map
-
-        plist[[pcount]] <- map
-        pcount=pcount+1
-        rv$pcount <- pcount
-      }
-    }
-    rv$pcount <- pcount
-    print(rv$pcount)
-    return(cowplot::plot_grid(plotlist=plist,ncol=1,align = "v"))
-
-  }#,
-  #height=function(){300*(rv$pcount)}
+  output$plotDiff <- renderPlot({
+    argus::plotDiffAbs(dataDiffAbsx(), input$scenarioRefSelected)
+  },
+ height=function(){400*length(unique(dataChartx()$param))}#,
+ #width=function(){500*length(unique(data()$scenario))}
   )
 
-  #---------------------------
-  # Map Analysis by Scenario x Param
-  #---------------------------
+  output$plotPerc <- renderPlot({
+    argus::plotDiffPrcnt(dataPrcntAbsx(), input$scenarioRefSelected)
+  },
+  height=function(){400*length(unique(dataChartx()$param))}#,
+  #width=function(){500*length(unique(data()$scenario))}
+  )
 
+    } # Bar Charts
+
+  #...........................
+  # Maps
+  #...........................
+
+    if(T){ # Maps
+
+  # Absolute Value Map
+  output$mapAbs <- renderPlot({
+    argus::map(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataMapx())
+  },
+  height=function(){500*length(unique(dataMapx()$param))}#,
+  #width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
+  )
+
+  # Percentage Difference Map
+  output$mapPerc <- renderPlot({
+    argus::map(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
+  },
+  height=function(){500*length(unique(dataMapx()$param))}#,
+  #width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
+  )
+
+  # Absolute Difference Map
+  output$mapDiff <- renderPlot({
+    argus::map(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
+  },
+  height=function(){500*length(unique(dataMapx()$param))}#,
+  #width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
+  )
+
+  # Download
   output$downloadMap <- downloadHandler(
     file = "map.png",
     content = function(file) {
@@ -2033,41 +1833,19 @@ server <- function(input, output, session) {
       )
     })
 
-  # map <- function(flag,
-  #                 mapLegend,
-  #                 mapYear,
-  #                 scenarioRefSelected,
-  #                 dataMapx,
-  #                 dataMapz){
-  #
+    } # Maps
 
-  output$mapAbs <- renderPlot({
-    argus::map(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataMapx())
-  },
-  height=function(){225*length(unique(dataMapx()$param))},
-  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
-  )
+  } # Plotting Outputs
 
-  output$mapPerc <- renderPlot({
-    argus::map(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
-  },
-  height=function(){225*length(unique(dataMapx()$param))},
-  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
-  )
-
-  output$mapDiff <- renderPlot({
-    argus::map(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
-  },
-  height=function(){225*length(unique(dataMapx()$param))},
-  width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
-  )
-
-  #---------------------------
+  #...........................
   # Data Table
-  #---------------------------
+  #...........................
+
+  if(T) { # Data Table
+
   output$table <- renderDT(
     # Point to reactive values
-    data(),
+    dataChartx(),
     filter = "top"
   )
 
@@ -2077,9 +1855,11 @@ server <- function(input, output, session) {
       write.csv(data() , file)
     })
 
-  #---------------------------
+  } # Data Table
+
+  #...........................
   # Download All
-  #---------------------------
+  #...........................
   output$downloadAll <- downloadHandler(
     file = "all.zip",
     content = function(file) {
@@ -2125,5 +1905,8 @@ server <- function(input, output, session) {
       zip::zip(zipfile=file, files=fs)
     }
   )
-}
+
+  } # Outputs
+
+} # Close Server
 

@@ -6,6 +6,162 @@ library(magrittr)
 library(profvis)
 library(tictoc)
 library(lineprof)
+library(argus)
+library(leaflet)
+library(mapview)
+library(RColorBrewer)
+
+# factpal <- colorFactor(brewer.pal(n = 11, name ="Spectral") , gadmCHE$NAME_1)
+#
+# leaflet() %>%
+#   addPolygons(
+#     data = gadmCHE,
+#     stroke = TRUE, fillOpacity = 0.5, smoothFactor = 0.5,
+#     color = "black", opacity = 1,
+#     fillColor = ~factpal(gadmCHE$NAME_1)) %>%
+#   addProviderTiles("CartoDB.Positron", options = providerTileOptions(opacity = 1))
+
+# Single Map Leaflet
+# Raw Map Data
+#dataMapx
+regionsx = argus::constants("US52")
+#regionsx = unique(mapCountriesdf$subRegion)
+#regionsx = c("USA","China")
+dataMap_raw <- tibble::tibble(
+  subRegion=c(regionsx),
+  scenario=c(rep("scen1",length(regionsx))),
+  x=c(rep(2010,length(regionsx))),
+  param=c(rep("ag",length(regionsx))),
+  value=runif(length(regionsx)*1,0,1000)); dataMap_raw
+
+dataMap_raw <- dataMap_raw %>% filter(subRegion %in% c("CA")); dataMap_raw
+
+plot_ly(dataMap_raw,
+        x=~x,
+        y=~value,
+        name)
+
+(ggplot2::ggplot(dataMap_raw ,
+                aes(x=x,y=value,
+                    color=scenario))+
+  geom_line(size=1.25) +
+  geom_line() +
+  geom_point()+
+  ylab(NULL) +  xlab(NULL) +
+  theme(legend.position="bottom",
+        legend.title = element_blank(),
+        plot.margin=margin(20,20,20,0,"pt"),
+        text=element_text(size=12),
+        aspect.ratio = NULL) +
+  ggtitle("Scenario Compare"))%>%
+  ggplotly()%>%
+  config(displayModeBar = FALSE)
+
+# Prepare Map Data
+mapdf <- argus::mapdfFind(dataMap_raw) %>%
+  left_join(dataMap_raw %>%
+              dplyr::select(subRegion,value)) %>%
+  filter(subRegion %in% unique(dataMap_raw$subRegion)) %>%
+  group_by(subRegion, piece) %>%
+  group_split(); mapdf
+
+mapdf <- rmap::mapFind(dataMap_raw)$subRegShapeFound;
+
+mapdf <- mapdf[(mapdf$subRegion %in% dataMap_raw$subRegion),]; mapdf
+
+mapdf@data <- mapdf@data %>%
+  left_join(dataMap_raw %>%
+              dplyr::select(subRegion,value)) %>%
+  filter(subRegion %in% unique(dataMap_raw$subRegion))%>%
+  droplevels(); mapdf
+
+mapFocus <- leaflet() %>% addTiles()
+
+bins <- unique(argus::breaks(dataMap_raw,breaks=7)[[1]]); bins
+pal <- colorBin(grDevices::colorRampPalette(RColorBrewer::brewer.pal(max(3,min(9,length(bins))), "YlOrRd"))(max(3,length(bins))),
+                domain = dataMap_raw$value, bins = bins)
+
+values <- pal(dataMap_raw$value); values
+pie(rep(1,length(values)),label=names(values),col=values)
+
+labels <- sprintf(
+  "<strong>%s</strong><br/>%g",
+  mapdf@data$subRegion, mapdf@data$value
+) %>% lapply(htmltools::HTML)
+
+mapFocus %>%
+  addPolygons(data=mapdf,
+              group=~unique(subRegionType),
+              fillColor = ~pal(value),
+              fillOpacity = 0.5,
+              opacity = 0.5,
+              stroke = TRUE,
+              weight = 0.5,
+              label = labels,
+              labelOptions = labelOptions(
+               style = list("font-weight" = "normal", padding = "3px 8px"),
+               textsize = "15px",
+               direction = "auto")
+              ) %>%
+addLegend(pal = pal,
+        values = mapdf@data$value,
+        opacity = 0.6,
+        title = NULL,
+        position = "bottomright");
+
+mapFocus %>%
+  addPolygons(data=mapdf,
+              group=~unique(subRegionType),
+              fillColor = "red",
+              fillOpacity = 0.5,
+              opacity = 0.5,
+              stroke = TRUE,
+              weight = 0.5,
+              label = labels,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto")
+  ) %>%
+  addLegend(colors = "red",
+            labels = bins,
+            opacity = 0.6,
+            title = NULL,
+            position = "bottomright");
+
+
+for(i in 1:length(mapdf)){
+
+  labels <- sprintf(
+    "<strong>%s</strong><br/>%g",
+    mapdf[[i]]$subRegion, mapdf[[i]]$value
+  ) %>% lapply(htmltools::HTML)
+
+mapFocus <- mapFocus %>%
+  addPolygons(data=mapdf[[i]],
+              group=~unique(subRegionType),
+              lat=~lat,
+              lng=~long,
+              fillColor = ~pal(value),
+              fillOpacity = 0.5,
+              opacity = 0.5,
+              #stroke = TRUE,
+              #weight = 0.5,
+              #label = labels,
+              #labelOptions = labelOptions(
+              #  style = list("font-weight" = "normal", padding = "3px 8px"),
+              #  textsize = "15px",
+              #  direction = "auto")
+)
+}
+
+mapFocus <- mapFocus %>%
+  addLegend(pal = pal,
+            values = dataMap_raw$value,
+            opacity = 0.9,
+            title = NULL,
+            position = "bottomright");
+mapFocus
 
 # Raw Map Data
 #dataMapx

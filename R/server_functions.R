@@ -221,10 +221,11 @@ summaryPlotReg <- function(titletext,
       facet_grid(param~subRegion, scales="free",switch="y",
                  labeller = labeller(param = label_wrap_gen(15))
       )+
-      theme(legend.position="right",
-            legend.text=element_text(size=titletext),
+      theme(legend.position="top",
+            legend.justification='left',
+            text = element_text(size = 15),
             legend.title = element_blank(),
-            plot.margin=margin(20,20,20,20,"pt"))}
+            plot.margin=margin(10,10,10,10,"pt"))}
 
   cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
 }
@@ -240,7 +241,9 @@ summaryPlotReg <- function(titletext,
 #' @import ggplot2
 #' @export
 
-breaks <- function(dataMap_raw_param, breaks_n){
+breaks <- function(dataMap_raw_param = NULL,
+                   breaks_n = 7){
+
   breaks_pretty <- scales::pretty_breaks(n=breaks_n)(dataMap_raw_param$value); breaks_pretty
   breaks_kmean <- sort(as.vector((stats::kmeans(dataMap_raw_param$value,
                                                 centers=max(1,
@@ -261,9 +264,10 @@ breaks <- function(dataMap_raw_param, breaks_n){
   breaks_kmean <- signif(breaks_kmean,animLegendDigits); breaks_kmean
 
   if(!min(dataMap_raw_param$value) %in% breaks_kmean){
-    breaks_kmean[breaks_kmean==min(breaks_kmean,na.rm=T)] <- signif(floor(min(dataMap_raw_param$value)),animLegendDigits)};breaks_kmean
+    breaks_kmean <- sort(c(breaks_kmean,signif(floor(min(dataMap_raw_param$value)))))};breaks_kmean
   if(!max(dataMap_raw_param$value) %in% breaks_kmean){
-    breaks_kmean[breaks_kmean==max(breaks_kmean,na.rm=T)] <- signif(ceiling(max(dataMap_raw_param$value)),animLegendDigits)};breaks_kmean
+    breaks_kmean <- sort(c(breaks_kmean,signif(ceiling(max(dataMap_raw_param$value)))))};breaks_kmean
+
 
   return(list(breaks_kmean, breaks_pretty))
 }
@@ -290,7 +294,7 @@ map <- function(flag,
                dataMapz){
 
   # Initialize
-  NULL->long->lat->group->scenario->rv->brks->subRegionMap
+  NULL->long->lat->group->scenario->rv->brks->subRegionMap->longLimMinbg->longLimMaxbg->latLimMinbg->latLimMaxbg
 
   gas <- 2
 
@@ -383,7 +387,7 @@ map <- function(flag,
                 legend.title = element_blank(),
                 strip.text.y = element_blank(),
                 plot.margin=margin(0,0,0,0,"pt"),
-                axis.title=element_text(10),
+                text = element_text(size = 15),
                 axis.text=element_blank(),
                 axis.ticks=element_blank())
         if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
@@ -497,7 +501,7 @@ map <- function(flag,
                 legend.title = element_blank(),
                 strip.text.y = element_blank(),
                 plot.margin=margin(0,0,0,0,"pt"),
-                axis.title=element_text(10),
+                text = element_text(size = 15),
                 axis.text=element_blank(),
                 axis.ticks=element_blank())
         if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
@@ -621,7 +625,7 @@ process_map <- function(dataMap_raw,
 
 mapBase<- function(dataMapx){
 
-  NULL->long->lat->group->aggregate->param->subRegionMap->param->subRegion
+  NULL->long->lat->group->aggregate->param->subRegionMap->param->subRegion->longLimMinbg->longLimMaxbg->latLimMinbg->latLimMaxbg
 
   dataMap_raw <- dataMapx %>% dplyr::ungroup() %>%
     dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
@@ -654,29 +658,9 @@ mapBase<- function(dataMapx){
                                      TRUE~long))%>%
       dplyr::ungroup()
 
-    dataMapPlot <- argus::mapdfFind(dataMap_raw_regions)%>%
-      dplyr::filter(subRegion %in% dataMap_raw_regions$subRegion)%>%
-      dplyr::group_by(subRegion) %>%
-      dplyr::mutate(minLong = min(long),
-                    negLongSum = sum(long[which(long<=0)], na.rm=T),
-                    maxLong = max(long),
-                    posLongSum = sum(long[which(long>=0)], na.rm=T),
-                    flip = dplyr::case_when(minLong<-160 & maxLong>160 ~ 1,
-                                     TRUE~0),
-                    long = dplyr::case_when((abs(posLongSum) > abs(negLongSum)) & (long < 0) & flip ==1 ~ long+360,
-                                     (abs(posLongSum) < abs(negLongSum)) & (long > 0) & flip ==1 ~ long-360,
-                                     TRUE~long))%>%
-      dplyr::ungroup()
-
     if(!any(unique(dataMapPlot$subRegionType) %in% subRegTypelist)){
 
       subRegTypelist[pcount] <- unique(dataMapPlot$subRegionType)
-
-      prcntZoom <- 1
-      longLimMinbg <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMinbg
-      longLimMaxbg <- max(dataMapPlot$long)+abs(max(dataMapPlot$long))*prcntZoom;longLimMaxbg
-      latLimMinbg <- min(dataMapPlot$lat)-abs(min(dataMapPlot$lat))*prcntZoom;latLimMinbg
-      latLimMaxbg <- max(dataMapPlot$lat)+abs(max(dataMapPlot$lat))*prcntZoom;latLimMaxbg
 
       prcntZoom <- 0.1
       longLimMin <- min(dataMapPlot$long)-abs(min(dataMapPlot$long))*prcntZoom;longLimMin
@@ -741,7 +725,6 @@ summaryPlot <- function(aspectratio,
     facet_wrap(.~param, scales="free", ncol = 3,
                labeller = labeller(param = label_wrap_gen(15)))+
     theme(legend.position="top",
-          legend.text=element_text(size=titletext),
           legend.title = element_blank(),
           plot.margin=margin(20,20,20,0,"pt"),
           text=element_text(size=textsize),
@@ -772,7 +755,7 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
 
     dataChartPlot <- dataChartPlot %>%
       dplyr::filter(!(is.na(class) & value==0))%>%
-      dplyr::mutate(class=if_else(is.na(class),"NA",class))
+      dplyr::mutate(class=dplyr::if_else(is.na(class),"NA",class))
 
     # Check Color Palettes
     palAdd <- rep(c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise"),1000)
@@ -812,7 +795,7 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
             strip.text.y = element_blank(),
             legend.margin=margin(0,0,0,0,"pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 12.5),
+            text = element_text(size = 15),
             plot.margin=margin(20,20,20,0,"pt"))
     x = x+2
 
@@ -834,7 +817,7 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
             legend.title = element_blank(),
             legend.margin=margin(0,0,0,0,"pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 12.5),
+            text = element_text(size = 15),
             plot.margin=margin(20,0,20,0,"pt"))
   }
   cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
@@ -862,7 +845,7 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
 
     dataChartPlot <- dataChartPlot %>%
       dplyr::filter(!(is.na(class) & value==0))%>%
-      dplyr::mutate(class=if_else(is.na(class),"NA",class))
+      dplyr::mutate(class=dplyr::if_else(is.na(class),"NA",class))
 
     # Check Color Palettes
     palAdd <- rep(c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise"),1000)
@@ -902,7 +885,7 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
             strip.text.y = element_blank(),
             legend.margin=margin(0,0,0,0,"pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 12.5),
+            text = element_text(size = 15),
             plot.margin=margin(20,20,20,0,"pt"))
     x = x+2
 
@@ -924,7 +907,7 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
             legend.title = element_blank(),
             legend.margin=margin(0,0,0,0,"pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 12.5),
+            text = element_text(size = 15),
             plot.margin=margin(20,0,20,0,"pt"))
   }
   cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
@@ -950,7 +933,7 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected){
 
     dataChartPlot <- dataChartPlot %>%
       dplyr::filter(!(is.na(class) & value==0))%>%
-      dplyr::mutate(class=if_else(is.na(class),"NA",class))
+      dplyr::mutate(class=dplyr::if_else(is.na(class),"NA",class))
 
     # Check Color Palettes
     palAdd <- rep(c("firebrick3","dodgerblue3","forestgreen","black","darkgoldenrod3","darkorchid3","gray50", "darkturquoise"),10000)
@@ -991,7 +974,7 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected){
             legend.title = element_blank(),
             legend.margin=margin(0,0,0,0,"pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 12.5),
+            text = element_text(size = 15),
             plot.margin=margin(20,0,20,0,"pt"))
   }
   cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
