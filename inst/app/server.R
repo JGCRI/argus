@@ -30,7 +30,7 @@ library(plotly)
 #...........................
 
 options(shiny.maxRequestSize=100*1024^2)
-options(shiny.trace = TRUE)
+#options(shiny.trace = TRUE)
 pal_all <- argus::mappings()$pal_all
 
 #...........................
@@ -43,9 +43,175 @@ server <- function(input, output, session) {
   # To collapse code for easy reading place cursor here and enter: ALT+0
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
 
+  #...........................
+  # Bookmark
+  #...........................
+  if(T){
+
+    #...........................
+    # Bookmark modal
+    #...........................
+    observeEvent(input$loadbookmark, {
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          fileInput(
+            inputId = "readbookmark",
+            label = "Upload rds",
+            accept = c(".rds"),
+            multiple = TRUE,
+            width = "100%"
+          ),
+          fluidRow(
+            column(6,
+                   div(
+                     downloadButton(
+                       'bookmark',
+                       "RDS",
+                       class = "download_button"
+                     ),
+                     style = "float:right;width=100%"
+                   ))
+            ,
+            column(6,
+                   div(
+
+                     #bookmarkButton(),
+                     actionLink(inputId="._bookmark_",
+                                label="URL",
+                                class = "btn btn-default shiny-download-link download_button",
+                                icon = icon("link","fa-1x")
+                     ),
+                     style = "float:left;width=100%"
+                   )
+            )
+          )
+        )
+      )
+    }) #Bookmark modal
+
+    #...........................
+    # URL Bookmark
+    #...........................
+    enableBookmarking(store = "server")
+    setBookmarkExclude(c("urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "inputz"))
+
+    onBookmark(function(state) {
+      state$values$data <- rv$data
+    }) #URL bookmark onbookmark
+
+    onRestore(function(state) {
+      print(state)
+      rv$data <- state$values$data
+      updatePickerInput(
+        inputId = "mapLegend",
+        session=session,
+        selected = state$input$mapLegend
+      )
+    }) #URL bookmark onRestore
+
+    #...........................
+    # RDS Bookmark
+    #...........................
+    output$bookmark <- downloadHandler(
+      filename <- "bookmark.rds",
+      content = function(file){
+        state <- isolate(reactiveValuesToList(input))
+        state$data <- rv$data
+        saveRDS(state, file)
+      }
+    ) #rds bookmark download handler
+
+    observeEvent(input$readbookmark, {
+      removeModal()
+      state <- readRDS(input$readbookmark$datapath)
+      rv$data <- state$data
+
+      settingsmapLegend <- state$mapLegend
+      if((settingsmapLegend %in% c("kmean","pretty")) && !is.null(settingsmapLegend)){
+        updatePickerInput(
+          inputId = "mapLegend",
+          session=session,
+          selected = settingsmapLegend
+        )
+        session$sendCustomMessage("setsetting", c("mapLegend", settingsmapLegend))
+      } #mapLegend
+
+
+      settingsmapYear <- state$mapYear
+      if(!is.null(settingsmapYear) && (settingsmapYear %in% dataMapx()$x)){
+        updateSliderInput(
+          inputId = "mapYear",
+          session=session,
+          min = min(dataMapx()$x),
+          max = max(dataMapx()$x),
+          value=settingsmapYear
+        )
+        session$sendCustomMessage("setsetting", c("mapYear", settingsmapYear))
+      } #mapYear
+
+
+      settingsSubsetRegions <- state$subsetRegions
+      if(any(unique(settingsSubsetRegions) %in% unique(data()$subRegion))){
+        print("c==c")
+        updatePickerInput(
+          inputId = "subsetRegions",
+          session=session,
+          choices = unique(data()$subRegion),
+          selected = state$subsetRegions)
+        session$sendCustomMessage("setsetting", c("subsetRegions", settingsSubsetRegions))
+        print(state$subsetRegions)
+      } #subsetRegions
+
+
+      settingsRegions <- state$regionsSelect
+      if(any(unique(settingsRegions) %in% unique(data()$subRegion))){
+        updatePickerInput(
+          session=session,
+          inputId = "regionsSelected",
+          selected = unique(settingsRegions)[unique(settingsRegions) %in% unique(data()$subRegion)],
+        )
+      } # Regions Update
+
+      settingsParams <- state$paramsSelect
+      if(any(unique(settingsParams) %in% unique(data()$param))){
+        updatePickerInput(
+          session=session,
+          inputId = "paramsSelected",
+          selected = unique(settingsParams)[unique(settingsParams) %in% unique(data()$param)],
+        )
+      } # Parameters Update
+
+
+      settingsScenario <- state$scenariosSelect
+      if(any(unique(settingsScenario) %in% unique(data()$scenario))){
+        updatePickerInput(
+          session=session,
+          inputId = "scenariosSelected",
+          selected = unique(settingsScenario)[unique(settingsScenario) %in% unique(data()$scenario)],
+        )
+      }  # Scenario Update
+
+
+      settingsRefScenario <- state$scenarioRefSelect
+      if(any(unique(settingsRefScenario) %in% unique(data()$scenario))){
+        updatePickerInput(
+          session=session,
+          inputId = "scenarioRefSelected",
+          selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
+        )
+      } # Reference Scenario Update
+    }) #rds bookmark upload handler
+
+
+
+    } # Bookmark
+
 
   #...........................
-  # Initial Settings
+  # Initial Setting
   #...........................
 
   if(T){ # Initial Settings

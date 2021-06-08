@@ -1,3 +1,6 @@
+#bookmark files
+/inst/app/shiny_bookmarks
+
 # History files
 .Rhistory
 .Rapp.history
