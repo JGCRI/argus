@@ -24,6 +24,7 @@ library(RColorBrewer)
 library(grDevices)
 library(rmap)
 library(plotly)
+library(sp)
 
 #...........................
 # Options
@@ -1747,8 +1748,22 @@ server <- function(input, output, session) {
         dplyr::select(-subRegionMap) %>%
       dplyr::filter(subRegion!="South_Pacific_Islands")
 
+      if(length(dataMapFocus_raw$x)==0){
+        my_title <- tags$p(tags$style("p {color: black; font-size:22px}"),tags$b("There is no data for this year"))
+
+        mapFocus <- leaflet() %>%
+#          setView(lat = initial_lat, lng = initial_lng, zoom = initial_zoom) %>%
+          addTiles()%>%
+          addControl(my_title, position = "topleft" )
+        return(mapFocus)
+      }
+
+      mapdf <- rmap::mapFind(dataMapFocus_raw)$subRegShapeFound;
+
      # Prepare for Polygons
-    mapdf <- rmap::mapFind(dataMapFocus_raw)$subRegShapeFound;
+
+
+
     mapdf <- mapdf[mapdf$subRegion %in% dataMapFocus_raw$subRegion,]; mapdf
     mapdf@data <- mapdf@data %>%
       left_join(dataMapFocus_raw %>%
@@ -1771,9 +1786,16 @@ server <- function(input, output, session) {
 
       if(length(bins)>1){
 
-        initial_lat = 0
-        initial_lng = 0
-        initial_zoom = 3
+        coords <- coordinates(mapdf)
+
+        lat_min = min(coords[,2])
+        lat_max = max(coords[,2])
+        lng_min = min(coords[,1])
+        lng_max = max(coords[,1])
+
+        initial_lat = (lat_max + lat_min )/2
+        initial_lng = (lng_max + lng_min)/2
+        initial_zoom = 2
 
       mapFocus <- leaflet() %>%
         setView(lat = initial_lat, lng = initial_lng, zoom = initial_zoom) %>%
@@ -1817,7 +1839,9 @@ server <- function(input, output, session) {
                     labels = bins,
                     opacity = 0.6,
                     title = NULL,
-                    position = "bottomright")}
+                    position = "bottomright")
+        }
+
 
     mapFocus
 
