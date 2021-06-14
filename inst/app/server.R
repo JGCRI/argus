@@ -24,13 +24,14 @@ library(RColorBrewer)
 library(grDevices)
 library(rmap)
 library(plotly)
+library(sp)
 
 #...........................
 # Options
 #...........................
 
 options(shiny.maxRequestSize=100*1024^2)
-options(shiny.trace = TRUE)
+#options(shiny.trace = TRUE)
 pal_all <- argus::mappings()$pal_all
 
 #...........................
@@ -43,9 +44,218 @@ server <- function(input, output, session) {
   # To collapse code for easy reading place cursor here and enter: ALT+0
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
 
+  #...........................
+  # Bookmark
+  #...........................
+  if(T){
+
+    #...........................
+    # Bookmark modal
+    #...........................
+
+    #Bookmark modal
+    observeEvent(input$loadbookmark, {
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          fileInput(
+            inputId = "readbookmark",
+            label = "Upload rds",
+            accept = c(".rds"),
+            multiple = TRUE,
+            width = "100%"
+          ),
+          fluidRow(
+            column(6,
+                   div(
+                     downloadButton(
+                       'bookmark',
+                       "RDS",
+                       class = "download_button"
+                     ),
+                     style = "float:right;width=100%"
+                   ))
+            ,
+            column(6,
+                   div(
+
+                     #bookmarkButton(),
+                     actionLink(inputId="._bookmark_",
+                                label="URL",
+                                class = "btn btn-default shiny-download-link download_button",
+                                icon = icon("link","fa-1x")
+                     ),
+                     style = "float:left;width=100%"
+                   )
+            )
+          )
+        )
+      )
+    })
+
+    #...........................
+    # URL Bookmark
+    #...........................
+    enableBookmarking(store = "server")
+    setBookmarkExclude(c("urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "inputz"))
+
+    #URL bookmark onbookmark
+    onBookmark(function(state) {
+      state$values$data <- rv$data
+    })
+
+    #URL bookmark onRestore
+    onRestore(function(state) {
+      print(state)
+      rv$data <- state$values$data
+      updatePickerInput(
+        inputId = "mapLegend",
+        session=session,
+        selected = state$input$mapLegend
+      )
+    })
+
+    #...........................
+    # RDS Bookmark
+    #...........................
+
+    #rds bookmark download handler
+    output$bookmark <- downloadHandler(
+      filename <- "bookmark.rds",
+      content = function(file){
+        state <- isolate(reactiveValuesToList(input))
+        state$data <- rv$data
+        saveRDS(state, file)
+      }
+    )
+
+    #rds bookmark upload handler
+    observeEvent(input$readbookmark, {
+      removeModal()
+      state <- readRDS(input$readbookmark$datapath)
+      rv$data <- state$data
+
+    #focusMapScenarioSelected
+    settingfocusMapScenarioSelected <- state$focusMapScenarioSelected
+    if(( settingfocusMapScenarioSelected %in% unique(data()$scenario)) && !is.null(settingfocusMapScenarioSelected)){
+      updatePickerInput(
+        inputId = "focusMapScenarioSelected",
+        session=session,
+        selected = settingfocusMapScenarioSelected
+      )
+      session$sendCustomMessage("setsetting", c("focusMapScenarioSelected", settingfocusMapScenarioSelected))
+    }
+
+    #focusMapScenarioSelected
+    settingfocusMapYearSelected <- state$focusMapYearSelected
+    if((settingfocusMapYearSelected %in% dataMapx()$x) && !is.null(settingfocusMapScenarioSelected)){
+      updatePickerInput(
+        inputId = "focusMapYearSelected",
+        session=session,
+        selected = settingfocusMapYearSelected
+      )
+      session$sendCustomMessage("setsetting", c("focusMapYearSelected", settingfocusMapYearSelected))
+    }
+
+    #focusMapScenarioSelected
+    settingfocusMapParamSelected  <- state$focusMapParamSelected
+    if(( settingfocusMapParamSelected %in% unique(dataMapx()$param)) && !is.null(settingfocusMapParamSelected)){
+      updatePickerInput(
+        inputId = "focusMapParamSelected",
+        session=session,
+        selected = settingfocusMapParamSelected
+      )
+      session$sendCustomMessage("setsetting", c("focusMapParamSelected", settingfocusMapParamSelected))
+    }
+
+
+      #mapLegend
+      settingsmapLegend <- state$mapLegend
+      if((settingsmapLegend %in% c("kmean","pretty")) && !is.null(settingsmapLegend)){
+        updatePickerInput(
+          inputId = "mapLegend",
+          session=session,
+          selected = settingsmapLegend
+        )
+        session$sendCustomMessage("setsetting", c("mapLegend", settingsmapLegend))
+      }
+
+      #mapYear
+      settingsmapYear <- state$mapYear
+      if(!is.null(settingsmapYear) && (settingsmapYear %in% dataMapx()$x)){
+        updateSliderInput(
+          inputId = "mapYear",
+          session=session,
+          min = min(dataMapx()$x),
+          max = max(dataMapx()$x),
+          value=settingsmapYear
+        )
+        session$sendCustomMessage("setsetting", c("mapYear", settingsmapYear))
+      }
+
+      #subsetRegions
+      settingsSubsetRegions <- state$subsetRegions
+      if(any(unique(settingsSubsetRegions) %in% unique(data()$subRegion))){
+        print("c==c")
+        updatePickerInput(
+          inputId = "subsetRegions",
+          session=session,
+          choices = unique(data()$subRegion),
+          selected = state$subsetRegions)
+        session$sendCustomMessage("setsetting", c("subsetRegions", settingsSubsetRegions))
+        print(state$subsetRegions)
+      }
+
+      # Regions Update
+      settingsRegions <- state$regionsSelect
+      if(any(unique(settingsRegions) %in% unique(data()$subRegion))){
+        updatePickerInput(
+          session=session,
+          inputId = "regionsSelected",
+          selected = unique(settingsRegions)[unique(settingsRegions) %in% unique(data()$subRegion)],
+        )
+      }
+
+      # Parameters Update
+      settingsParams <- state$paramsSelect
+      if(any(unique(settingsParams) %in% unique(data()$param))){
+        updatePickerInput(
+          session=session,
+          inputId = "paramsSelected",
+          selected = unique(settingsParams)[unique(settingsParams) %in% unique(data()$param)],
+        )
+      }
+
+      # Scenario Update
+      settingsScenario <- state$scenariosSelect
+      if(any(unique(settingsScenario) %in% unique(data()$scenario))){
+        updatePickerInput(
+          session=session,
+          inputId = "scenariosSelected",
+          selected = unique(settingsScenario)[unique(settingsScenario) %in% unique(data()$scenario)],
+        )
+      }
+
+      # Reference Scenario Update
+      settingsRefScenario <- state$scenarioRefSelect
+      if(any(unique(settingsRefScenario) %in% unique(data()$scenario))){
+        updatePickerInput(
+          session=session,
+          inputId = "scenarioRefSelected",
+          selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
+        )
+      }
+    })
+
+
+
+    } # Bookmark
+
 
   #...........................
-  # Initial Settings
+  # Initial Setting
   #...........................
 
   if(T){ # Initial Settings
@@ -980,7 +1190,7 @@ server <- function(input, output, session) {
         inputId = "subsetRegions",
         label = "Select Regions to Compare",
         choices = unique(dataMap()$subRegion),
-        selected = unique(dataMap()$subRegion)[1:4],
+        selected = subsetRegionsx(),
         multiple = TRUE,
         options = list(
           `actions-box` = TRUE,
@@ -990,11 +1200,20 @@ server <- function(input, output, session) {
         ))
     })
 
+    # Reactive year select Select based on inputs
+    mapYearx <- reactive({
+      if(!is.null(input$mapYear)){
+        return(input$mapYear)
+      }else{
+        return(sort(unique(dataMapx()$x))[round(length(sort(unique(dataMapx()$x)))/2)])
+      }
+    })
+
     # Select Years for Map
     output$selectMapYear = renderUI({
       sliderInput("mapYear", label ="Year", min = min(dataMap()$x),
                   max = max(dataMap()$x), step = 5,
-                  value=sort(unique(dataMap()$x))[round(length(sort(unique(dataMap()$x)))/2)], sep="",
+                  value=mapYearx(), sep="",
                   animate =F)
     })
 
@@ -1048,6 +1267,15 @@ server <- function(input, output, session) {
       }
     })
 
+    #focusMapParamSelected helper function
+    focusMapScenariox <- reactive({
+      if(!is.null(input$focusMapScenarioSelected)){
+        return(input$focusMapParamSelected)
+      }else{
+        return(unique(dataMapx()$scenario)[1])
+      }
+    })
+
     # Focus maps Inputs
     # Scenario Select
     output$selectFocusMapScenario = renderUI({
@@ -1055,8 +1283,17 @@ server <- function(input, output, session) {
         inputId = "focusMapScenarioSelected",
         label = "Scenario",
         choices = unique(dataMapx()$scenario),
-        selected = unique(dataMapx()$scenario)[1],
+        selected =unique(dataMapx()$scenario)[1],
         multiple = FALSE)
+    })
+
+    #sfocusMapParamSelected helper function
+    focusMapParamSelectedx <- reactive({
+      if(!is.null(input$focusMapParamSelected)){
+        return(input$focusMapParamSelected)
+      }else{
+        return(unique(dataMapx()$param)[1])
+      }
     })
 
     # Parameters Select
@@ -1065,8 +1302,16 @@ server <- function(input, output, session) {
         inputId = "focusMapParamSelected",
         label = "Parameter",
         choices =  unique(dataMapx()$param),
-        selected = unique(dataMapx()$param)[1],
+        selected = focusMapParamSelectedx(),
         multiple = FALSE)
+    })
+
+    selectFocusMapYearx <-  reactive({
+     if (is.null(input$focusMapYearSelected)){
+        return(sort(unique(dataMap()$x))[round(length(sort(unique(dataMap()$x)))/2)])
+      } else{
+        return(input$focusMapYearSelected)
+      }
     })
 
     # Select Years for Map
@@ -1075,7 +1320,8 @@ server <- function(input, output, session) {
                   label ="Year",
                   min = min(data()$x),
                   max = max(data()$x), step = 5,
-                  value=sort(unique(dataMap()$x))[round(length(sort(unique(dataMap()$x)))/2)], sep="",
+                  value=selectFocusMapYearx(),
+                  sep="",
                   animate =F)
     })
 
@@ -1502,8 +1748,22 @@ server <- function(input, output, session) {
         dplyr::select(-subRegionMap) %>%
       dplyr::filter(subRegion!="South_Pacific_Islands")
 
+      if(length(dataMapFocus_raw$x)==0){
+        my_title <- tags$p(tags$style("p {color: black; font-size:22px}"),tags$b("There is no data for this year"))
+
+        mapFocus <- leaflet() %>%
+#          setView(lat = initial_lat, lng = initial_lng, zoom = initial_zoom) %>%
+          addTiles()%>%
+          addControl(my_title, position = "topleft" )
+        return(mapFocus)
+      }
+
+      mapdf <- rmap::mapFind(dataMapFocus_raw)$subRegShapeFound;
+
      # Prepare for Polygons
-    mapdf <- rmap::mapFind(dataMapFocus_raw)$subRegShapeFound;
+
+
+
     mapdf <- mapdf[mapdf$subRegion %in% dataMapFocus_raw$subRegion,]; mapdf
     mapdf@data <- mapdf@data %>%
       left_join(dataMapFocus_raw %>%
@@ -1526,9 +1786,16 @@ server <- function(input, output, session) {
 
       if(length(bins)>1){
 
-        initial_lat = 0
-        initial_lng = 0
-        initial_zoom = 3
+        coords <- coordinates(mapdf)
+
+        lat_min = min(coords[,2])
+        lat_max = max(coords[,2])
+        lng_min = min(coords[,1])
+        lng_max = max(coords[,1])
+
+        initial_lat = (lat_max + lat_min )/2
+        initial_lng = (lng_max + lng_min)/2
+        initial_zoom = 2
 
       mapFocus <- leaflet() %>%
         setView(lat = initial_lat, lng = initial_lng, zoom = initial_zoom) %>%
@@ -1572,7 +1839,9 @@ server <- function(input, output, session) {
                     labels = bins,
                     opacity = 0.6,
                     title = NULL,
-                    position = "bottomright")}
+                    position = "bottomright")
+        }
+
 
     mapFocus
 
@@ -1809,7 +2078,6 @@ server <- function(input, output, session) {
     argus::map(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
   },
   height=function(){500*length(unique(dataMapx()$param))}#,
-  #width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
   )
 
   # Absolute Difference Map
