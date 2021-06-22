@@ -151,10 +151,12 @@ server <- function(input, output, session) {
     #focusMapScenarioSelected
     settingfocusMapYearSelected <- state$focusMapYearSelected
     if((settingfocusMapYearSelected %in% dataMapx()$x) && !is.null(settingfocusMapScenarioSelected)){
-      updatePickerInput(
+      updateSliderInput(
         inputId = "focusMapYearSelected",
         session=session,
-        selected = settingfocusMapYearSelected
+        min = min(dataMapx()$x),
+        max = max(dataMapx()$x),
+        value=settingfocusMapYearSelected
       )
       session$sendCustomMessage("setsetting", c("focusMapYearSelected", settingfocusMapYearSelected))
     }
@@ -1270,7 +1272,7 @@ server <- function(input, output, session) {
     #focusMapParamSelected helper function
     focusMapScenariox <- reactive({
       if(!is.null(input$focusMapScenarioSelected)){
-        return(input$focusMapParamSelected)
+        return(input$focusMapScenarioSelected)
       }else{
         return(unique(dataMapx()$scenario)[1])
       }
@@ -1310,7 +1312,7 @@ server <- function(input, output, session) {
      if (is.null(input$focusMapYearSelected)){
         return(sort(unique(dataMap()$x))[round(length(sort(unique(dataMap()$x)))/2)])
       } else{
-        return(input$focusMapYearSelected)
+        return(isolate(input$focusMapYearSelected))
       }
     })
 
@@ -1322,7 +1324,7 @@ server <- function(input, output, session) {
                   max = max(data()$x), step = 5,
                   value=selectFocusMapYearx(),
                   sep="",
-                  animate =F)
+                  animate =T)
     })
 
   } # Select Reactive Inputs
@@ -1739,7 +1741,7 @@ server <- function(input, output, session) {
     dataMapFocus_raw <- dataMapx() %>%
       dplyr::ungroup() %>%
       dplyr::select(x,param,scenario,subRegion,value) %>%
-      filter(param == input$focusMapParamSelected,
+      filter(param == focusMapParamSelectedx(),
              scenario == input$focusMapScenarioSelected,
              x == input$focusMapYearSelected) %>%
         dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
@@ -1852,7 +1854,7 @@ server <- function(input, output, session) {
     #ggplotly()
     (ggplot2::ggplot(dataSumx() %>%
                        dplyr::select(scenario, value, param, x)%>%
-                       dplyr::filter(param == input$focusMapParamSelected),
+                       dplyr::filter(param == focusMapParamSelectedx()),
                      aes(x=x,y=value,
                          group=scenario,
                          color=scenario))+
@@ -1860,7 +1862,6 @@ server <- function(input, output, session) {
        ggplottheme +
        geom_line() +
        geom_point() +
-       ylab(NULL) +  xlab(NULL) + ggtitle(input$focusMapParamSelected) +
        theme(legend.position="bottom",
              legend.title = element_blank(),
              plot.margin=margin(0,0,0,0,"pt"),
@@ -1880,7 +1881,7 @@ server <- function(input, output, session) {
       dplyr::filter(!(is.na(class) & value==0))%>%
       dplyr::mutate(class=if_else(is.na(class),"NA",class))%>%
       dplyr::select(scenario, value, param, class, x)%>%
-      dplyr::filter(param == input$focusMapParamSelected,
+      dplyr::filter(param == focusMapParamSelectedx(),
                     scenario == input$focusMapScenarioSelected)
 
     # Check Color Palettes
