@@ -144,13 +144,13 @@ ui <- fluidPage(
                            div(align="center",
                                 tabsetPanel(type = "tabs",
                                       tabPanel("Absolute Value",
-                                               div(class="charts",plotOutput(outputId = "plotAbs", width = "100%", height="100%"))
+                                               div(class="charts",plotOutput(outputId = "plotAbs", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Absolute Difference",
-                                               div(class="charts",plotOutput(outputId = "plotDiff", width = "100%", height="100%"))
+                                               div(class="charts",plotOutput(outputId = "plotDiff", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Percent Difference",
-                                               div(class="charts",plotOutput(outputId = "plotPerc", width = "100%", height="100%"))
+                                               div(class="charts",plotOutput(outputId = "plotPerc", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       )
                                 )
                            )
@@ -172,15 +172,15 @@ ui <- fluidPage(
                                            tabPanel("Absolute Value",
                                                     div(class="charts",
                                                         br(),
-                                                        plotOutput(outputId = "mapAbs", width = "100%", height="100%"))),
+                                                        plotOutput(outputId = "mapAbs", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;")),
                                            tabPanel("Absolute Difference",
                                                     div(class="charts",
                                                         br(),
-                                                        plotOutput(outputId = "mapDiff", width = "100%", height="100%"))),
+                                                        plotOutput(outputId = "mapDiff", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;")),
                                            tabPanel("Percent Difference",
                                                     div(class="charts",
                                                         br(),
-                                                        plotOutput(outputId = "mapPerc", width = "100%", height="100%")))
+                                                        plotOutput(outputId = "mapPerc", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;"))
                                                     )
                                ),
                   #---------------------------

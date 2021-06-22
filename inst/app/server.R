@@ -966,7 +966,7 @@ server <- function(input, output, session) {
     # Reactive year select Select based on inputs
     mapYearx <- reactive({
       if(!is.null(input$mapYear)){
-        return(input$mapYear)
+        return(isolate(input$mapYear))
       }else{
         return(sort(unique(dataMapx()$x))[round(length(sort(unique(dataMapx()$x)))/2)])
       }
@@ -1826,27 +1826,44 @@ server <- function(input, output, session) {
   #...........................
 
     if(T){ # Maps
-
   # Absolute Value Map
   output$mapAbs <- renderPlot({
     argus::map(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataMapx())
-  },
-  height=function(){500*length(unique(dataMapx()$param))}#,
+  }
+  ,height=function(){
+    if (length(unique(scenariosSelectedx()))<=5){
+      return(300*length(unique((dataMapx()$param))))
+    }else{
+      return(200*length(unique((dataMapx()$param))))
+    }
+  }
   #width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
   )
 
   # Percentage Difference Map
   output$mapPerc <- renderPlot({
     argus::map(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
-  },
-  height=function(){500*length(unique(dataMapx()$param))}#,
+  }
+  ,height=function(){
+    if (length(unique(scenariosSelectedx()))<=5){
+      return(300*length(unique((dataMapx()$param))))
+    }else{
+      return(200*length(unique((dataMapx()$param))))
+    }
+  }
   )
 
   # Absolute Difference Map
   output$mapDiff <- renderPlot({
     argus::map(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
-  },
-  height=function(){500*length(unique(dataMapx()$param))}#,
+  }
+  ,height=function(){
+      if (length(unique(scenariosSelectedx()))<=5){
+        return(300*length(unique((dataMapx()$param))))
+      }else{
+        return(200*length(unique((dataMapx()$param))))
+      }
+    }
   #width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
   )
 
