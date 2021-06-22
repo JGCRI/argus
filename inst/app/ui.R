@@ -202,7 +202,6 @@ ui <- fluidPage(
     div(actionButton(inputId="toggleSidebar", label="Inputs", icon = icon("caret-up","fa-1x"),class = "download_button_input")),
     div(actionLink(inputId='github', label='',class = "icon", icon = icon("github","fa-1x"),onclick ="window.open('https://github.com/JGCRI/argus', '_blank')")),
     div(actionLink(inputId='help', label='', class = "icon",icon = icon("question","fa-1x"),onclick ="window.open('https://jgcri.github.io/argus/', '_blank')")),
-    div(actionLink(inputId='loadsetting', label='', class = "icon", icon = icon("cog","fa-1x"))),
     div(actionLink(inputId='loadbookmark', label='', class = "icon", icon = icon("bookmark","fa-1x"))),
     tags$script(HTML("var header = $('.navbar> .container-fluid');
                    header.append($('#toggleSidebar'));
