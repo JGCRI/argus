@@ -964,13 +964,13 @@ server <- function(input, output, session) {
     })
 
     # Reactive year select Select based on inputs
-    mapYearx <- reactive({
-      if(!is.null(input$mapYear)){
+    mapYearx <- function(){
+      if(!is.null(isolate(input$mapYear))){
         return(isolate(input$mapYear))
       }else{
         return(sort(unique(dataMapx()$x))[round(length(sort(unique(dataMapx()$x)))/2)])
       }
-    })
+    }
 
     # Select Years for Map
     output$selectMapYear = renderUI({
@@ -1069,13 +1069,13 @@ server <- function(input, output, session) {
         multiple = FALSE)
     })
 
-    selectFocusMapYearx <-  reactive({
-     if (is.null(input$focusMapYearSelected)){
+    selectFocusMapYearx <-  function(){
+     if (is.null(isolate(input$focusMapYearSelected))){
         return(sort(unique(dataMap()$x))[round(length(sort(unique(dataMap()$x)))/2)])
       } else{
         return(isolate(input$focusMapYearSelected))
       }
-    })
+    }
 
     # Select Years for Map
     output$selectFocusMapYear = renderUI({
