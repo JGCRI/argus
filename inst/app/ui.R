@@ -144,13 +144,13 @@ ui <- fluidPage(
                            div(align="center",
                                 tabsetPanel(type = "tabs",
                                       tabPanel("Absolute Value",
-                                               div(class="charts",plotOutput(outputId = "plotAbs", width = "100%", height="100%"))
+                                               div(class="charts",plotOutput(outputId = "plotAbs", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Absolute Difference",
-                                               div(class="charts",plotOutput(outputId = "plotDiff", width = "100%", height="100%"))
+                                               div(class="charts",plotOutput(outputId = "plotDiff", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Percent Difference",
-                                               div(class="charts",plotOutput(outputId = "plotPerc", width = "100%", height="100%"))
+                                               div(class="charts",plotOutput(outputId = "plotPerc", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       )
                                 )
                            )
@@ -172,15 +172,15 @@ ui <- fluidPage(
                                            tabPanel("Absolute Value",
                                                     div(class="charts",
                                                         br(),
-                                                        plotOutput(outputId = "mapAbs", width = "100%", height="100%"))),
+                                                        plotOutput(outputId = "mapAbs", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;")),
                                            tabPanel("Absolute Difference",
                                                     div(class="charts",
                                                         br(),
-                                                        plotOutput(outputId = "mapDiff", width = "100%", height="100%"))),
+                                                        plotOutput(outputId = "mapDiff", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;")),
                                            tabPanel("Percent Difference",
                                                     div(class="charts",
                                                         br(),
-                                                        plotOutput(outputId = "mapPerc", width = "100%", height="100%")))
+                                                        plotOutput(outputId = "mapPerc", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;"))
                                                     )
                                ),
                   #---------------------------
@@ -202,7 +202,6 @@ ui <- fluidPage(
     div(actionButton(inputId="toggleSidebar", label="Inputs", icon = icon("caret-up","fa-1x"),class = "download_button_input")),
     div(actionLink(inputId='github', label='',class = "icon", icon = icon("github","fa-1x"),onclick ="window.open('https://github.com/JGCRI/argus', '_blank')")),
     div(actionLink(inputId='help', label='', class = "icon",icon = icon("question","fa-1x"),onclick ="window.open('https://jgcri.github.io/argus/', '_blank')")),
-    div(actionLink(inputId='loadsetting', label='', class = "icon", icon = icon("cog","fa-1x"))),
     div(actionLink(inputId='loadbookmark', label='', class = "icon", icon = icon("bookmark","fa-1x"))),
     tags$script(HTML("var header = $('.navbar> .container-fluid');
                    header.append($('#toggleSidebar'));

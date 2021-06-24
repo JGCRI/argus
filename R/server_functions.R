@@ -287,11 +287,11 @@ breaks <- function(dataMap_raw_param = NULL,
 #' @export
 
 map <- function(flag,
-               mapLegend,
-               mapYear,
-               scenarioRefSelected,
-               dataMapx,
-               dataMapz){
+                  mapLegend,
+                  mapYear,
+                  scenarioRefSelected,
+                  dataMapx,
+                  dataMapz){
 
   # Initialize
   NULL->long->lat->group->scenario->rv->brks->subRegionMap->longLimMinbg->longLimMaxbg->latLimMinbg->latLimMaxbg
@@ -302,19 +302,19 @@ map <- function(flag,
     dataMap_raw <- dataMapz %>% dplyr::ungroup() %>%
       dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
       dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
-                                        TRUE~subRegion)) %>%
+                                               TRUE~subRegion)) %>%
       dplyr::select(-subRegionMap)
   }else if (flag == 2){
     dataMap_raw <- dataMapz %>% dplyr::ungroup() %>%
       dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
       dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
-                                        TRUE~subRegion)) %>%
+                                               TRUE~subRegion)) %>%
       dplyr::select(-subRegionMap)
   }else{
     dataMap_raw <- dataMapx %>% dplyr::ungroup() %>%
       dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
       dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
-                                        TRUE~subRegion)) %>%
+                                               TRUE~subRegion)) %>%
       dplyr::select(-subRegionMap)
     gas<-1
   }
@@ -338,7 +338,7 @@ map <- function(flag,
       proc <- process_map(dataMapx %>% dplyr::ungroup() %>%
                             dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
                             dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
-                                                              TRUE~subRegion)) %>%
+                                                                     TRUE~subRegion)) %>%
                             dplyr::select(-subRegionMap), i, mapLegend, mapYear)
       shp_df <- proc[[1]]
       dataMapPlot <- proc[[2]]
@@ -363,34 +363,34 @@ map <- function(flag,
                       lat < latLimMaxbg);
 
       # data_map, paletteDiff, paletteAbs
-        map <- ggplot()
-        if(!US52Compact){
-          map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
-        #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
-        map <- map + geom_polygon(data = dataMapPlot %>% dplyr::filter(scenario == scenarioRefSelected),
-                                  aes(x = long, y = lat, group = group, fill = as.factor(brks)),
-                                  colour = "gray10", lwd=0.5) +
-          scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
-          ylab("hello") +
-          coord_fixed(ratio = 1.0,
-                      ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
-          theme(panel.grid.major = element_blank(),
-                panel.grid.minor = element_blank()
-          )+
-          scale_y_continuous(position = "left")+
-          facet_grid(param~scenario, switch="y",
-                     labeller = labeller(param = label_wrap_gen(15))
-          ) +
-          ylab(i) +
-          xlab(NULL) +
-          theme(legend.position="bottom",
-                legend.title = element_blank(),
-                strip.text.y = element_blank(),
-                plot.margin=margin(0,0,0,0,"pt"),
-                text = element_text(size = 15),
-                axis.text=element_blank(),
-                axis.ticks=element_blank())
-        if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
+      map <- ggplot()
+      if(!US52Compact){
+        map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
+      #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
+      map <- map + geom_polygon(data = dataMapPlot %>% dplyr::filter(scenario == scenarioRefSelected),
+                                aes(x = long, y = lat, group = group, fill = as.factor(brks)),
+                                colour = "gray10", lwd=0.5) +
+        scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
+        ylab("hello") +
+        coord_fixed(ratio = 1.0,
+                    ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
+        theme(panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank()
+        )+
+        scale_y_continuous(position = "left")+
+        facet_grid(param~scenario, switch="y",
+                   labeller = labeller(param = label_wrap_gen(15))
+        ) +
+        ylab(i) +
+        xlab(NULL) +
+        theme(legend.position="bottom",
+              legend.title = element_blank(),
+              strip.text.y = element_blank(),
+              plot.margin=margin(0,0,0,0,"pt"),
+              text = element_text(size = 10),
+              axis.text=element_blank(),
+              axis.ticks=element_blank())
+      if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
 
       plist[[z]] <- map
       z = z+1
@@ -419,40 +419,41 @@ map <- function(flag,
                       lat < latLimMaxbg);
 
       # data_map, paletteDiff, paletteAbs
-        map <- ggplot()
-        if(!US52Compact){
-          map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
-        #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
-        map <- map + geom_polygon(data = dataMapPlot %>% dplyr::filter(scenario != scenarioRefSelected),
-                                  aes(x = long, y = lat, group = group, fill = as.factor(brks)),
-                                  colour = "gray10", lwd=0.5) +
-          scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
-          xlab(NULL) +
-          ylab(NULL) +
-          coord_fixed(ratio = 1.0,
-                      ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
-          theme(panel.grid.major = element_blank(),
-                panel.grid.minor = element_blank()
-          )+
-          scale_y_continuous(position = "right")+
-          facet_grid(param~scenario, switch="y",
-                     labeller = labeller(param = label_wrap_gen(15))
-          ) +
-          theme(legend.position="bottom",
-                legend.title = element_blank(),
-                plot.margin=margin(0,0,0,0,"pt"),
-                strip.text.y = element_blank(),
-                axis.title=element_blank(),
-                axis.text=element_blank(),
-                axis.ticks=element_blank())
-        if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
+      map <- ggplot()
+      if(!US52Compact){
+        map <- map + geom_polygon(data = shp_bg, aes(x = long, y = lat, group = group),colour = "gray40", fill = "gray90", lwd=0.5)}
+      #map <- map + geom_text(data = cnames, aes(x = long, y = lat, label = id),color="gray50", size = 1) +
+      map <- map + geom_polygon(data = dataMapPlot %>% dplyr::filter(scenario != scenarioRefSelected),
+                                aes(x = long, y = lat, group = group, fill = as.factor(brks)),
+                                colour = "gray10", lwd=0.5) +
+        scale_fill_manual(values=paletteAbs, na.value  = naColor, drop=FALSE) + theme_bw() +
+        xlab(NULL) +
+        ylab(NULL) +
+        coord_fixed(ratio = 1.0,
+                    ylim=c(latLimMin,latLimMax),xlim=c(max(-180,longLimMin),longLimMax),expand = c(0, 0)) +
+        theme(panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank()
+        )+
+        scale_y_continuous(position = "right")+
+        facet_grid(param~scenario, switch="y",
+                   labeller = labeller(param = label_wrap_gen(15))
+        ) +
+        theme(legend.position="bottom",
+              legend.title = element_blank(),
+              plot.margin=margin(0,0,0,0,"pt"),
+              strip.text.y = element_blank(),
+              axis.title=element_blank(),
+              axis.text=element_blank(),
+              axis.ticks=element_blank())
+
+      if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
       plist[[z]] <- map
       z = z+1
     }else {
       proc <- process_map(dataMapx %>% dplyr::ungroup() %>%
                             dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
                             dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
-                                                              TRUE~subRegion)) %>%
+                                                                     TRUE~subRegion)) %>%
                             dplyr::select(-subRegionMap), i, mapLegend, mapYear)
       shp_df <- proc[[1]]
       dataMapPlot <- proc[[2]]
@@ -501,7 +502,7 @@ map <- function(flag,
                 legend.title = element_blank(),
                 strip.text.y = element_blank(),
                 plot.margin=margin(0,0,0,0,"pt"),
-                text = element_text(size = 15),
+                text = element_text(size = 10),
                 axis.text=element_blank(),
                 axis.ticks=element_blank())
         if(!US52Compact){map <- map + theme(panel.background = element_rect(fill="lightblue1"))}
@@ -510,7 +511,7 @@ map <- function(flag,
     }
   }
   # temp <- cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
-  temp <- cowplot::plot_grid(plotlist=plist,ncol=gas,align = "v", rel_widths = c(1, length(unique(dataMapx$scenario))-1))
+  temp <- cowplot::plot_grid(plotlist=plist,ncol=gas,align = "v", axis = "tblr", rel_widths = c(1, length(unique(dataMapx$scenario))-1))
   # ggsave("~/Desktop/mapz.png",temp)
   return(temp)
 }

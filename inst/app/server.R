@@ -151,10 +151,12 @@ server <- function(input, output, session) {
     #focusMapScenarioSelected
     settingfocusMapYearSelected <- state$focusMapYearSelected
     if((settingfocusMapYearSelected %in% dataMapx()$x) && !is.null(settingfocusMapScenarioSelected)){
-      updatePickerInput(
+      updateSliderInput(
         inputId = "focusMapYearSelected",
         session=session,
-        selected = settingfocusMapYearSelected
+        min = min(dataMapx()$x),
+        max = max(dataMapx()$x),
+        value=settingfocusMapYearSelected
       )
       session$sendCustomMessage("setsetting", c("focusMapYearSelected", settingfocusMapYearSelected))
     }
@@ -424,248 +426,9 @@ server <- function(input, output, session) {
     ))
     }, ignoreInit=TRUE)
 
-  observeEvent(input$loadsetting, {
-    showModal(
-      modalDialog(
-        size = "s",
-        easyClose = TRUE,
-        footer = NULL,
-        fileInput(
-          inputId = "settingdata",
-          label = "Upload csv",
-          accept = c(".csv"),
-          multiple = TRUE,
-          width = "100%"
-        ),
-        fluidRow(
-          column(6,
-                 div(downloadButton(
-                   outputId='downloadSettings',
-                   label="Save Settings",
-                   download = "settings.csv",
-                   class = "download_button"),
-                   style = "float:center;"
-                 ))
-          ,
-          column(6,
-                 div(actionLink(inputId='defaultsetting',
-                                label='Default Setting',
-                                class = "btn btn-default shiny-download-link download_button",
-                                icon = icon("cog","fa-1x")
-                 )
-                 )
-          )
-        )
-      )
-    )
-  })
-
   observeEvent(input$help,{
     session$sendCustomMessage("handler1", unique(data()$subRegion))
   })
-
-  # Download Settings
-  output$downloadSettings <- downloadHandler(
-    filename = "settings.csv",
-    content = function(filename) {
-      write.csv(data.frame(variable=settingsVars,
-                           value=c(paste(input$urlfiledata,collapse=";"),
-                                   paste(regionsSelectedx(),collapse=";"),
-                                   paste(scenariosSelectedx(),collapse=";"),
-                                   paste(scenarioRefSelectedx(),collapse=";"),
-                                   paste(paramsSelectedx(),collapse=";"))),
-                file=filename,
-                row.names = F)
-    })
-
-  # Load Settings Data if Selected
-  observeEvent(input$settingdata,{
-    settings <- reactive({
-      if (!is.null(input$settingdata)){
-        return(read.csv(input$settingdata$datapath,header=T)%>%as.data.frame())
-      }
-    })
-    print("Settings file loaded.")
-    print(settings())
-
-    # Make sure all variables in settings are valid
-    if(any(!settingsVars %in% unique(settings()$variable))){
-     showModal(modalDialog(
-        title = "Settings Variable Error.",
-        print(paste("Setting variable(s) not valid: ",
-                    paste(unique(settings()$variable)[
-                      !unique(settings()$variable) %in% settingsVars],collapse=", "),
-              sep=""))
-     ))
-    } else {
-
-    # Update All Reactive Inputs Based on Settings Loaded
-    if(nrow(settings())>0){
-
-      # Regions Update
-      settingsRegions <- unlist(
-        strsplit(
-          (settings()%>%dplyr::filter(variable=="regionsSelect"))$value
-          ,split=";")
-      )
-      if(any(unique(settingsRegions) %in% unique(data()$subRegion))){
-      updatePickerInput(
-        session=session,
-        inputId = "regionsSelected",
-        selected = unique(settingsRegions)[unique(settingsRegions) %in% unique(data()$subRegion)],
-      )
-      } else{
-        showModal(modalDialog(
-          title = "Settings Region Error.",
-          "None of the regions selected in the settings file are available in the data.
-          Using default selection."
-        ))
-      }
-
-      # Parameters Update
-      settingsParams <- unlist(
-        strsplit(
-          (settings()%>%dplyr::filter(variable=="paramsSelect"))$value
-          ,split=";")
-      )
-      if(any(unique(settingsParams) %in% unique(data()$param))){
-        updatePickerInput(
-          session=session,
-          inputId = "paramsSelected",
-          selected = unique(settingsParams)[unique(settingsParams) %in% unique(data()$param)],
-        )
-      } else{
-        showModal(modalDialog(
-          title = "Settings Param Error.",
-          "None of the params selected in the settings file are available in the data.
-          Using default selection."
-        ))
-      }
-
-      # Scenario Update
-      settingsScenario <- unlist(
-        strsplit(
-          (settings()%>%dplyr::filter(variable=="scenariosSelect"))$value
-          ,split=";")
-      )
-      if(any(unique(settingsScenario) %in% unique(data()$scenario))){
-        updatePickerInput(
-          session=session,
-          inputId = "scenariosSelected",
-          selected = unique(settingsScenario)[unique(settingsScenario) %in% unique(data()$scenario)],
-        )
-      } else{
-        showModal(modalDialog(
-          title = "Settings Scenario Error.",
-          "None of the scenarios selected in the settings file are available in the data.
-          Using default selection."
-        ))
-      }
-
-      # Reference Scenario Update
-      settingsRefScenario <- unlist(
-        strsplit(
-          (settings()%>%dplyr::filter(variable=="scenarioRefSelect"))$value
-          ,split=";")
-      )
-      if(any(unique(settingsRefScenario) %in% unique(data()$scenario))){
-        updatePickerInput(
-          session=session,
-          inputId = "scenarioRefSelected",
-          selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
-        )
-      } else{
-        showModal(modalDialog(
-          title = "Settings Ref Scenario Error.",
-          "The Ref Scenario selected in the settings file is not available in the data.
-          Using default selection."
-        ))
-      }
-
-    }
-  }
-  })
-
-  # Attempt to read settings if selected
-  observeEvent(input$settingdata,
-               if(!is.null(input$settingdata)){
-                 if(grepl(".csv",input$settingdata$datapath)){
-                   #removeModal()
-                 }else{
-                   showModal(modalDialog(
-                     title = "Incorrect file type loaded",
-                     "Settings file must be a .csv"
-                   ))
-                 }
-               })
-
-  # Attempt to read default settings if selected
-  observeEvent(input$defaultsetting,{
-
-    settings <- reactive({
-      return(data.frame(variable=settingsVars) %>%
-                          dplyr::mutate(value="Default"))
-    })
-
-    #...........................
-    # Update input File to Default (NULL)
-    #...........................
-    rv$filedatax <- NULL
-    rv$selectedx <- NULL
-
-    #...........................
-    # Scenarios Select
-    #...........................
-   updatePickerInput(
-        inputId = "scenariosSelected",
-        session=session,
-        choices = unique(data()$scenario),
-        selected = unique(data()$scenario))
-
-    #...........................
-    # Ref Scenario Select
-    #...........................
-    updatePickerInput(
-        inputId = "scenarioRefSelected",
-        session=session,
-        choices = unique(data()$scenario)[unique(data()$scenario)
-                                             %in% scenariosSelectedx()],
-        selected = (unique(data()$scenario)[unique(data()$scenario)
-                                               %in% scenariosSelectedx()])[1])
-
-    #...........................
-    # Parameters Select
-    #...........................
-    updatePickerInput(
-        inputId = "paramsSelected",
-        session=session,
-        choices = c("Chosen Mix", unique(data()$param)),
-        selected = unique(data()$param)[1:5])
-
-    #...........................
-    # Regions Select
-    #...........................
-    updatePickerInput(
-        inputId = "regionsSelected",
-        session=session,
-        choices = unique(data()$subRegion),
-        selected = unique(data()$subRegion))
-
-    #...........................
-    # Subset Regions Selected
-    #...........................
-    updatePickerInput(
-        inputId = "subsetRegions",
-        session=session,
-        choices = unique(data()$subRegion),
-        selected = unique(data()$subRegion)[1:4])
-  })
-
-  # Close Modal After Loading Default
-  observeEvent(input$defaultsetting,
-               if(!is.null(input$defaultsetting)){
-                 removeModal()
-               })
 
   # Toggle Sidebar
   observeEvent(input$toggleSidebar, {
@@ -1201,13 +964,13 @@ server <- function(input, output, session) {
     })
 
     # Reactive year select Select based on inputs
-    mapYearx <- reactive({
-      if(!is.null(input$mapYear)){
-        return(input$mapYear)
+    mapYearx <- function(){
+      if(!is.null(isolate(input$mapYear))){
+        return(isolate(input$mapYear))
       }else{
         return(sort(unique(dataMapx()$x))[round(length(sort(unique(dataMapx()$x)))/2)])
       }
-    })
+    }
 
     # Select Years for Map
     output$selectMapYear = renderUI({
@@ -1270,7 +1033,7 @@ server <- function(input, output, session) {
     #focusMapParamSelected helper function
     focusMapScenariox <- reactive({
       if(!is.null(input$focusMapScenarioSelected)){
-        return(input$focusMapParamSelected)
+        return(input$focusMapScenarioSelected)
       }else{
         return(unique(dataMapx()$scenario)[1])
       }
@@ -1306,13 +1069,13 @@ server <- function(input, output, session) {
         multiple = FALSE)
     })
 
-    selectFocusMapYearx <-  reactive({
-     if (is.null(input$focusMapYearSelected)){
+    selectFocusMapYearx <-  function(){
+     if (is.null(isolate(input$focusMapYearSelected))){
         return(sort(unique(dataMap()$x))[round(length(sort(unique(dataMap()$x)))/2)])
       } else{
-        return(input$focusMapYearSelected)
+        return(isolate(input$focusMapYearSelected))
       }
-    })
+    }
 
     # Select Years for Map
     output$selectFocusMapYear = renderUI({
@@ -1322,7 +1085,7 @@ server <- function(input, output, session) {
                   max = max(data()$x), step = 5,
                   value=selectFocusMapYearx(),
                   sep="",
-                  animate =F)
+                  animate =T)
     })
 
   } # Select Reactive Inputs
@@ -1739,7 +1502,7 @@ server <- function(input, output, session) {
     dataMapFocus_raw <- dataMapx() %>%
       dplyr::ungroup() %>%
       dplyr::select(x,param,scenario,subRegion,value) %>%
-      filter(param == input$focusMapParamSelected,
+      filter(param == focusMapParamSelectedx(),
              scenario == input$focusMapScenarioSelected,
              x == input$focusMapYearSelected) %>%
         dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
@@ -1852,7 +1615,7 @@ server <- function(input, output, session) {
     #ggplotly()
     (ggplot2::ggplot(dataSumx() %>%
                        dplyr::select(scenario, value, param, x)%>%
-                       dplyr::filter(param == input$focusMapParamSelected),
+                       dplyr::filter(param == focusMapParamSelectedx()),
                      aes(x=x,y=value,
                          group=scenario,
                          color=scenario))+
@@ -1860,7 +1623,6 @@ server <- function(input, output, session) {
        ggplottheme +
        geom_line() +
        geom_point() +
-       ylab(NULL) +  xlab(NULL) + ggtitle(input$focusMapParamSelected) +
        theme(legend.position="bottom",
              legend.title = element_blank(),
              plot.margin=margin(0,0,0,0,"pt"),
@@ -1880,7 +1642,7 @@ server <- function(input, output, session) {
       dplyr::filter(!(is.na(class) & value==0))%>%
       dplyr::mutate(class=if_else(is.na(class),"NA",class))%>%
       dplyr::select(scenario, value, param, class, x)%>%
-      dplyr::filter(param == input$focusMapParamSelected,
+      dplyr::filter(param == focusMapParamSelectedx(),
                     scenario == input$focusMapScenarioSelected)
 
     # Check Color Palettes
@@ -2064,27 +1826,44 @@ server <- function(input, output, session) {
   #...........................
 
     if(T){ # Maps
-
   # Absolute Value Map
   output$mapAbs <- renderPlot({
     argus::map(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataMapx())
-  },
-  height=function(){500*length(unique(dataMapx()$param))}#,
+  }
+  ,height=function(){
+    if (length(unique(scenariosSelectedx()))<=5){
+      return(300*length(unique((dataMapx()$param))))
+    }else{
+      return(200*length(unique((dataMapx()$param))))
+    }
+  }
   #width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
   )
 
   # Percentage Difference Map
   output$mapPerc <- renderPlot({
     argus::map(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
-  },
-  height=function(){500*length(unique(dataMapx()$param))}#,
+  }
+  ,height=function(){
+    if (length(unique(scenariosSelectedx()))<=5){
+      return(300*length(unique((dataMapx()$param))))
+    }else{
+      return(200*length(unique((dataMapx()$param))))
+    }
+  }
   )
 
   # Absolute Difference Map
   output$mapDiff <- renderPlot({
     argus::map(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
-  },
-  height=function(){500*length(unique(dataMapx()$param))}#,
+  }
+  ,height=function(){
+      if (length(unique(scenariosSelectedx()))<=5){
+        return(300*length(unique((dataMapx()$param))))
+      }else{
+        return(200*length(unique((dataMapx()$param))))
+      }
+    }
   #width=function(){max(600, 450*length(unique(dataMapx()$scenario)))}
   )
 
