@@ -3,7 +3,8 @@ Title: Interactive data visualizations
 Version: 0.1.0
 Authors@R: c(person("Zarrar", "Khan", email = "zarrar.khan@pnnl.gov", role = c("aut", "cre"),
 		   comment = c(ORCID ="0000-0002-8147-8553")),
-		   person("Tom", "Wild", role = c("aut"),comment = c(ORCID ="0000-0002-8147-8553")),
+		   person("Sean", "Tang", role = c("aut")),
+		   person("Anna", "Warmka", role = c("aut")),
 		   person("Chris", "Vernon", role = c("aut")))
 Description: R shiny package to interactively visualize data across scenarios, parameters and regions.
 URL: https://github.com/JGCRI/argus
@@ -20,6 +21,8 @@ Imports:
     tools,
     shiny,
     shinyFiles,
+	shinythemes,
+	DT,
     knitr (>= 1.20),
     dplyr,
     magrittr,

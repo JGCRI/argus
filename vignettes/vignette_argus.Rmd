@@ -1,16 +1,67 @@
 ---
-title: "argus"
+title: "User Guide"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{argus}
+  %\VignetteIndexEntry{User Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Guide"></a>Guide
+# <a name="Overview"></a>Overview
 <!-- ------------------------>
 <!-- ------------------------>
 
-To be added
+## Layout:
+<p align="center" style="font-size:18px;"> *General Layout* </p>
+<p align="center"> <img src="vignetteFigs/layout.PNG"></p>
+
+## Inputs:
+Brief discussion
+
+## Boomarking:
+Brief discussion
+
+
+
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Focus Tab"></a>Focus
+<!-- ------------------------>
+<!-- ------------------------>
+
+- Details on focus tab
+
+
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Lines Tab"></a>Lines
+<!-- ------------------------>
+<!-- ------------------------>
+
+- Details on Lines tab
+
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Charts Tab"></a>Charts
+<!-- ------------------------>
+<!-- ------------------------>
+
+- Details on charts tab
+
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Maps Tab"></a>Maps
+<!-- ------------------------>
+<!-- ------------------------>
+
+- Details on maps tab
+
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Table Tab"></a>Table
+<!-- ------------------------>
+<!-- ------------------------>
+
+- Details on Table tab
