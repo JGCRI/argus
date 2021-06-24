@@ -3,32 +3,6 @@
 [![pkgdown](https://github.com/JGCRI/argus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/JGCRI/argus/actions/workflows/pkgdown.yaml)
 [![codecov](https://codecov.io/gh/JGCRI/argus/branch/dev/graph/badge.svg?token=NDE0ZK7OHN)](https://codecov.io/gh/JGCRI/argus)
 <!-- badges: end -->
-
-<!-- ------------------------>
-<!-- ------------------------>
-# <a name="Contents"></a>Contents
-<!-- ------------------------>
-<!-- ------------------------>
-
-- [Key Links](#KeyLinks)
-- [Introduction](#Introduction)
-- [Citation](#Citation)
-- [Installation Guide](#InstallGuide)
-- [How-to guide](#howto) 
-- [Publications](#Publications)
-
-<!-- ------------------------>
-<!-- ------------------------>
-# <a name="KeyLinks"></a>Key Links
-<!-- ------------------------>
-<!-- ------------------------>
-
-[Back to Contents](#Contents)
-
-- Online App:  https://zarrar.shinyapps.io/argus/
-- Github: https://github.com/JGCRI/argus
-- Webpage: https://jgcri.github.io/argus/
-- Cheatsheet: https://github.com/JGCRI/argus/blob/master/argus.pdf
   
 <!-- ------------------------>
 <!-- ------------------------>
@@ -36,19 +10,17 @@
 <!-- ------------------------>
 <!-- ------------------------>
 
-[Back to Contents](#Contents)
-
 `argus` is an R Shiny App to interactively visualize data across scenarios, parameters and regions.
 
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="KeyLinks"></a>Key Links
+<!-- ------------------------>
+<!-- ------------------------>
 
-<!-- ------------------------>
-<!-- ------------------------>
-# <a name="Citation"></a>Citation
-<!-- ------------------------>
-<!-- ------------------------>
-
-[Back to Contents](#Contents)
-
+- Online App:  https://jgcri.shinyapps.io/argus/
+- Github: https://github.com/JGCRI/argus
+- Webpage: https://jgcri.github.io/argus/
 
 <!-- ------------------------>
 <!-- ------------------------>
@@ -56,12 +28,13 @@
 <!-- ------------------------>
 <!-- ------------------------>
 
-[Back to Contents](#Contents)
+Most users should use the online version at: https://jgcri.github.io/argus/
+
+To install locally:
 
 1. Download and install:
     - R (https://www.r-project.org/)
     - R studio (https://www.rstudio.com/)  
-    
     
 2. Open R studio:
 
@@ -74,22 +47,27 @@ devtools::install_github(“JGCRI/argus”)
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="keyfunctions"></a> How to guides
+# <a name="keyfunctions"></a> User Guide
 <!-- ------------------------>
 <!-- ------------------------>
 
-[Back to Contents](#Contents)
-
-A detailed step-by-step walkthrough and how-to guide is provided on the [How-to](https://jgcri.github.io/argus/articles/vignette_argus.html) page. 
+A detailed step-by-step walkthrough is provided on the [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html) page. 
 
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Publications"></a>Publications
+# <a name="Citation"></a>Citation
 <!-- ------------------------>
 <!-- ------------------------>
 
-[Back to Contents](#Contents)
+Citation to be added
 
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Publications"></a>Related Publications
+<!-- ------------------------>
+<!-- ------------------------>
+
+-
 
   
