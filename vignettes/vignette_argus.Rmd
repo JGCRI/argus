@@ -9,42 +9,48 @@ vignette: >
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Overview"></a>Overview
+# <a name="Overall Layout"></a>Overall Layout
 <!-- ------------------------>
 <!-- ------------------------>
 
-## Layout:
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
 <p align="center" style="font-size:18px;"> *General Layout* </p>
 <p align="center"> <img src="vignetteFigs/layout.PNG"></p>
 
 <!-- ------------------------>
 <!-- ------------------------>
-## Inputs:
+# <a name="Inputs"></a>Inputs
 <!-- ------------------------>
 <!-- ------------------------>
+
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
 
 Within the input panel, there is a data input drop down and several selection drop downs.
 
 <!-- ------------------------>
 <!-- ------------------------>
-### Data Input
+## Data Input
 <!-- ------------------------>
 <!-- ------------------------>
+
 Data inputs can be uploaded through a url, csv file, or GCAM directory. Select one and the corresponding input window will appear.
 
 <p align="center"> <img src="vignetteFigs/input.PNG"></p>
 
 <!-- ------------------------>
 <!-- ------------------------>
-### Selections
+## Selections
 <!-- ------------------------>
 <!-- ------------------------>
 
 Other drop downs include selections for:
-  : - Scenarios Running
-  : - Reference Scenario
-  : - Parameters Displayed
-  : - Regions Included
+
+- Scenarios Running
+- Reference Scenario
+- Parameters Displayed
+- Regions Included
+
 These selections can be changed at anytime by clicking the inputs drop down in the upper right corner.
 
 <!-- ------------------------>
@@ -53,7 +59,10 @@ These selections can be changed at anytime by clicking the inputs drop down in t
 <!-- ------------------------>
 <!-- ------------------------>
 
-1. On the right side of the top bar, there are four additional icons along with the inputs panel.
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
+On the right side of the top bar, there are four additional icons along with the inputs panel:
+
 1. Bookmarking
 1. Github
 1. Help
@@ -104,6 +113,8 @@ Add brief description
 <!-- ------------------------>
 <!-- ------------------------>
 
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
 - Details on focus tab
 
 <p align="center"> <img src="vignetteFigs/focus.PNG"></p>
@@ -113,6 +124,8 @@ Add brief description
 # <a name="Lines Tab"></a>Lines
 <!-- ------------------------>
 <!-- ------------------------>
+
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
 
 - Details on Lines tab
 
@@ -124,6 +137,8 @@ Add brief description
 <!-- ------------------------>
 <!-- ------------------------>
 
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
 - Details on charts tab
 
 <!-- ------------------------>
@@ -131,6 +146,8 @@ Add brief description
 # <a name="Maps Tab"></a>Maps
 <!-- ------------------------>
 <!-- ------------------------>
+
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
 
 - Details on maps tab
 
@@ -141,5 +158,7 @@ Add brief description
 # <a name="Table Tab"></a>Table
 <!-- ------------------------>
 <!-- ------------------------>
+
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
 
 - Details on Table tab

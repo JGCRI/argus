@@ -12,25 +12,15 @@
 
 `argus` is an R Shiny App to interactively visualize data across scenarios, parameters and regions.
 
-<!-- ------------------------>
-<!-- ------------------------>
-# <a name="KeyLinks"></a>Key Links
-<!-- ------------------------>
-<!-- ------------------------>
-
-- Online App:  https://jgcri.shinyapps.io/argus/
-- Github: https://github.com/JGCRI/argus
-- Webpage: https://jgcri.github.io/argus/
+![Launch App](https://github.com/jgcri/argus/blob/dev/vignettes/vignetteFigs/launch_button.jpg?raw=true) ![User Guide](https://github.com/jgcri/argus/blob/dev/vignettes/vignetteFigs/user_guide_button.jpg?raw=true)
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="InstallGuide"></a>Installation Guide
+# <a name="Argus Offline"></a>Argus Offline
 <!-- ------------------------>
 <!-- ------------------------>
 
-Most users should use the online version at: https://jgcri.github.io/argus/
-
-To install locally:
+If users want to use argus locally on their machines they can install the software as follows:
 
 1. Download and install:
     - R (https://www.r-project.org/)
@@ -44,15 +34,6 @@ devtools::install_github(“JGCRI/rgcam”)
 devtools::install_github(“JGCRI/rmap”)
 devtools::install_github(“JGCRI/argus”)
 ```
-
-<!-- ------------------------>
-<!-- ------------------------>
-# <a name="keyfunctions"></a> User Guide
-<!-- ------------------------>
-<!-- ------------------------>
-
-A detailed step-by-step walkthrough is provided on the [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html) page. 
-
 
 <!-- ------------------------>
 <!-- ------------------------>
