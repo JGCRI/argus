@@ -14,10 +14,8 @@
 
 `argus` is an R Shiny App to interactively visualize data across scenarios, parameters and regions.
 
-<div class="container">
-<a href="https://jgcri.shinyapps.io/argus/" target="_blank" class="button button1">Launch App</a> 
-<a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank" class="button button2">User Guide</a>
-</div>
+<a href="https://jgcri.shinyapps.io/argus/" target="_blank"><img src="https://github.com/JGCRI/argus/blob/dev/vignettes/vignetteFigs/launch_button.PNG?raw=true" alt="Launch App" height="100"></a>
+<a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank"><img src="https://github.com/JGCRI/argus/blob/dev/vignettes/vignetteFigs/user_guide_button.PNG?raw=true" alt="User guide" height="100"></a>
 
 <!-- ------------------------>
 <!-- ------------------------>
@@ -47,51 +45,5 @@ devtools::install_github(“JGCRI/argus”)
 <!-- ------------------------>
 
 Citation to be added
-
-<hr>
-
-
-<style>
-
-.container {
-  display: flex;
-  justify-content: left;
-}
-
-.button {
-  border: none;
-  padding: 30px 30px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 32px;
-  margin: 30px 30px;
-  cursor: pointer;
-  transition-duration: 0.4s;
-  border-radius: 8px;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-}
-
-.button1{
- background-color: #008CBB; /* Green */
- color: white;
-}
-
-.button1:hover{
- background-color: #008CBB; /* Green */
- color: black;
-}
-
-.button2{
- background-color: #4CAF50; /* Green */
- color: white;
-}
-
-.button2:hover{
- background-color: #4CAF59; /* Green */
- color: black;
-}
-
-</style>
 
   
