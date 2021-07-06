@@ -3,6 +3,8 @@
 [![pkgdown](https://github.com/JGCRI/argus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/JGCRI/argus/actions/workflows/pkgdown.yaml)
 [![codecov](https://codecov.io/gh/JGCRI/argus/branch/dev/graph/badge.svg?token=NDE0ZK7OHN)](https://codecov.io/gh/JGCRI/argus)
 <!-- badges: end -->
+
+<br>
   
 <!-- ------------------------>
 <!-- ------------------------>
@@ -12,25 +14,28 @@
 
 `argus` is an R Shiny App to interactively visualize data across scenarios, parameters and regions.
 
-<!-- ------------------------>
-<!-- ------------------------>
-# <a name="KeyLinks"></a>Key Links
-<!-- ------------------------>
-<!-- ------------------------>
+<p align="center">
+<a href="https://jgcri.shinyapps.io/argus/" target="_blank"><img src="https://github.com/JGCRI/argus/blob/dev/vignettes/vignetteFigs/launch_button.PNG?raw=true" alt="Launch App" height="100" style="margin:50px"/></a>
+<a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank"><img src="https://github.com/JGCRI/argus/blob/dev/vignettes/vignetteFigs/user_guide_button.PNG?raw=true" alt="User guide" height="100" style="margin:50px"/></a>
+</p>
 
-- Online App:  https://jgcri.shinyapps.io/argus/
-- Github: https://github.com/JGCRI/argus
-- Webpage: https://jgcri.github.io/argus/
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="InstallGuide"></a>Installation Guide
+# <a name="Citation"></a>Citation
 <!-- ------------------------>
 <!-- ------------------------>
 
-Most users should use the online version at: https://jgcri.github.io/argus/
+Citation to be added
 
-To install locally:
+
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Argus Offline"></a>Argus Offline
+<!-- ------------------------>
+<!-- ------------------------>
+
+If users want to use argus locally on their machines they can install the software as follows:
 
 1. Download and install:
     - R (https://www.r-project.org/)
@@ -45,29 +50,6 @@ devtools::install_github(“JGCRI/rmap”)
 devtools::install_github(“JGCRI/argus”)
 ```
 
-<!-- ------------------------>
-<!-- ------------------------>
-# <a name="keyfunctions"></a> User Guide
-<!-- ------------------------>
-<!-- ------------------------>
 
-A detailed step-by-step walkthrough is provided on the [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html) page. 
-
-
-<!-- ------------------------>
-<!-- ------------------------>
-# <a name="Citation"></a>Citation
-<!-- ------------------------>
-<!-- ------------------------>
-
-Citation to be added
-
-<!-- ------------------------>
-<!-- ------------------------>
-# <a name="Publications"></a>Related Publications
-<!-- ------------------------>
-<!-- ------------------------>
-
--
 
   
