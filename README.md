@@ -14,8 +14,10 @@
 
 `argus` is an R Shiny App to interactively visualize data across scenarios, parameters and regions.
 
+<center>
 <a href="https://jgcri.shinyapps.io/argus/" target="_blank"><img src="https://github.com/JGCRI/argus/blob/dev/vignettes/vignetteFigs/launch_button.PNG?raw=true" alt="Launch App" height="100"></a>
 <a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank"><img src="https://github.com/JGCRI/argus/blob/dev/vignettes/vignetteFigs/user_guide_button.PNG?raw=true" alt="User guide" height="100"></a>
+</center>
 
 <!-- ------------------------>
 <!-- ------------------------>
