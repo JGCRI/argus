@@ -142,11 +142,21 @@ server <- function(input, output, session) {
       if (input$readurlrds == ""){
         return(0)
       }
-      removeModal()
-      state <- readRDS(input$readurlrds)
-      rv$data <- state$data
+      tryCatch({
+        temp <- tempfile()
+        utils::download.file(input$readurlrds, temp)
+        state <- readRDS(temp)
+        rv$data <- state$data
+        removeModal()
+        updateVals(state)
+      },finally = {
+        return(0)
+      })
 
-      updateVals(state)
+
+
+
+
       }, ignoreInit = TRUE
     )
 
