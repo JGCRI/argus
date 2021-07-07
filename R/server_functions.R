@@ -117,7 +117,8 @@ parse_remote <- function(urlfiledata){
     utils::download.file(urlfiledata, temp)
     return(utils::read.csv(temp) %>%
              as.data.frame())
-  }else{
+  }
+  else{
     return(NULL)
   }
 }

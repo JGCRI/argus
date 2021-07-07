@@ -67,6 +67,12 @@ server <- function(input, output, session) {
             multiple = TRUE,
             width = "100%"
           ),
+          textInput(
+            inputId = "readurlrds",
+            label = "Read rds from url",
+            width = "100%",
+            placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"
+          ),
           fluidRow(
             column(6,
                    div(
@@ -131,125 +137,142 @@ server <- function(input, output, session) {
       }
     )
 
+    #rds bookmark url handler
+    observeEvent(input$readurlrds, {
+      if (input$readurlrds == ""){
+        return(0)
+      }
+      removeModal()
+      state <- readRDS(input$readurlrds)
+      rv$data <- state$data
+
+      updateVals(state)
+      }, ignoreInit = TRUE
+    )
+
     #rds bookmark upload handler
     observeEvent(input$readbookmark, {
       removeModal()
       state <- readRDS(input$readbookmark$datapath)
       rv$data <- state$data
+      updateVals(state)
+    })
 
-    #focusMapScenarioSelected
-    settingfocusMapScenarioSelected <- state$focusMapScenarioSelected
-    if(( settingfocusMapScenarioSelected %in% unique(data()$scenario)) && !is.null(settingfocusMapScenarioSelected)){
-      updatePickerInput(
-        inputId = "focusMapScenarioSelected",
-        session=session,
-        selected = settingfocusMapScenarioSelected
-      )
-      session$sendCustomMessage("setsetting", c("focusMapScenarioSelected", settingfocusMapScenarioSelected))
-    }
-
-    #focusMapScenarioSelected
-    settingfocusMapYearSelected <- state$focusMapYearSelected
-    if((settingfocusMapYearSelected %in% dataMapx()$x) && !is.null(settingfocusMapScenarioSelected)){
-      updateSliderInput(
-        inputId = "focusMapYearSelected",
-        session=session,
-        min = min(dataMapx()$x),
-        max = max(dataMapx()$x),
-        value=settingfocusMapYearSelected
-      )
-      session$sendCustomMessage("setsetting", c("focusMapYearSelected", settingfocusMapYearSelected))
-    }
-
-    #focusMapScenarioSelected
-    settingfocusMapParamSelected  <- state$focusMapParamSelected
-    if(( settingfocusMapParamSelected %in% unique(dataMapx()$param)) && !is.null(settingfocusMapParamSelected)){
-      updatePickerInput(
-        inputId = "focusMapParamSelected",
-        session=session,
-        selected = settingfocusMapParamSelected
-      )
-      session$sendCustomMessage("setsetting", c("focusMapParamSelected", settingfocusMapParamSelected))
-    }
-
-
-      #mapLegend
-      settingsmapLegend <- state$mapLegend
-      if((settingsmapLegend %in% c("kmean","pretty")) && !is.null(settingsmapLegend)){
+    #update input values from rds state
+    updateVals <- function(state){
+      #focusMapScenarioSelected
+      settingfocusMapScenarioSelected <- state$focusMapScenarioSelected
+      if(( settingfocusMapScenarioSelected %in% unique(data()$scenario)) && !is.null(settingfocusMapScenarioSelected)){
         updatePickerInput(
-          inputId = "mapLegend",
+          inputId = "focusMapScenarioSelected",
           session=session,
-          selected = settingsmapLegend
+          selected = settingfocusMapScenarioSelected
         )
-        session$sendCustomMessage("setsetting", c("mapLegend", settingsmapLegend))
+        session$sendCustomMessage("setsetting", c("focusMapScenarioSelected", settingfocusMapScenarioSelected))
       }
 
-      #mapYear
-      settingsmapYear <- state$mapYear
-      if(!is.null(settingsmapYear) && (settingsmapYear %in% dataMapx()$x)){
+      #focusMapScenarioSelected
+      settingfocusMapYearSelected <- state$focusMapYearSelected
+      if((settingfocusMapYearSelected %in% dataMapx()$x) && !is.null(settingfocusMapScenarioSelected)){
         updateSliderInput(
-          inputId = "mapYear",
+          inputId = "focusMapYearSelected",
           session=session,
           min = min(dataMapx()$x),
           max = max(dataMapx()$x),
-          value=settingsmapYear
+          value=settingfocusMapYearSelected
         )
-        session$sendCustomMessage("setsetting", c("mapYear", settingsmapYear))
+        session$sendCustomMessage("setsetting", c("focusMapYearSelected", settingfocusMapYearSelected))
       }
 
-      #subsetRegions
-      settingsSubsetRegions <- state$subsetRegions
-      if(any(unique(settingsSubsetRegions) %in% unique(data()$subRegion))){
-        print("c==c")
+      #focusMapScenarioSelected
+      settingfocusMapParamSelected  <- state$focusMapParamSelected
+      if(( settingfocusMapParamSelected %in% unique(dataMapx()$param)) && !is.null(settingfocusMapParamSelected)){
         updatePickerInput(
-          inputId = "subsetRegions",
+          inputId = "focusMapParamSelected",
           session=session,
-          choices = unique(data()$subRegion),
-          selected = state$subsetRegions)
-        session$sendCustomMessage("setsetting", c("subsetRegions", settingsSubsetRegions))
-        print(state$subsetRegions)
+          selected = settingfocusMapParamSelected
+        )
+        session$sendCustomMessage("setsetting", c("focusMapParamSelected", settingfocusMapParamSelected))
       }
 
-      # Regions Update
-      settingsRegions <- state$regionsSelect
-      if(any(unique(settingsRegions) %in% unique(data()$subRegion))){
-        updatePickerInput(
-          session=session,
-          inputId = "regionsSelected",
-          selected = unique(settingsRegions)[unique(settingsRegions) %in% unique(data()$subRegion)],
-        )
-      }
 
-      # Parameters Update
-      settingsParams <- state$paramsSelect
-      if(any(unique(settingsParams) %in% unique(data()$param))){
-        updatePickerInput(
-          session=session,
-          inputId = "paramsSelected",
-          selected = unique(settingsParams)[unique(settingsParams) %in% unique(data()$param)],
-        )
-      }
+        #mapLegend
+        settingsmapLegend <- state$mapLegend
+        if((settingsmapLegend %in% c("kmean","pretty")) && !is.null(settingsmapLegend)){
+          updatePickerInput(
+            inputId = "mapLegend",
+            session=session,
+            selected = settingsmapLegend
+          )
+          session$sendCustomMessage("setsetting", c("mapLegend", settingsmapLegend))
+        }
 
-      # Scenario Update
-      settingsScenario <- state$scenariosSelect
-      if(any(unique(settingsScenario) %in% unique(data()$scenario))){
-        updatePickerInput(
-          session=session,
-          inputId = "scenariosSelected",
-          selected = unique(settingsScenario)[unique(settingsScenario) %in% unique(data()$scenario)],
-        )
-      }
+        #mapYear
+        settingsmapYear <- state$mapYear
+        if(!is.null(settingsmapYear) && (settingsmapYear %in% dataMapx()$x)){
+          updateSliderInput(
+            inputId = "mapYear",
+            session=session,
+            min = min(dataMapx()$x),
+            max = max(dataMapx()$x),
+            value=settingsmapYear
+          )
+          session$sendCustomMessage("setsetting", c("mapYear", settingsmapYear))
+        }
 
-      # Reference Scenario Update
-      settingsRefScenario <- state$scenarioRefSelect
-      if(any(unique(settingsRefScenario) %in% unique(data()$scenario))){
-        updatePickerInput(
-          session=session,
-          inputId = "scenarioRefSelected",
-          selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
-        )
-      }
-    })
+        #subsetRegions
+        settingsSubsetRegions <- state$subsetRegions
+        if(any(unique(settingsSubsetRegions) %in% unique(data()$subRegion))){
+          print("c==c")
+          updatePickerInput(
+            inputId = "subsetRegions",
+            session=session,
+            choices = unique(data()$subRegion),
+            selected = state$subsetRegions)
+          session$sendCustomMessage("setsetting", c("subsetRegions", settingsSubsetRegions))
+          print(state$subsetRegions)
+        }
+
+        # Regions Update
+        settingsRegions <- state$regionsSelect
+        if(any(unique(settingsRegions) %in% unique(data()$subRegion))){
+          updatePickerInput(
+            session=session,
+            inputId = "regionsSelected",
+            selected = unique(settingsRegions)[unique(settingsRegions) %in% unique(data()$subRegion)],
+          )
+        }
+
+        # Parameters Update
+        settingsParams <- state$paramsSelect
+        if(any(unique(settingsParams) %in% unique(data()$param))){
+          updatePickerInput(
+            session=session,
+            inputId = "paramsSelected",
+            selected = unique(settingsParams)[unique(settingsParams) %in% unique(data()$param)],
+          )
+        }
+
+        # Scenario Update
+        settingsScenario <- state$scenariosSelect
+        if(any(unique(settingsScenario) %in% unique(data()$scenario))){
+          updatePickerInput(
+            session=session,
+            inputId = "scenariosSelected",
+            selected = unique(settingsScenario)[unique(settingsScenario) %in% unique(data()$scenario)],
+          )
+        }
+
+        # Reference Scenario Update
+        settingsRefScenario <- state$scenarioRefSelect
+        if(any(unique(settingsRefScenario) %in% unique(data()$scenario))){
+          updatePickerInput(
+            session=session,
+            inputId = "scenarioRefSelected",
+            selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
+          )
+        }
+    }
 
 
 
