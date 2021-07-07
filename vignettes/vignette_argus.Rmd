@@ -9,21 +9,103 @@ vignette: >
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Overview"></a>Overview
+# <a name="Overall Layout"></a>Overall Layout
 <!-- ------------------------>
 <!-- ------------------------>
 
-## Layout:
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
 <p align="center" style="font-size:18px;"> *General Layout* </p>
 <p align="center"> <img src="vignetteFigs/layout.PNG"></p>
 
-## Inputs:
-Brief discussion
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Inputs"></a>Inputs
+<!-- ------------------------>
+<!-- ------------------------>
 
-## Boomarking:
-Brief discussion
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
 
+Within the input panel, there is a data input drop down and several selection drop downs.
 
+<!-- ------------------------>
+<!-- ------------------------>
+## Data Input
+<!-- ------------------------>
+<!-- ------------------------>
+
+Data inputs can be uploaded through a url, csv file, or GCAM directory. Select one and the corresponding input window will appear.
+
+<p align="center"> <img src="vignetteFigs/input.PNG"></p>
+
+<!-- ------------------------>
+<!-- ------------------------>
+## Selections
+<!-- ------------------------>
+<!-- ------------------------>
+
+Other drop downs include selections for:
+
+- Scenarios Running
+- Reference Scenario
+- Parameters Displayed
+- Regions Included
+
+These selections can be changed at anytime by clicking the inputs drop down in the upper right corner.
+
+<!-- ------------------------>
+<!-- ------------------------>
+# <a name="Top Bar"></a>Top Bar
+<!-- ------------------------>
+<!-- ------------------------>
+
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
+On the right side of the top bar, there are four additional icons along with the inputs panel:
+
+1. Bookmarking
+1. Github
+1. Help
+1. Download All
+
+<p align="center"> <img src="vignetteFigs/top_bar.PNG"></p>
+
+<!-- ------------------------>
+<!-- ------------------------>
+## 1. Bookmarking
+<!-- ------------------------>
+<!-- ------------------------>
+By clicking the bookmarking icon, you can obtain a downloadable .RDS file or a URL linking to the webpage as it currently appears, saving all inputs and modifications. With this icon, you can also load a previously created bookmark.
+
+<p align="center"> <img src="vignetteFigs/bookmark.PNG"></p>
+
+<!-- ------------------------>
+<!-- ------------------------>
+## 2. Github
+<!-- ------------------------>
+<!-- ------------------------>
+
+The Github icon will redirect you to the Argus Github page. On this page you can find the Argus source code.
+
+<p align="center"> <img src="vignetteFigs/github.PNG"></p>
+
+<!-- ------------------------>
+<!-- ------------------------>
+## 3. Help
+<!-- ------------------------>
+<!-- ------------------------>
+
+Clicking the help icon will take you to the webpage including the Installation and User Guide.
+
+<p align="center"> <img src="vignetteFigs/help.PNG"></p>
+
+<!-- ------------------------>
+<!-- ------------------------>
+## 4. Download All
+<!-- ------------------------>
+<!-- ------------------------>
+
+Add brief description
 
 <!-- ------------------------>
 <!-- ------------------------>
@@ -31,8 +113,11 @@ Brief discussion
 <!-- ------------------------>
 <!-- ------------------------>
 
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
 - Details on focus tab
 
+<p align="center"> <img src="vignetteFigs/focus.PNG"></p>
 
 <!-- ------------------------>
 <!-- ------------------------>
@@ -40,13 +125,19 @@ Brief discussion
 <!-- ------------------------>
 <!-- ------------------------>
 
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
 - Details on Lines tab
+
+<p align="center"> <img src="vignetteFigs/line_all.PNG"></p>
 
 <!-- ------------------------>
 <!-- ------------------------>
 # <a name="Charts Tab"></a>Charts
 <!-- ------------------------>
 <!-- ------------------------>
+
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
 
 - Details on charts tab
 
@@ -56,12 +147,18 @@ Brief discussion
 <!-- ------------------------>
 <!-- ------------------------>
 
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
 - Details on maps tab
+
+<p align="center"> <img src="vignetteFigs/maps.PNG"></p>
 
 <!-- ------------------------>
 <!-- ------------------------>
 # <a name="Table Tab"></a>Table
 <!-- ------------------------>
 <!-- ------------------------>
+
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
 
 - Details on Table tab
