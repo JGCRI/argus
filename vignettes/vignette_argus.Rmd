@@ -38,6 +38,10 @@ Data inputs can be uploaded through a url, csv file, or GCAM directory. Select o
 
 <p align="center"> <img src="vignetteFigs/input.PNG"></p>
 
+Uploaded data must be formatted like the following:
+
+<p align="center"> <img src="vignetteFigs/input_format.PNG"></p>
+
 <!-- ------------------------>
 <!-- ------------------------>
 ## Selections
@@ -51,7 +55,9 @@ Other drop downs include selections for:
 - Parameters Displayed
 - Regions Included
 
-These selections can be changed at anytime by clicking the inputs drop down in the upper right corner.
+These selections can be changed at anytime by clicking the inputs drop down in the upper right corner. Checkmarks next to items signify selection.
+
+<p align="center"> <img src="vignetteFigs/selections.PNG"></p>
 
 <!-- ------------------------>
 <!-- ------------------------>
