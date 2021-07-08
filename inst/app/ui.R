@@ -170,19 +170,47 @@ ui <- fluidPage(
                                                          class = "download_button"),style="float:right"))),
                            tabsetPanel(type="tabs",
                                            tabPanel("Absolute Value",
-                                                    div(class="charts",
-                                                        br(),
-                                                        plotOutput(outputId = "mapAbs", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;")),
+                                                    fluidRow(
+                                                      column(4,
+                                                             div(class="charts",
+                                                                 br(),
+                                                                 plotOutput(outputId = "mapAbsRef", width = "100%", height="100%"))
+                                                      ),
+                                                      column(8,
+                                                             div(
+                                                               br(),
+                                                               div(plotOutput(outputId = "mapAbs", width = "100%", height="100%"), style="transform: rotateX(180deg);"),style = "overflow-x : scroll; transform: rotateX(180deg);")
+                                                      ))
+
+                                                    ),
                                            tabPanel("Absolute Difference",
-                                                    div(class="charts",
-                                                        br(),
-                                                        plotOutput(outputId = "mapDiff", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;")),
+                                                    fluidRow(
+                                                     column(4,
+                                                            div(class="charts",
+                                                                br(),
+                                                                plotOutput(outputId = "mapDiffRef", width = "100%", height="100%"))
+                                                     ),
+                                               column(8,
+                                                      div(
+                                                          br(),
+                                                          div(plotOutput(outputId = "mapDiff", width = "100%", height="100%"), style="transform: rotateX(180deg);"),style = "overflow-x : scroll; transform: rotateX(180deg);")
+                                                     ))),
+                                                    # div(class="charts",
+                                                    #     br(),
+                                                    #     plotOutput(outputId = "mapDiff", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;")),
                                            tabPanel("Percent Difference",
-                                                    div(class="charts",
-                                                        br(),
-                                                        plotOutput(outputId = "mapPerc", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;"))
-                                                    )
-                               ),
+                                                    fluidRow(
+                                                      column(4,
+                                                             div(class="charts",
+                                                                 br(),
+                                                                 plotOutput(outputId = "mapPercRef", width = "100%", height="100%"))
+                                                      ),
+                                                      column(8,
+                                                             div(
+                                                               br(),
+                                                               div(plotOutput(outputId = "mapPerc", width = "100%", height="100%"), style="transform: rotateX(180deg);"), style = "overflow-x : scroll; transform: rotateX(180deg);")
+                                                      ))
+                               ))),
                   #---------------------------
                   # Main Panel: Table Tab
                   #---------------------------
