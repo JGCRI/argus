@@ -21,9 +21,12 @@ All results can be downloaded onto a local machine, or the user can obtain a boo
 For more detailed information on using argus, click the green **User Guide** button below. 
 To launch argus in your browser, click the blue **Launch App** button.
 
+<br>
+
 <p align="center">
-<a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_user_guide.PNG?raw=true" alt="User Guide" height="130" style="margin:20px"/></a>
-<a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_launch_app.PNG?raw=true" alt="User Guide" height="130" style="margin:20px"/></a>
+<a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_user_guide.PNG?raw=true" alt="User Guide" height="60"/></a>
+<img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_divider.PNG?raw=true" height="40"/>
+<a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_launch_app.PNG?raw=true" alt="User Guide" height="60"/></a>
 </p>
 
 
@@ -33,7 +36,8 @@ To launch argus in your browser, click the blue **Launch App** button.
 <!-- ------------------------>
 <!-- ------------------------>
 
-Citation to be added
+Khan, Z., Tang, S., Warmka, A., Zhao, M., Wild, T., Vernon, C., 2021. Argus - An interactive platform to effectively communicate and share spatio-temporal scientific data. (In progress) Journal of Open Source Software, DOI: XXXX
+
 
 
 <!-- ------------------------>
