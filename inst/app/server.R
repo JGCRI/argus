@@ -1864,50 +1864,50 @@ server <- function(input, output, session) {
 
     # Percentage Difference Map of Reference Scenario
     output$mapDiffRef <- renderPlot({
-      maprs(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
+      maprs(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
     }
-    ,height=function(){300*length(unique(isolate(dataMapx()$param)))}
-    ,width=function(){return(500)}
+    ,height=function(){300*length(unique(dataChartx()$param))}
+    ,width=function(){return(800)}
     )
 
     # Percentage Difference Map of Other Scenario
     output$mapDiff <- renderPlot({
       mapos(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
     }
-    ,height=function(){300*length(unique(isolate(dataMapx()$param)))}
-    ,width=function(){return(500 * (length(unique(scenariosSelectedx())) -1 ))}
+    ,height=function(){300*length(unique(dataChartx()$param))}
+    ,width=function(){return(800 * (length(unique(scenariosSelectedx())) -1 ))}
     )
 
     # Absolute Difference Map of Reference Scenario
     output$mapAbsRef <- renderPlot({
     maprs(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataMapx())
     }
-    ,height=function(){300*length(unique(isolate(dataMapx()$param)))}
-    ,width=function(){return(500)}
+    ,height=function(){300*length(unique(dataChartx()$param))}
+    ,width=function(){return(800)}
     )
 
     # Absolute Difference Map of Other Scenario
     output$mapAbs <- renderPlot({
-    mapos(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
+    mapos(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataMapx())
     }
-    ,height=function(){300*length(unique(isolate(dataMapx()$param)))}
-    ,width=function(){return(500 * (length(unique(scenariosSelectedx())) -1 ))}
+    ,height=function(){300*length(unique(dataChartx()$param))}
+    ,width=function(){return(800 * (length(unique(scenariosSelectedx())) -1 ))}
     )
 
     # Percentage Difference Map of Reference scenario
     output$mapPercRef <- renderPlot({
       maprs(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
     }
-    ,height=function(){300*length(unique(isolate(dataMapx()$param)))}
-    ,width=function(){return(500)}
+    ,height=function(){300*length(unique(dataChartx()$param))}
+    ,width=function(){return(800)}
     )
 
     # Percentage Difference Map of Other Scenario
     output$mapPerc <- renderPlot({
     mapos(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
     }
-    ,height=function(){300*length(unique(isolate(dataMapx()$param)))}
-    ,width=function(){return(500 * (length(unique(scenariosSelectedx())) -1 ))}
+    ,height=function(){300*length(unique(dataChartx()$param))}
+    ,width=function(){return(800 * (length(unique(scenariosSelectedx())) -1 ))}
     )
 
   # Download

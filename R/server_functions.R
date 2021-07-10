@@ -1020,6 +1020,12 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
       dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == scenarioRefSelected)
     z<-x
 
+    temp <- dataChartPlot %>%
+      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != scenarioRefSelected)%>%
+      droplevels()
+
+    palCharts <- palCharts[names(palCharts) %in% unique(temp$class)]
+
     plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
                                        dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != scenarioRefSelected)%>%
                                        droplevels(),
@@ -1109,6 +1115,12 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
     chartz <- dataChartPlot %>%
       dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == scenarioRefSelected)
     z<-x
+
+    temp <- dataChartPlot %>%
+      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != scenarioRefSelected)%>%
+      droplevels()
+
+    palCharts <- palCharts[names(palCharts) %in% unique(temp$class)]
 
     plist[[z+1]] <-  ggplot2::ggplot(dataChartPlot %>%
                                        dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != scenarioRefSelected)%>%
@@ -1201,6 +1213,12 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected){
     chartz <- dataChartPlot %>%
       dplyr::filter(param==unique(dataChartPlot$param)[i])
     x=x+1
+
+    temp <- dataChartPlot %>%
+      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != scenarioRefSelected)%>%
+      droplevels()
+
+    palCharts <- palCharts[names(palCharts) %in% unique(temp$class)]
 
     plist[[z]] <-  ggplot2::ggplot(chartz%>%
                                      droplevels(),
