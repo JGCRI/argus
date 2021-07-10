@@ -171,12 +171,12 @@ ui <- fluidPage(
                            tabsetPanel(type="tabs",
                                            tabPanel("Absolute Value",
                                                     fluidRow(
-                                                      column(4,
+                                                      column(6,
                                                              div(class="charts",
                                                                  br(),
-                                                                 plotOutput(outputId = "mapAbsRef", width = "100%", height="100%"))
+                                                                 div(plotOutput(outputId = "mapAbsRef", width = "100%", height="100%"), style="transform: rotateX(180deg);"), style = "overflow-x : scroll; transform: rotateX(180deg);")
                                                       ),
-                                                      column(8,
+                                                      column(6,
                                                              div(
                                                                br(),
                                                                div(plotOutput(outputId = "mapAbs", width = "100%", height="100%"), style="transform: rotateX(180deg);"),style = "overflow-x : scroll; transform: rotateX(180deg);")
@@ -185,12 +185,12 @@ ui <- fluidPage(
                                                     ),
                                            tabPanel("Absolute Difference",
                                                     fluidRow(
-                                                     column(4,
+                                                     column(6,
                                                             div(class="charts",
                                                                 br(),
-                                                                plotOutput(outputId = "mapDiffRef", width = "100%", height="100%"))
+                                                                div(plotOutput(outputId = "mapDiffRef", width = "100%", height="100%"), style="transform: rotateX(180deg);"), style = "overflow-x : scroll; transform: rotateX(180deg);")
                                                      ),
-                                               column(8,
+                                               column(6,
                                                       div(
                                                           br(),
                                                           div(plotOutput(outputId = "mapDiff", width = "100%", height="100%"), style="transform: rotateX(180deg);"),style = "overflow-x : scroll; transform: rotateX(180deg);")
@@ -200,12 +200,12 @@ ui <- fluidPage(
                                                     #     plotOutput(outputId = "mapDiff", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;")),
                                            tabPanel("Percent Difference",
                                                     fluidRow(
-                                                      column(4,
+                                                      column(6,
                                                              div(class="charts",
                                                                  br(),
-                                                                 plotOutput(outputId = "mapPercRef", width = "100%", height="100%"))
+                                                                 div(plotOutput(outputId = "mapPercRef", width = "100%", height="100%"), style="transform: rotateX(180deg);"), style = "overflow-x : scroll; transform: rotateX(180deg);")
                                                       ),
-                                                      column(8,
+                                                      column(6,
                                                              div(
                                                                br(),
                                                                div(plotOutput(outputId = "mapPerc", width = "100%", height="100%"), style="transform: rotateX(180deg);"), style = "overflow-x : scroll; transform: rotateX(180deg);")
