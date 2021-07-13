@@ -333,8 +333,6 @@ map <- function(flag,
   z <- 1
   plist <- list()
   for(i in paramsSelect[!is.na(paramsSelect)]){
-    print(i)
-    print("++++++++++++++++=")
     if ((flag == 3)||(flag == 2)){
       proc <- process_map(dataMapx %>% dplyr::ungroup() %>%
                             dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
@@ -675,8 +673,6 @@ maprs <- function(flag,
   z <- 1
   plist <- list()
   for(i in paramsSelect[!is.na(paramsSelect)]){
-    print(i)
-    print("++++++++++++++++=")
     if (T){
       proc <- process_map(dataMapx %>% dplyr::ungroup() %>%
                             dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
@@ -991,8 +987,6 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
 
   g <- 2
 
-  print("abs diff")
-
   plist <- list()
   x = 1
 
@@ -1014,7 +1008,6 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
     } else{
       palCharts <- jgcricolors::jgcricol()$pal_all
     }
-    print(palCharts)
 
     chartz <- dataChartPlot %>%
       dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == scenarioRefSelected)
@@ -1087,7 +1080,6 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
 
   g <- 2
 
-  print("abs diff")
 
   plist <- list()
   x = 1
@@ -1110,7 +1102,6 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
     } else{
       palCharts <- jgcricolors::jgcricol()$pal_all
     }
-    print(palCharts)
 
     chartz <- dataChartPlot %>%
       dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == scenarioRefSelected)
@@ -1204,7 +1195,6 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected){
     } else{
       palCharts <- jgcricolors::jgcricol()$pal_all
     }
-    print(palCharts)
 
     chartz <- dataChartPlot %>%
       dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == scenarioRefSelected)
