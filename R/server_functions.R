@@ -217,7 +217,7 @@ summaryPlotReg <- function(titletext,
                                        color=scenario)) +
       ggplottheme +
       ylab(NULL) + xlab(NULL) +
-      geom_line() +
+      geom_line(size=2) +
       scale_y_continuous(position = "right")+
       facet_grid(param~subRegion, scales="free",switch="y",
                  labeller = labeller(param = label_wrap_gen(15))
@@ -959,9 +959,8 @@ summaryPlot <- function(aspectratio,
                   aes(x=x,y=value,
                       group=scenario,
                       color=scenario))+
-    geom_line(size=1.25) +
     ggplottheme +
-    geom_line() +
+    geom_line(size=2) +
     ylab(NULL) +  xlab(NULL) +
     facet_wrap(.~param, scales="free", ncol = 3,
                labeller = labeller(param = label_wrap_gen(15)))+
@@ -1031,8 +1030,6 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
       scale_fill_manual(breaks=names(palCharts),values=palCharts) +
       scale_y_continuous(position = "left")+
       geom_bar(position="stack", stat="identity") +
-      # geom_line()+
-      # geom_point()+
       facet_grid(param~scenario, scales="free",switch="y") +
       theme(legend.position="bottom",
             legend.title = element_blank(),
@@ -1124,9 +1121,7 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
       ylab(NULL) +
       scale_color_manual(breaks=names(palCharts),values=palCharts) +
       scale_y_continuous(position = "left")+
-      #geom_bar(position="stack", stat="identity") +
-      geom_line()+
-      # geom_point()+
+      geom_line(size=2)+
       facet_grid(param~scenario, scales="free",switch="y") +
       theme(legend.position="bottom",
             legend.title = element_blank(),
