@@ -32,7 +32,7 @@ library(sp)
 
 options(shiny.maxRequestSize=100*1024^2)
 #options(shiny.trace = TRUE)
-pal_all <- argus::mappings()$pal_all
+pal_all <- rmap::mappings()$pal_all
 
 #...........................
 # Server object
@@ -114,7 +114,6 @@ server <- function(input, output, session) {
 
     #URL bookmark onRestore
     onRestore(function(state) {
-      print("Restoring bookmark...")
       rv$data <- state$values$data
       updatePickerInput(
         inputId = "mapLegend",
@@ -168,9 +167,6 @@ server <- function(input, output, session) {
     updateVals <- function(state){
       #focusMapScenarioSelected
       settingfocusMapScenarioSelected <- state$focusMapScenarioSelected
-      print("Updating focus map scenario selected...")
-      print(( settingfocusMapScenarioSelected %in% unique(data()$scenario)) && !is.null(settingfocusMapScenarioSelected))
-      print(settingfocusMapScenarioSelected)
       if(( settingfocusMapScenarioSelected %in% unique(data()$scenario)) && !is.null(settingfocusMapScenarioSelected)){
         updatePickerInput(
           inputId = "focusMapScenarioSelected",
@@ -262,9 +258,6 @@ server <- function(input, output, session) {
         # Scenario Update
         settingsScenario <- state$scenariosSelected
         if(!any(unique(settingsScenario) %in% unique(data()$scenario))){
-          print("settingsScenario not valid.")
-          print("state files available: ")
-          print(names(state))
         }
         if(any(unique(settingsScenario) %in% unique(data()$scenario))){
           updatePickerInput(
@@ -478,7 +471,7 @@ server <- function(input, output, session) {
   })
 
   # Load Default Datasets from argus
-  dataDefault <- argus::example_GCAMv5p3_SSP235
+  dataDefault <- argus::exampleData
   ggplottheme <- ggplot2::theme_bw()
 
   } # Initial Setting
@@ -596,31 +589,15 @@ server <- function(input, output, session) {
       gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",rv_gcam$gcamdatabasepathx)); gcamdatabasePath_dir
       gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', rv_gcam$gcamdatabasepathx); gcamdatabasePath_file
       # Save Message from rgcam::localDBConn to a text file and then extract names
-      zz <- file(paste(getwd(),"/test.txt",sep=""), open = "wt")
-      sink(zz,type="message")
-      #progress$inc(1/3, detail = paste("Connecting to Database", 2))
-      rgcam::localDBConn(gcamdatabasePath_dir,gcamdatabasePath_file)
-      sink()
-      closeAllConnections()
-      # Read temp file
-      #progress$inc(1/3, detail = paste("Reading temp file", 2))
-      con <- file(paste(getwd(),"/test.txt",sep=""),open = "r")
-      first_line <- readLines(con,n=1); first_line
-      closeAllConnections()
-      if(grepl("error",first_line,ignore.case = T)){stop(paste(first_line))}
-      print(first_line)
-      if(file.exists(paste(getwd(),"/test.txt",sep=""))){unlink(paste(getwd(),"/test.txt",sep=""))}
-      # Extract scenario names from saved line
-      #progress$inc(1/3, detail = paste("Extracting Scenario names from saved line", 2))
-      s1 <- gsub(".*:","",first_line);s1
-      s2 <- gsub(" ","",s1);s2
-      b <- as.vector(unlist(strsplit(s2,",")))
-      if (!is.null(b)){
+      x <- utils::capture.output(rgcam::localDBConn(gcamdatabasePath,gcamdatabaseName), type="message")
+      x <- gsub(", ",",",gsub(": ","",gsub("Database scenarios:  ","",x)));x
+      gcam_scenarios_extracted <- as.vector(unlist(strsplit(gsub("Database scenarios: ","",x),",")))
+      if (!is.null(gcam_scenarios_extracted)){
         rv$validGCAM <- TRUE
       }else{
         rv$validGCAM <- FALSE
       }
-      return(b)
+      return(gcam_scenarios_extracted)
   })
 
   gcamScenariosxProj <- reactive({
@@ -675,7 +652,7 @@ server <- function(input, output, session) {
   #.........................................
 
   gcamParamsx <- reactive({
-    unique((argus::mappings()$mapParamQuery)$param)
+    unique((rmap::mappings()$mapParamQuery)$param)
   })
 
   output$gcamParams = renderUI({
@@ -699,7 +676,7 @@ server <- function(input, output, session) {
   #.........................................
 
   gcamRegionsx <- reactive({
-   unique((argus::mappings()$countryToGCAMReg32)$region)
+   unique((rmap::mappings()$countryToGCAMReg32)$region)
   })
 
   output$gcamRegions = renderUI({
@@ -821,33 +798,50 @@ server <- function(input, output, session) {
 
   # Read in Raw Data
   data_raw <- reactive({
+
     if (is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
-      return(argus::addMissing(
+
+      data_raw_result <- argus::addMissing(
         dataDefault %>%
-          dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
-      ))
+          dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
+
+    return(data_raw_result)
+
     } else if(!is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
-      res <- NULL
+
+      data_raw_result <- NULL
+
       for (i in 1:length(input$filedata$datapath)){
         argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) %>%
-            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
-        z<-argus::addMissing(a)
-        res <- dplyr::bind_rows(res, z)
+            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> data_raw_result_i
+        data_raw_result_i<-argus::addMissing(data_raw_result_i)
+        data_raw_result <- dplyr::bind_rows(data_raw_result, data_raw_result_i)
       }
-      return(res)
+
+      return(data_raw_result)
+
     } else if(is.null(rv$filedatax) & !is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))){
-      return(argus::addMissing(rv$dataGCAM %>%
-        dplyr::select(scenario, subRegion, param, aggregate, class, x, value)))
-    }else{
-      z <- strsplit(rv$urlfiledatax, ",")
-      res <- NULL
-      for (i in 1:length(z[[1]])){
-        argus::parse_remote(gsub(" ", "", z[[1]][i], fixed = TRUE))%>%
-            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
-        res <- dplyr::bind_rows(res, a)
+
+      data_raw_result <-argus::addMissing(rv$dataGCAM %>%
+                                            dplyr::select(scenario, subRegion, param, aggregate, class, x, value))
+
+      return(data_raw_result)
+
+    } else {
+
+      urlfiledatax_path <- strsplit(rv$urlfiledatax, ",")
+
+      data_raw_result <- NULL
+
+      for (i in 1:length(urlfiledatax_path[[1]])){
+        argus::parse_remote(gsub(" ", "", urlfiledatax_path[[1]][i], fixed = TRUE))%>%
+            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> data_raw_result_i
+
+        data_raw_result <- dplyr::bind_rows(data_raw_result, data_raw_result_i)
       }
-      return(res)
+      return(data_raw_result)
     }
+
   })
 
   data <- reactive({
@@ -1239,7 +1233,6 @@ server <- function(input, output, session) {
                                                    unique(
                                                      tbl_pd$scenario
                                                    )[unique(tbl_pd$scenario) != scenRef_i])))
-      # print(tbl_pd)
       tbl_pd
     })
 
@@ -1273,7 +1266,6 @@ server <- function(input, output, session) {
           scenRef_i = unique(dataChartx()$scenario)[1]
         } else{
           scenRef_i <- input$scenarioRefSelected
-          print(scenRef_i)
         }
       } # Check if Ref Scenario Chosen
 
@@ -1284,7 +1276,6 @@ server <- function(input, output, session) {
       for (k in unique(dataChartx()$scenario)[unique(dataChartx()$scenario) !=
                                               scenRef_i]) {
 
-        print(k)
         tbl_temp <- dataChartx() %>%
           dplyr::filter(scenario %in% c(scenRef_i, k))  %>%
           dplyr::filter(!(is.na(class) & value==0))%>%
@@ -1441,7 +1432,6 @@ server <- function(input, output, session) {
           scenRef_i = unique(dataMapx()$scenario)[1]
         } else{
           scenRef_i <- input$scenarioRefSelected
-          print(scenRef_i)
         }
       } # Check if Ref Scenario Chosen
 
@@ -1450,7 +1440,6 @@ server <- function(input, output, session) {
         dplyr::filter(scenario == scenRef_i)
       for (k in unique(dataMapx()$scenario)[unique(dataMapx()$scenario) !=
                                             scenRef_i]) {
-        print(k)
         tbl_temp <- dataMapx() %>%
           dplyr::filter(scenario %in% c(scenRef_i, k))
         tbl_temp <- tbl_temp %>%
@@ -1474,7 +1463,6 @@ server <- function(input, output, session) {
                                                    unique(
                                                      tbl_pd$scenario
                                                    )[unique(tbl_pd$scenario) != scenRef_i])))
-      print(dplyr::filter(tbl_pd, scenario %in% c(paste(k, diffText, sep = ""))))
       tbl_pd
     })
 
@@ -1509,7 +1497,7 @@ server <- function(input, output, session) {
       filter(param == focusMapParamSelectedx(),
              scenario == input$focusMapScenarioSelected,
              x == input$focusMapYearSelected) %>%
-        dplyr::left_join(argus::mappings("mappingGCAMBasins"),by="subRegion") %>%
+        dplyr::left_join(rmap::mappings("mappingGCAMBasins"),by="subRegion") %>%
         dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
                                                  TRUE~subRegion)) %>%
         dplyr::select(-subRegionMap) %>%
@@ -1525,11 +1513,9 @@ server <- function(input, output, session) {
         return(mapFocus)
       }
 
-      mapdf <- rmap::map_find(dataMapFocus_raw)$subRegShapeFound;
+    mapdf <- rmap::map_find(dataMapFocus_raw)$subRegShapeFound;
 
-     # Prepare for Polygons
-
-
+    # Prepare for Polygons
 
     mapdf <- mapdf[mapdf$subRegion %in% dataMapFocus_raw$subRegion,]; mapdf
     mapdf@data <- mapdf@data %>%
@@ -1828,56 +1814,6 @@ server <- function(input, output, session) {
 
     if(T){ # Maps
 
-    #outputs right group of graphs
-
-    # Percentage Difference Map of Reference Scenario
-    output$mapDiffRef <- renderPlot({
-      maprs(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
-    }
-    ,height=function(){300*length(unique(dataChartx()$param))}
-    ,width=function(){return(800)}
-    )
-
-    # Percentage Difference Map of Other Scenario
-    output$mapDiff <- renderPlot({
-      mapos(3, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataDiffAbsMapx())
-    }
-    ,height=function(){300*length(unique(dataChartx()$param))}
-    ,width=function(){return(800 * (length(unique(scenariosSelectedx())) -1 ))}
-    )
-
-    # Absolute Difference Map of Reference Scenario
-    output$mapAbsRef <- renderPlot({
-    maprs(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataMapx())
-    }
-    ,height=function(){300*length(unique(dataChartx()$param))}
-    ,width=function(){return(800)}
-    )
-
-    # Absolute Difference Map of Other Scenario
-    output$mapAbs <- renderPlot({
-    mapos(1, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataMapx())
-    }
-    ,height=function(){300*length(unique(dataChartx()$param))}
-    ,width=function(){return(800 * (length(unique(scenariosSelectedx())) -1 ))}
-    )
-
-    # Percentage Difference Map of Reference scenario
-    output$mapPercRef <- renderPlot({
-      maprs(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
-    }
-    ,height=function(){300*length(unique(dataChartx()$param))}
-    ,width=function(){return(800)}
-    )
-
-    # Percentage Difference Map of Other Scenario
-    output$mapPerc <- renderPlot({
-    mapos(2, input$mapLegend, input$mapYear, input$scenarioRefSelected, dataMapx(), dataPrcntAbsMapx())
-    }
-    ,height=function(){300*length(unique(dataChartx()$param))}
-    ,width=function(){return(800 * (length(unique(scenariosSelectedx())) -1 ))}
-    )
-
   # Download
   output$downloadMap <- downloadHandler(
     file = "map.png",
@@ -1923,7 +1859,6 @@ server <- function(input, output, session) {
     content = function(file) {
       tmpdir <- tempdir()
       setwd(tempdir())
-      print(tempdir())
       fs <- c("table.csv",
               "summaryChart.png",
               "barCharts.png",
@@ -1958,8 +1893,6 @@ server <- function(input, output, session) {
               width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
               units="in"
             )
-
-      print(fs)
       zip::zip(zipfile=file, files=fs)
     }
   )

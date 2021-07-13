@@ -14,5 +14,6 @@
 #' @import shiny
 
 run <- function() {
+  enableBookmarking(store="url")
   shiny::runApp(system.file('app', package='argus'))
 }
