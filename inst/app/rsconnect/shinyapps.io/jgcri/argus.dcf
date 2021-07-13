@@ -5,9 +5,7 @@ account: jgcri
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4178628
-bundleId: 4634930
+bundleId: 4813640
 url: https://jgcri.shinyapps.io/argus/
-when: 1621891226.67788
-asMultiple: FALSE
-asStatic: FALSE
-ignoredFiles: test.txt
+when: 1626151728.98221
+lastSyncTime: 1626151728.98221

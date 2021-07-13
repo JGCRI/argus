@@ -114,7 +114,7 @@ server <- function(input, output, session) {
 
     #URL bookmark onRestore
     onRestore(function(state) {
-      print(state)
+      print("Restoring bookmark...")
       rv$data <- state$values$data
       updatePickerInput(
         inputId = "mapLegend",
@@ -153,10 +153,6 @@ server <- function(input, output, session) {
         return(0)
       })
 
-
-
-
-
       }, ignoreInit = TRUE
     )
 
@@ -172,6 +168,9 @@ server <- function(input, output, session) {
     updateVals <- function(state){
       #focusMapScenarioSelected
       settingfocusMapScenarioSelected <- state$focusMapScenarioSelected
+      print("Updating focus map scenario selected...")
+      print(( settingfocusMapScenarioSelected %in% unique(data()$scenario)) && !is.null(settingfocusMapScenarioSelected))
+      print(settingfocusMapScenarioSelected)
       if(( settingfocusMapScenarioSelected %in% unique(data()$scenario)) && !is.null(settingfocusMapScenarioSelected)){
         updatePickerInput(
           inputId = "focusMapScenarioSelected",
@@ -205,7 +204,6 @@ server <- function(input, output, session) {
         session$sendCustomMessage("setsetting", c("focusMapParamSelected", settingfocusMapParamSelected))
       }
 
-
         #mapLegend
         settingsmapLegend <- state$mapLegend
         if((settingsmapLegend %in% c("kmean","pretty")) && !is.null(settingsmapLegend)){
@@ -233,18 +231,16 @@ server <- function(input, output, session) {
         #subsetRegions
         settingsSubsetRegions <- state$subsetRegions
         if(any(unique(settingsSubsetRegions) %in% unique(data()$subRegion))){
-          print("c==c")
           updatePickerInput(
             inputId = "subsetRegions",
             session=session,
             choices = unique(data()$subRegion),
             selected = state$subsetRegions)
           session$sendCustomMessage("setsetting", c("subsetRegions", settingsSubsetRegions))
-          print(state$subsetRegions)
         }
 
         # Regions Update
-        settingsRegions <- state$regionsSelect
+        settingsRegions <- state$regionsSelected
         if(any(unique(settingsRegions) %in% unique(data()$subRegion))){
           updatePickerInput(
             session=session,
@@ -254,7 +250,7 @@ server <- function(input, output, session) {
         }
 
         # Parameters Update
-        settingsParams <- state$paramsSelect
+        settingsParams <- state$paramsSelected
         if(any(unique(settingsParams) %in% unique(data()$param))){
           updatePickerInput(
             session=session,
@@ -264,7 +260,12 @@ server <- function(input, output, session) {
         }
 
         # Scenario Update
-        settingsScenario <- state$scenariosSelect
+        settingsScenario <- state$scenariosSelected
+        if(!any(unique(settingsScenario) %in% unique(data()$scenario))){
+          print("settingsScenario not valid.")
+          print("state files available: ")
+          print(names(state))
+        }
         if(any(unique(settingsScenario) %in% unique(data()$scenario))){
           updatePickerInput(
             session=session,
@@ -274,7 +275,7 @@ server <- function(input, output, session) {
         }
 
         # Reference Scenario Update
-        settingsRefScenario <- state$scenarioRefSelect
+        settingsRefScenario <- state$scenarioRefSelected
         if(any(unique(settingsRefScenario) %in% unique(data()$scenario))){
           updatePickerInput(
             session=session,
@@ -431,9 +432,7 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$readfilebutton, {
-      print("oof")
-      removeModal()
-      #req(input$filedata)
+    removeModal()
     showModal(
       modalDialog(
         size = "s",
@@ -822,24 +821,17 @@ server <- function(input, output, session) {
 
   # Read in Raw Data
   data_raw <- reactive({
-    print("oof")
     if (is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
       return(argus::addMissing(
         dataDefault %>%
           dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       ))
     } else if(!is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
-      print(rv$filedatax)
-      # res <- argus::parse_local(input$filedata$datapath[1], inpu$urlfiledata$datapath)%>%
-      #   dplyr::select(scenario, subRegion, param, aggregate, class, x, value)
       res <- NULL
       for (i in 1:length(input$filedata$datapath)){
-        print("lllllllllll")
-        print(input$filedata$datapath[i])
         argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) %>%
             dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
         z<-argus::addMissing(a)
-        print("oofz")
         res <- dplyr::bind_rows(res, z)
       }
       return(res)
@@ -850,10 +842,7 @@ server <- function(input, output, session) {
       z <- strsplit(rv$urlfiledatax, ",")
       res <- NULL
       for (i in 1:length(z[[1]])){
-        print(z[[1]])
-        print("lllllllllll")
-        print(z[[1]][i])
-          argus::parse_remote(gsub(" ", "", z[[1]][i], fixed = TRUE))%>%
+        argus::parse_remote(gsub(" ", "", z[[1]][i], fixed = TRUE))%>%
             dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> a
         res <- dplyr::bind_rows(res, a)
       }
@@ -866,7 +855,6 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$append, {
-    print("ooof")
     tblAggsums <- data_raw() %>%
       dplyr::filter(aggregate == "sum") %>%
       dplyr::select(scenario, subRegion, param, aggregate, class, x, value)%>%
@@ -880,7 +868,6 @@ server <- function(input, output, session) {
 
     tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
     rv$data <- dplyr::bind_rows(rv$data, tbl)
-    print("apend")
     rv$filedatax<-NULL
     rv$dataGCAM<-NULL
     rv$urlfiledatax<-NULL
@@ -901,7 +888,6 @@ server <- function(input, output, session) {
 
     tbl <- dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
     rv$data <- dplyr::bind_rows(NULL, tbl)
-    print("close")
     rv$filedatax<-NULL
     rv$dataGCAM<-NULL
     rv$urlfiledatax<-NULL
@@ -1152,8 +1138,6 @@ server <- function(input, output, session) {
 
     # Data for summary chart
     dataSumx <- reactive({
-      # print(unique(scenariosSelectedx()))
-      # print(paramsSelectedx())
       x <- dataSum() %>%
         dplyr::filter(scenario %in% scenariosSelectedx(),
                       param %in% paramsSelectedx())
@@ -1235,7 +1219,6 @@ server <- function(input, output, session) {
           dplyr::filter(!(is.na(class) & value==0))%>%
           dplyr::mutate(class=if_else(is.na(class),"NA",class))
 
-        print(tbl_temp$value)
         tbl_temp <- tbl_temp %>%
           tidyr::spread(scenario, value)
 
@@ -1329,7 +1312,6 @@ server <- function(input, output, session) {
                                                    unique(
                                                      tbl_pd$scenario
                                                    )[unique(tbl_pd$scenario) != scenRef_i])))
-      print(dplyr::filter(tbl_pd, scenario %in% c(paste(k, diffText, sep = ""))))
       tbl_pd
     })
 
@@ -1406,30 +1388,19 @@ server <- function(input, output, session) {
                                             scenRef_i]) {
         tbl_temp <- dataMapx() %>%
           dplyr::filter(scenario %in% c(scenRef_i, k))
-        # print("tbl_temp")
-        # print(tbl_temp)
-        # print("tbl_temp$value")
-        # print(tbl_temp$value)
         tbl_temp <- tbl_temp %>%
           tidyr::spread(scenario, value)
-        # print("tbl_temp post spread")
-        # print(tbl_temp)
 
         tbl_temp[is.na(tbl_temp)] <- 0
 
         tbl_temp <- tbl_temp %>%
           dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
           dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
-        # print("tbl temp post mute")
-        # print(tbl_temp)
         tbl_temp <- tbl_temp %>%
           tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
-        # print("tidyr")
-        # print(tbl_temp)
-        tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
-        # print("bind_rows")
-        # print(tbl_pd)
-      }
+       tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
+
+        }
 
       tbl_pd <- tbl_pd %>%
         dplyr::mutate(scenario = factor(scenario,
@@ -1437,8 +1408,7 @@ server <- function(input, output, session) {
                                                    unique(
                                                      tbl_pd$scenario
                                                    )[unique(tbl_pd$scenario) != scenRef_i])))
-      # print(tbl_pd)
-      tbl_pd
+     tbl_pd
     })
 
     # Data Map Percent Diff
@@ -1555,7 +1525,7 @@ server <- function(input, output, session) {
         return(mapFocus)
       }
 
-      mapdf <- rmap::mapFind(dataMapFocus_raw)$subRegShapeFound;
+      mapdf <- rmap::map_find(dataMapFocus_raw)$subRegShapeFound;
 
      # Prepare for Polygons
 
@@ -1570,8 +1540,6 @@ server <- function(input, output, session) {
 
     # Create legends and color scales
     bins <- unique(argus::breaks(dataMapFocus_raw,breaks=7)[[1]]);
-    print("bins")
-    print(bins)
     pal <- colorBin(grDevices::colorRampPalette(RColorBrewer::brewer.pal(min(9,length(bins)), "YlOrRd"))(length(bins)),
                     domain = dataMapFocus_raw$value, bins = bins)
 
@@ -1691,7 +1659,6 @@ server <- function(input, output, session) {
     } else{
       palCharts <- jgcricolors::jgcricol()$pal_all
     }
-    print(palCharts)
 
     #ggplotly()
     (ggplot2::ggplot(dataChartPlot,
