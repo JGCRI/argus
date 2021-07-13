@@ -128,6 +128,7 @@ ui <- fluidPage(
                                     plotOutput(outputId = "summary")),
                        tabPanel("Compare Regions",
                                 fluidRow(
+                                  column(6,div(uiOutput('subsetRegions'))),
                                   column(6, downloadButton('downloadPlotSumReg',NULL,download = "summaryChartReg.png",
                                       class = "download_button_in"),style="float:right")),
                                 plotOutput(outputId = "summaryReg"))

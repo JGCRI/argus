@@ -1361,7 +1361,8 @@ server <- function(input, output, session) {
     dataMapx <- reactive({
       dataMap() %>%
         dplyr::filter(scenario %in% input$scenariosSelected,
-                      param %in% paramsSelectedx())
+                      param %in% paramsSelectedx()) %>%
+        dplyr::mutate(subRegion = gsub("-","_",subRegion))
     })
 
     # Data Map Absolute Diff
