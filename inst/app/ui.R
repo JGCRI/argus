@@ -170,48 +170,13 @@ ui <- fluidPage(
                                         column(1, div(br(),downloadButton('downloadMap',NULL,download = "map.png",
                                                          class = "download_button"),style="float:right"))),
                            tabsetPanel(type="tabs",
-                                           tabPanel("Absolute Value",
-                                                    fluidRow(
-                                                      column(6,
-                                                             div(class="charts",
-                                                                 br(),
-                                                                 div(plotOutput(outputId = "mapAbsRef", width = "100%", height="100%"), style="transform: rotateX(180deg);"), style = "overflow-x : scroll; transform: rotateX(180deg);")
-                                                      ),
-                                                      column(6,
-                                                             div(
-                                                               br(),
-                                                               div(plotOutput(outputId = "mapAbs", width = "100%", height="100%"), style="transform: rotateX(180deg);"),style = "overflow-x : scroll; transform: rotateX(180deg);")
-                                                      ))
-
+                                           tabPanel("Absolute Value"
                                                     ),
-                                           tabPanel("Absolute Difference",
-                                                    fluidRow(
-                                                     column(6,
-                                                            div(class="charts",
-                                                                br(),
-                                                                div(plotOutput(outputId = "mapDiffRef", width = "100%", height="100%"), style="transform: rotateX(180deg);"), style = "overflow-x : scroll; transform: rotateX(180deg);")
-                                                     ),
-                                               column(6,
-                                                      div(
-                                                          br(),
-                                                          div(plotOutput(outputId = "mapDiff", width = "100%", height="100%"), style="transform: rotateX(180deg);"),style = "overflow-x : scroll; transform: rotateX(180deg);")
-                                                     ))),
-                                                    # div(class="charts",
-                                                    #     br(),
-                                                    #     plotOutput(outputId = "mapDiff", width = "100%", height="100%"),style = "margin-right: 20px;margin-left: 20px;")),
-                                           tabPanel("Percent Difference",
-                                                    fluidRow(
-                                                      column(6,
-                                                             div(class="charts",
-                                                                 br(),
-                                                                 div(plotOutput(outputId = "mapPercRef", width = "100%", height="100%"), style="transform: rotateX(180deg);"), style = "overflow-x : scroll; transform: rotateX(180deg);")
-                                                      ),
-                                                      column(6,
-                                                             div(
-                                                               br(),
-                                                               div(plotOutput(outputId = "mapPerc", width = "100%", height="100%"), style="transform: rotateX(180deg);"), style = "overflow-x : scroll; transform: rotateX(180deg);")
-                                                      ))
-                               ))),
+                                           tabPanel("Absolute Difference"
+                                                   ),
+                                          tabPanel("Percent Difference"
+                                                   )
+                               )),
                   #---------------------------
                   # Main Panel: Table Tab
                   #---------------------------
