@@ -1,6 +1,0 @@
-variable,value
-urlSelect,https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv
-regionsSelect,SChinaSea;SepikR;SittaungR;SolomonIsl;Southeast Asia;ThaiGulf;VietnamCst;XunJiang
-scenariosSelect,Scenario 2
-scenarioRefSelect,Scenario 2
-paramsSelect,Electricity Generation by Fuel (TWh);Final Electricity by Sector (TWh);Final Energy by Fuel (EJ)

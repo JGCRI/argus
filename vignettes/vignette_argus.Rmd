@@ -9,7 +9,7 @@ vignette: >
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Overall Layout"></a>Overall Layout
+# Overall Layout
 <!-- ------------------------>
 <!-- ------------------------>
 
@@ -20,7 +20,7 @@ vignette: >
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Inputs"></a>Inputs
+# Inputs
 <!-- ------------------------>
 <!-- ------------------------>
 
@@ -61,7 +61,7 @@ These selections can be changed at anytime by clicking the inputs drop down in t
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Top Bar"></a>Top Bar
+# Top Bar
 <!-- ------------------------>
 <!-- ------------------------>
 
@@ -78,10 +78,11 @@ On the right side of the top bar, there are four additional icons along with the
 
 <!-- ------------------------>
 <!-- ------------------------>
-## 1. Bookmarking
+## 1. Bookmarking {#top_bookmarking}
 <!-- ------------------------>
 <!-- ------------------------>
-By clicking the bookmarking icon, you can obtain a downloadable .RDS file or a URL linking to the webpage as it currently appears, saving all inputs and modifications. With this icon, you can also load a previously created bookmark.
+
+By clicking the bookmarking icon, you can obtain a downloadable .RDS file or a URL linking to the webpage as it currently appears, saving all inputs and modifications. With this icon, you can also load a previously created bookmark. Step-by-step instruction on creating, sharing and loading bookmarks is provided in the [Bookmarks](#bookmarks) section.
 
 <p align="center"> <img src="vignetteFigs/bookmark.PNG"></p>
 
@@ -115,7 +116,32 @@ The download all button allows the user to download all figures from all tabs th
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Focus Tab"></a>Focus
+# Bookmarks {#bookmarks}
+<!-- ------------------------>
+<!-- ------------------------>
+
+## Create a Bookmark
+
+- Choose all your inputs (scenarios, parameters, years, zoom levels etc.)
+- Click the bookmark icon in the [top bar](#top_bookmarking)
+- Click `Download Boomark` and choose an appropriate name (e.g. `my_argus_bookmark.rds`).
+- Argus will download your current state and save as `my_argus_bookmark.rds`.
+
+## Share a Bookmark
+
+- You can now share the `my_argus_bookmark.rds` file directly with anyone.
+- You can also upload the file to a github repository or zenodo account and then share the direct link to that file.
+
+## Load a Bookmark
+
+- Click the bookmark icon shown in the figure below
+- Click `Upload Boomark` and choose the appropriate bookmark file (e.g. `my_argus_bookmark.rds`)
+- OR enter the appropriate link to your bookmark saved online in the `Read Bookmark from URL` box.
+
+
+<!-- ------------------------>
+<!-- ------------------------>
+# Focus
 <!-- ------------------------>
 <!-- ------------------------>
 
@@ -127,7 +153,7 @@ The Focus tab gives an overview of the data input based on the year, parameter, 
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Lines Tab"></a>Lines
+# Lines
 <!-- ------------------------>
 <!-- ------------------------>
 
@@ -141,7 +167,7 @@ The user can also visualize each scenario by parameter split into several region
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Charts Tab"></a>Charts
+# Charts
 <!-- ------------------------>
 <!-- ------------------------>
 
@@ -155,7 +181,7 @@ The landing page for this tab is the Absolute Value charts. The user can also na
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Maps Tab"></a>Maps
+# Maps
 <!-- ------------------------>
 <!-- ------------------------>
 
@@ -169,7 +195,7 @@ The landing page for this tab is the Absolute Value maps. The user can also navi
 
 <!-- ------------------------>
 <!-- ------------------------>
-# <a name="Table Tab"></a>Table
+# Table
 <!-- ------------------------>
 <!-- ------------------------>
 

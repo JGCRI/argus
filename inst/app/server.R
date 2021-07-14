@@ -45,6 +45,16 @@ server <- function(input, output, session) {
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
 
   #...........................
+  # Preloaded Data
+  #...........................
+  if(T){
+
+    preloaded_df <- argus::preloaded_data()
+    print(preloaded_df)
+  }
+
+
+  #...........................
   # Bookmark
   #...........................
   if(T){
@@ -60,42 +70,38 @@ server <- function(input, output, session) {
           size = "s",
           easyClose = TRUE,
           footer = NULL,
+          fluidRow(column(6,div(
+                     downloadButton(
+                       'bookmark',
+                       "Download Bookmark",
+                       class = "download_button"
+                     ),
+                     style = "float:left;width=100%;margin-bottom:40px"
+                   ))),
+            # fluidRow(
+            #        div(
+            #
+            #          #bookmarkButton(),
+            #          actionLink(inputId="._bookmark_",
+            #                     label="URL",
+            #                     class = "btn btn-default shiny-download-link download_button",
+            #                     icon = icon("link","fa-1x")
+            #          ),
+            #          style = "float:left;width=100%"
+            #        )
+            #)
           fileInput(
             inputId = "readbookmark",
-            label = "Upload rds",
+            label = "Upload Bookmark",
             accept = c(".rds"),
             multiple = TRUE,
             width = "100%"
           ),
           textInput(
             inputId = "readurlrds",
-            label = "Read rds from url",
+            label = "Read Bookmark from URL",
             width = "100%",
             placeholder =  "https://raw.githubusercontent.com/JGCRI/argus/main/inst/extdata/exampleData.csv"
-          ),
-          fluidRow(
-            column(6,
-                   div(
-                     downloadButton(
-                       'bookmark',
-                       "RDS",
-                       class = "download_button"
-                     ),
-                     style = "float:right;width=100%"
-                   ))
-            ,
-            column(6,
-                   div(
-
-                     #bookmarkButton(),
-                     actionLink(inputId="._bookmark_",
-                                label="URL",
-                                class = "btn btn-default shiny-download-link download_button",
-                                icon = icon("link","fa-1x")
-                     ),
-                     style = "float:left;width=100%"
-                   )
-            )
           )
         )
       )
