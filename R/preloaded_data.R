@@ -17,7 +17,7 @@ preloaded_data <- function(){
 
   preloaded_data <- tibble::tribble(
     ~"group", ~"name", ~"link",
-    "examples", "exampleData", "link_to_rds",
+    "examples", "exampleData", "https://github.com/JGCRI/argusbookmarks/raw/main/argus_bookmark_exampleData.rds",
     "GCAM", "GCAMvX.X_branch_name", "link_to_rds")
 
 invisible(preloaded_data)
