@@ -11,7 +11,7 @@ A dataframe with preloaded data
 }
 \description{
 preloaded_data that allows Argus to load up data from a github or zenodo link.
-Argus data is maintained on the https://github.com/JGCRI/argusdata repo
+Argus data is maintained on the https://github.com/JGCRI/argusbookmarks repo
 If new data is added to the repo users can directly change this file and
 commit on github at : https://github.com/JGCRI/argus/blob/main/R/preloaded_data.R
 }
