@@ -123,7 +123,7 @@ The download all button allows the user to download all figures from all tabs th
 ## Create a Bookmark
 
 - Choose all your inputs (scenarios, parameters, years, zoom levels etc.)
-- Click the bookmark icon in the [top bar](#top_bookmarking)
+- Click the bookmark icon in the top bar as shown in the figure below.
 - Click `Download Boomark` and choose an appropriate name (e.g. `my_argus_bookmark.rds`).
 - Argus will download your current state and save as `my_argus_bookmark.rds`.
 
@@ -138,6 +138,7 @@ The download all button allows the user to download all figures from all tabs th
 - Click `Upload Boomark` and choose the appropriate bookmark file (e.g. `my_argus_bookmark.rds`)
 - OR enter the appropriate link to your bookmark saved online in the `Read Bookmark from URL` box.
 
+<p align="center"> <img src="vignetteFigs/bookmark.PNG"></p>
 
 <!-- ------------------------>
 <!-- ------------------------>
