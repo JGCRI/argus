@@ -134,7 +134,7 @@ server <- function(input, output, session) {
 
     #rds bookmark download handler
     output$bookmark <- downloadHandler(
-      filename <- "bookmark.rds",
+      filename <- "argus_bookmark_data.rds",
       content = function(file){
         state <- isolate(reactiveValuesToList(input))
         state$data <- rv$data
