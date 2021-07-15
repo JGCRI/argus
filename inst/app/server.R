@@ -77,19 +77,16 @@ server <- function(input, output, session) {
                        class = "download_button"
                      ),
                      style = "float:left;width=100%;margin-bottom:40px"
-                   ))),
-            # fluidRow(
-            #        div(
-            #
-            #          #bookmarkButton(),
-            #          actionLink(inputId="._bookmark_",
-            #                     label="URL",
-            #                     class = "btn btn-default shiny-download-link download_button",
-            #                     icon = icon("link","fa-1x")
-            #          ),
-            #          style = "float:left;width=100%"
-            #        )
-            #)
+                   )),
+                   column(6,div(
+                     actionLink(inputId="._bookmark_",
+                                label="URL",
+                                class = "btn btn-default shiny-download-link download_button",
+                                icon = icon("link","fa-1x")
+                     ),
+                     style = "float:right;width=100%;margin-bottom:40px"
+                   ))
+                   ),
           fileInput(
             inputId = "readbookmark",
             label = "Upload Bookmark",
@@ -110,7 +107,7 @@ server <- function(input, output, session) {
     #...........................
     # URL Bookmark
     #...........................
-    enableBookmarking(store = "server")
+
     setBookmarkExclude(c("urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "inputz"))
 
     #URL bookmark onbookmark
