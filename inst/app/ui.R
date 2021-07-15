@@ -170,11 +170,20 @@ ui <- fluidPage(
                                         column(1, div(br(),downloadButton('downloadMap',NULL,download = "map.png",
                                                          class = "download_button"),style="float:right"))),
                            tabsetPanel(type="tabs",
-                                           tabPanel("Absolute Value"
+                                           tabPanel("Absolute Value",
+                                                    div(
+                                                    h2("Argus Maps are under development and will be released soon!"),
+                                                    style="margin-top:100px")
                                                     ),
-                                           tabPanel("Absolute Difference"
+                                           tabPanel("Absolute Difference",
+                                                    div(
+                                                      h2("Argus Maps are under development and will be released soon!"),
+                                                      style="margin-top:100px")
                                                    ),
-                                          tabPanel("Percent Difference"
+                                          tabPanel("Percent Difference",
+                                                   div(
+                                                     h2("Argus Maps are under development and will be released soon!"),
+                                                     style="margin-top:100px")
                                                    )
                                )),
                   #---------------------------
