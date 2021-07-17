@@ -45,6 +45,66 @@ ui <- fluidPage(
     Shiny.setInputValue('regionsSelected', value);
     });
   "),
+  tags$script("
+    Shiny.addCustomMessageHandler('openlink', function(value) {
+    window.open(value, '_blank');
+    });
+  "),
+
+
+  #---------------------------
+  #Dropdown Button
+  #---------------------------
+
+  div(id = "preload",
+      dropdownButton(
+        label="Preload",
+        circle = FALSE,
+        up=FALSE,
+        right=TRUE,
+        uiOutput('gcamPreloadInput'),
+        uiOutput('examplesPreloadInput')
+      ),
+      class="dropdown_button"
+  ),
+
+
+  #---------------------------
+  # Side Bar with dropdown
+  #---------------------------
+
+  # div(id = "Sidebar",
+  #
+  #     dropdownButton(
+  #       label="Input",
+  #       circle = FALSE,
+  #       up=FALSE,
+  #       right=TRUE,
+  #       div(class="floatNav",
+  #           selectInput(
+  #             inputId = "inputz",
+  #             label = "Input",
+  #             choices = c("url","csv","gcam", ""),
+  #             selected = "",
+  #             multiple = FALSE,
+  #             selectize = TRUE,
+  #             width = "100%"),
+  #           # Reactive Input Choices Based on Input File-------------------------
+  #
+  #           # Scenarios
+  #           uiOutput('selectScenarios'),
+  #           # Ref Scenarios
+  #           uiOutput('selectRefScenarios'),
+  #           # Params
+  #           uiOutput('selectParams'),
+  #           # Regions
+  #           uiOutput('selectRegions')
+  #           # div(id="map", class="maps")
+  #           # leafletOutput(outputId = "mymap")
+  #           )
+  #     ),
+  #     class="dropdown_button"
+  #   ),
 
 
   #---------------------------
@@ -52,6 +112,8 @@ ui <- fluidPage(
   #---------------------------
 
   div(id = "Sidebar",
+
+
 
       absolutePanel(class="floatNav",
                     fixed = TRUE,
@@ -197,7 +259,6 @@ ui <- fluidPage(
                     div(class="charts", DTOutput(outputId = "table"))
                   ),
 
-
     #---------------------------
     # NavBar buttons
     #---------------------------
@@ -206,9 +267,11 @@ ui <- fluidPage(
     div(actionLink(inputId='github', label='',class = "icon", icon = icon("github","fa-1x"),onclick ="window.open('https://github.com/JGCRI/argus', '_blank')")),
     div(actionLink(inputId='help', label='', class = "icon",icon = icon("question","fa-1x"),onclick ="window.open('https://jgcri.github.io/argus/', '_blank')")),
     div(actionLink(inputId='loadbookmark', label='', class = "icon", icon = icon("bookmark","fa-1x"))),
+    #div(actionLink(inputId='togglepreload', label='', class="download_button")),
     tags$script(HTML("var header = $('.navbar> .container-fluid');
                    header.append($('#toggleSidebar'));
                    header.append($('#downloadAll'));
+                   header.append($('#preload'));
                    header.append($('#help'));
                    header.append($('#github'));
                    header.append($('#loadsetting'));

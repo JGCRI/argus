@@ -51,6 +51,67 @@ server <- function(input, output, session) {
 
     preloaded_df <- argus::preloaded_data()
     print(preloaded_df)
+
+    output$gcamPreloadInput = renderUI({
+      selectInput(
+        inputId = "gcamPreload",
+        label = "Select GCAM preload",
+        choices = c(dplyr::filter(preloaded_df, group=="GCAM")$name, ""),
+        selected = "",
+        multiple = F
+      )
+    })
+
+    output$examplesPreloadInput = renderUI({
+      selectInput(
+        inputId = "examplesPreload",
+        label = "Select example preload",
+        choices = c(dplyr::filter(preloaded_df, group=="examples")$name,""),
+        selected = "",
+        multiple = F
+      )
+    })
+
+    observeEvent(input$gcamPreload, {
+      if (input$gcamPreload == ""){
+        return()
+      }
+      session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$gcamPreload)$link)
+      updatePickerInput(
+        inputId = "gcamPreload",
+        session=session,
+        selected = ""
+      )
+    })
+
+    observeEvent(input$examplesPreload, {
+      if (input$examplesPreload == ""){
+        return()
+      }
+      session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$examplesPreload)$link)
+      updatePickerInput(
+        inputId = "examplesPreload",
+        session=session,
+        selected = ""
+      )
+    })
+    #
+    # output$examplePreload = renderUI({
+    #   pickerInput(
+    #     inputId = "scenariosSelected",
+    #     label = "Select example preload",
+    #     choices = unique(data()$scenario),
+    #     selected = unique(data()$scenario),
+    #     multiple = TRUE,
+    #     options = list(
+    #       `actions-box` = TRUE,
+    #       `deselect-all-text` = "None",
+    #       `select-all-text` = "All",
+    #       `none-selected-text` = "None Selected"
+    #     )
+    #   )
+    # })
+
   }
 
 
