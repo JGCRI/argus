@@ -73,79 +73,79 @@ ui <- fluidPage(
   # Side Bar with dropdown
   #---------------------------
 
-  # div(id = "Sidebar",
-  #
-  #     dropdownButton(
-  #       label="Input",
-  #       circle = FALSE,
-  #       up=FALSE,
-  #       right=TRUE,
-  #       div(class="floatNav",
-  #           selectInput(
-  #             inputId = "inputz",
-  #             label = "Input",
-  #             choices = c("url","csv","gcam", ""),
-  #             selected = "",
-  #             multiple = FALSE,
-  #             selectize = TRUE,
-  #             width = "100%"),
-  #           # Reactive Input Choices Based on Input File-------------------------
-  #
-  #           # Scenarios
-  #           uiOutput('selectScenarios'),
-  #           # Ref Scenarios
-  #           uiOutput('selectRefScenarios'),
-  #           # Params
-  #           uiOutput('selectParams'),
-  #           # Regions
-  #           uiOutput('selectRegions')
-  #           # div(id="map", class="maps")
-  #           # leafletOutput(outputId = "mymap")
-  #           )
-  #     ),
-  #     class="dropdown_button"
-  #   ),
+  div(id = "Sidebar",
+
+      dropdownButton(
+        label="Input",
+        circle = FALSE,
+        up=FALSE,
+        right=TRUE,
+        div(
+            selectInput(
+              inputId = "inputz",
+              label = "Input",
+              choices = c("url","csv","gcam", ""),
+              selected = "",
+              multiple = FALSE,
+              selectize = TRUE,
+              width = "100%"),
+            # Reactive Input Choices Based on Input File-------------------------
+
+            # Scenarios
+            uiOutput('selectScenarios'),
+            # Ref Scenarios
+            uiOutput('selectRefScenarios'),
+            # Params
+            uiOutput('selectParams'),
+            # Regions
+            uiOutput('selectRegions')
+            # div(id="map", class="maps")
+            # leafletOutput(outputId = "mymap")
+            )
+      ),
+      class="dropdown_button"
+    ),
 
 
   #---------------------------
   # Side Bar
   #---------------------------
 
-  div(id = "Sidebar",
-
-
-
-      absolutePanel(class="floatNav",
-                    fixed = TRUE,
-                    draggable = FALSE,
-                    top = 60,
-                    left = "auto",
-                    right = 15,
-                    bottom = "auto",
-                    width = 330,
-                    height = "auto",
-
-      selectInput(
-        inputId = "inputz",
-        label = "Input",
-        choices = c("url","csv","gcam", ""),
-        selected = "",
-        multiple = FALSE,
-        selectize = TRUE,
-        width = "100%"),
-      # Reactive Input Choices Based on Input File-------------------------
-
-      # Scenarios
-      uiOutput('selectScenarios'),
-      # Ref Scenarios
-      uiOutput('selectRefScenarios'),
-      # Params
-      uiOutput('selectParams'),
-      # Regions
-      uiOutput('selectRegions'),
-      # div(id="map", class="maps")
-      # leafletOutput(outputId = "mymap")
-    )),
+  # div(id = "Sidebar",
+  #
+  #
+  #
+  #     absolutePanel(class="floatNav",
+  #                   fixed = TRUE,
+  #                   draggable = FALSE,
+  #                   top = 60,
+  #                   left = "auto",
+  #                   right = 15,
+  #                   bottom = "auto",
+  #                   width = 330,
+  #                   height = "auto",
+  #
+  #     selectInput(
+  #       inputId = "inputz",
+  #       label = "Input",
+  #       choices = c("url","csv","gcam", ""),
+  #       selected = "",
+  #       multiple = FALSE,
+  #       selectize = TRUE,
+  #       width = "100%"),
+  #     # Reactive Input Choices Based on Input File-------------------------
+  #
+  #     # Scenarios
+  #     uiOutput('selectScenarios'),
+  #     # Ref Scenarios
+  #     uiOutput('selectRefScenarios'),
+  #     # Params
+  #     uiOutput('selectParams'),
+  #     # Regions
+  #     uiOutput('selectRegions'),
+  #     # div(id="map", class="maps")
+  #     # leafletOutput(outputId = "mymap")
+  #   )),
 
 
     #---------------------------
@@ -269,7 +269,7 @@ ui <- fluidPage(
     div(actionLink(inputId='loadbookmark', label='', class = "icon", icon = icon("bookmark","fa-1x"))),
     #div(actionLink(inputId='togglepreload', label='', class="download_button")),
     tags$script(HTML("var header = $('.navbar> .container-fluid');
-                   header.append($('#toggleSidebar'));
+                   header.append($('#Sidebar'));
                    header.append($('#downloadAll'));
                    header.append($('#preload'));
                    header.append($('#help'));
