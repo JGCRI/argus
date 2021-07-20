@@ -48,9 +48,7 @@ server <- function(input, output, session) {
   # Preloaded Data
   #...........................
   if(T){
-
     preloaded_df <- argus::preloaded_data()
-    print(preloaded_df)
   }
 
 
