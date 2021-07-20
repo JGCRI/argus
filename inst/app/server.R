@@ -592,7 +592,7 @@ server <- function(input, output, session) {
       gcamdatabasePath_dir <- gsub("/$","",gsub("[^/]+$","",rv_gcam$gcamdatabasepathx)); gcamdatabasePath_dir
       gcamdatabasePath_file <- gsub('.*/ ?(\\w+)', '\\1', rv_gcam$gcamdatabasepathx); gcamdatabasePath_file
       # Save Message from rgcam::localDBConn to a text file and then extract names
-      x <- utils::capture.output(rgcam::localDBConn(gcamdatabasePath,gcamdatabaseName), type="message")
+      x <- utils::capture.output(rgcam::localDBConn(gcamdatabasePath_dir,gcamdatabasePath_file), type="message")
       x <- gsub(", ",",",gsub(": ","",gsub("Database scenarios:  ","",x)));x
       gcam_scenarios_extracted <- as.vector(unlist(strsplit(gsub("Database scenarios: ","",x),",")))
       if (!is.null(gcam_scenarios_extracted)){
