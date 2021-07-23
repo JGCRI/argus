@@ -76,6 +76,7 @@ ui <- fluidPage(
   div(id = "Sidebar",
 
       dropdownButton(
+        inputId="inputx",
         label="Input",
         circle = FALSE,
         up=FALSE,
@@ -184,14 +185,43 @@ ui <- fluidPage(
                   tabsetPanel(type="tabs",
                        tabPanel("All",
                                     fluidRow(
-                                      column(6, downloadButton(
+                                      column(10,
+                                             div(
+
+                                             )),
+                                      column(1,
+                                              div(
+                                                style="float:right",
+                                                dropdownButton(
+                                                  label="Storyboard",
+                                                  circle = FALSE,
+                                                  up=FALSE,
+                                                  right=TRUE,
+                                                  textAreaInput(inputId="linestoryboard",label="Story Board")
+                                                )
+                                              )
+                                              ),
+                                      column(1, downloadButton(
                                             'downloadPlotSum',NULL,download = "summaryChart.png",
-                                            class = "download_button_in"),style="float:right")),
+                                            class = "download_button_in"),style="float:left")
+                                      ),
                                     plotOutput(outputId = "summary")),
                        tabPanel("Compare Regions",
                                 fluidRow(
-                                  column(6,div(uiOutput('subsetRegions'))),
-                                  column(6, downloadButton('downloadPlotSumReg',NULL,download = "summaryChartReg.png",
+                                  column(10,div(uiOutput('subsetRegions'),style="float:left;")),
+                                  column(1,
+                                         div(
+                                           style="float:right",
+                                           dropdownButton(
+                                             label="Storyboard",
+                                             circle = FALSE,
+                                             up=FALSE,
+                                             right=TRUE
+
+                                           )
+                                         )
+                                  ),
+                                  column(1, downloadButton('downloadPlotSumReg',NULL,download = "summaryChartReg.png",
                                       class = "download_button_in"),style="float:right")),
                                 plotOutput(outputId = "summaryReg"))
                   )
@@ -201,18 +231,60 @@ ui <- fluidPage(
                   # Main Panel: Charts
                   #---------------------------
                   tabPanel("Charts",
-                           fluidRow(column(9),
-                             column(3, div(downloadButton('downloadPlotChart',NULL,download = "barCharts.png",  class = "download_button"),
-                                           style = "float: right"))),
                            div(align="center",
                                 tabsetPanel(type = "tabs",
                                       tabPanel("Absolute Value",
+                                               fluidRow(
+                                                 column(10),
+                                                 column(1,
+                                                        div(
+                                                          style="float:right",
+                                                          dropdownButton(
+                                                            label="Storyboard",
+                                                            circle = FALSE,
+                                                            up=FALSE,
+                                                            right=TRUE,
+                                                            textAreaInput(inputId="absvalstoryboard",label="Story Board")
+                                                          )
+                                                        )),
+                                                 column(1, div(downloadButton('downloadPlotChart',NULL,download = "barCharts.png",  class = "download_button"),
+                                                               style = "float: right"))),
                                                div(class="charts",plotOutput(outputId = "plotAbs", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Absolute Difference",
+                                               fluidRow(
+                                                 column(10),
+                                                 column(1,
+                                                        div(
+                                                          style="float:right",
+                                                          dropdownButton(
+                                                            label="Storyboard",
+                                                            circle = FALSE,
+                                                            up=FALSE,
+                                                            right=TRUE
+                                                            textAreaInput(inputId="absdifstoryboard",label="Story Board")
+                                                          )
+                                                        )),
+                                                 column(1, div(downloadButton('downloadPlotChart1',NULL,download = "barCharts.png",  class = "download_button"),
+                                                               style = "float: right"))),
                                                div(class="charts",plotOutput(outputId = "plotDiff", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Percent Difference",
+                                               fluidRow(
+                                                 column(10),
+                                                 column(1,
+                                                        div(
+                                                          style="float:right",
+                                                          dropdownButton(
+                                                            label="Storyboard",
+                                                            circle = FALSE,
+                                                            up=FALSE,
+                                                            right=TRUE
+                                                            textAreaInput(inputId="percdifstoryboard",label="Story Board")
+                                                          )
+                                                        )),
+                                                 column(1, div(downloadButton('downloadPlotChart2',NULL,download = "barCharts.png",  class = "download_button"),
+                                                               style = "float: right"))),
                                                div(class="charts",plotOutput(outputId = "plotPerc", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       )
                                 )
@@ -223,14 +295,27 @@ ui <- fluidPage(
                   #---------------------------
                   tabPanel("Maps",
                            fluidRow(column(6,div(uiOutput('selectMapYear')),style = "float: left"),
-                                        column(5,div(br(),pickerInput(
+                                        column(4,
+                                               div(br(),pickerInput(
                                           inputId = "mapLegend",
                                           label = "Legend Type",
                                           choices = c("kmean","pretty"),
                                           selected = "kmean",
                                           multiple = F))),
+                                    column(1,
+                                           br(),
+                                           div(
+                                             style="float:right",
+                                             dropdownButton(
+                                               label="Storyboard",
+                                               circle = FALSE,
+                                               up=FALSE,
+                                               right=TRUE,
+                                               textAreaInput(inputId="mapstoryboard",label="Story Board")
+                                             )
+                                           )),
                                         column(1, div(br(),downloadButton('downloadMap',NULL,download = "map.png",
-                                                         class = "download_button"),style="float:right"))),
+                                                         class = "download_button"),style="float:left"))),
                            tabsetPanel(type="tabs",
                                            tabPanel("Absolute Value",
                                                     div(
@@ -263,11 +348,11 @@ ui <- fluidPage(
     # NavBar buttons
     #---------------------------
     div(downloadButton('downloadAll', "All",  class = "download_button")),
-    div(actionButton(inputId="toggleSidebar", label="Inputs", icon = icon("caret-up","fa-1x"),class = "download_button_input")),
+    #div(actionButton(inputId="toggleSidebar", label="Inputs", icon = icon("caret-up","fa-1x"),class = "download_button_input")),
     div(actionLink(inputId='github', label='',class = "icon", icon = icon("github","fa-1x"),onclick ="window.open('https://github.com/JGCRI/argus', '_blank')")),
     div(actionLink(inputId='help', label='', class = "icon",icon = icon("question","fa-1x"),onclick ="window.open('https://jgcri.github.io/argus/', '_blank')")),
     div(actionLink(inputId='loadbookmark', label='', class = "icon", icon = icon("bookmark","fa-1x"))),
-    #div(actionLink(inputId='togglepreload', label='', class="download_button")),
+    div(actionLink(inputId='togglepreload', label='', class="download_button")),
     tags$script(HTML("var header = $('.navbar> .container-fluid');
                    header.append($('#Sidebar'));
                    header.append($('#downloadAll'));

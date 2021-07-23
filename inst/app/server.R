@@ -40,6 +40,9 @@ pal_all <- rmap::mappings()$pal_all
 
 server <- function(input, output, session) {
 
+
+  toggleDropdownButton("inputx", session = session)
+
   # NOTE:
   # To collapse code for easy reading place cursor here and enter: ALT+0
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
