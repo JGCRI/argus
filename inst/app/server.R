@@ -41,9 +41,10 @@ enableBookmarking(store = c("server"))
 
 server <- function(input, output, session) {
 
+  #toggling on dropdown menus to ensure loading of bookmark data
 
   toggleDropdownButton("inputx", session = session)
-
+  toggleDropdownButton("linestoryboard", session = session)
   # NOTE:
   # To collapse code for easy reading place cursor here and enter: ALT+0
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
@@ -190,7 +191,7 @@ server <- function(input, output, session) {
     # URL Bookmark
     #...........................
 
-    setBookmarkExclude(c("urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "inputz"))
+    setBookmarkExclude(c("urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "inputz", "._bookmark_", "loadbookmark"))
 
     #URL bookmark onbookmark
     onBookmark(function(state) {
@@ -202,17 +203,6 @@ server <- function(input, output, session) {
     onRestore(function(state) {
       print(state)
       rv$data <- state$values$data
-      updatePickerInput(
-        inputId = "mapLegend",
-        session=session,
-        selected = state$input$mapLegend
-      )
-      print(input$linestoryboard)
-      updateTextAreaInput(
-        session=session,
-        inputId="linestoryboard",
-        value = input$linestoryboard
-      )
     })
 
     #...........................
@@ -371,6 +361,52 @@ server <- function(input, output, session) {
             selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
           )
         }
+        
+        # Line story board
+        settingslinestoryboard <- state$linestoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "linestoryboard",
+          value = settingslinestoryboard
+        )
+        
+        # Line story board
+        settingscompregstoryboard <- state$compregstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "compregstoryboard",
+          value = settingscompregstoryboard
+        )
+        
+                # Line story board
+        settingsabsvalstoryboard <- state$absvalstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "absvalstoryboard",
+          value = settingsabsvalstoryboard
+        )
+        
+                # Line story board
+        settingsabsdifstoryboard<- state$absdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "absdifstoryboard",
+          value = settingsabsdifstoryboard
+        )
+        
+         settingspercdifstoryboard<- state$percdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "percdifstoryboard",
+          value = settingspercdifstoryboard
+        )     
+        
+         settingsmapstoryboard<- state$mapstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "mapstoryboard",
+          value = settingsmapstoryboard
+        )     
     }
 
 

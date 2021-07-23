@@ -17,7 +17,7 @@ library(plotly)
 # ui object
 #---------------------------
 
-ui <- fluidPage(
+ui <- function(request) { fluidPage(
 
   #---------------------------
   # Themes
@@ -51,7 +51,12 @@ ui <- fluidPage(
     window.open(value, '_blank');
     });
   "),
-
+  tags$script("
+    Shiny.addCustomMessageHandler('setsetting', function(value) {
+    console.log(value);
+    Shiny.setInputValue(value[0], value.slice(1,value.length));
+    });
+  "),
 
   #---------------------------
   #Dropdown Button
@@ -220,7 +225,7 @@ ui <- fluidPage(
                                              up=FALSE,
                                              right=TRUE,
                                              width = "30vw",
-                                             textAreaInput(inputId="absvalstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
+                                             textAreaInput(inputId="compregstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
 
                                            )
                                          )
@@ -374,3 +379,4 @@ ui <- fluidPage(
 
 )
 
+}
