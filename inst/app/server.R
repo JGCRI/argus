@@ -33,6 +33,7 @@ library(sp)
 options(shiny.maxRequestSize=100*1024^2)
 #options(shiny.trace = TRUE)
 pal_all <- rmap::mappings()$pal_all
+enableBookmarking(store = c("server"))
 
 #...........................
 # Server object
@@ -46,6 +47,23 @@ server <- function(input, output, session) {
   # NOTE:
   # To collapse code for easy reading place cursor here and enter: ALT+0
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
+
+  #...........................
+  # Storyboard
+  #...........................
+  if(T){
+    observeEvent(input$linestoryboard, {
+      
+      print(input$linestoryboard)
+      }
+      
+    
+    )
+
+  }
+
+
+
 
   #...........................
   # Preloaded Data
@@ -177,21 +195,31 @@ server <- function(input, output, session) {
     #URL bookmark onbookmark
     onBookmark(function(state) {
       state$values$data <- rv$data
+      print(input$linestoryboard)
     })
 
     #URL bookmark onRestore
     onRestore(function(state) {
+      print(state)
       rv$data <- state$values$data
       updatePickerInput(
         inputId = "mapLegend",
         session=session,
         selected = state$input$mapLegend
       )
+      print(input$linestoryboard)
+      updateTextAreaInput(
+        session=session,
+        inputId="linestoryboard",
+        value = input$linestoryboard
+      )
     })
 
     #...........................
     # RDS Bookmark
     #...........................
+
+
 
     #rds bookmark download handler
     output$bookmark <- downloadHandler(

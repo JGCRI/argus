@@ -45,6 +45,7 @@ ui <- fluidPage(
     Shiny.setInputValue('regionsSelected', value);
     });
   "),
+  
   tags$script("
     Shiny.addCustomMessageHandler('openlink', function(value) {
     window.open(value, '_blank');
@@ -197,7 +198,8 @@ ui <- fluidPage(
                                                   circle = FALSE,
                                                   up=FALSE,
                                                   right=TRUE,
-                                                  textAreaInput(inputId="linestoryboard",label="Story Board")
+                                                  width = "30vw",
+                                                  textAreaInput(inputId="linestoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
                                                 )
                                               )
                                               ),
@@ -211,12 +213,14 @@ ui <- fluidPage(
                                   column(10,div(uiOutput('subsetRegions'),style="float:left;")),
                                   column(1,
                                          div(
-                                           style="float:right",
+                                           style="float:right;",
                                            dropdownButton(
                                              label="Storyboard",
                                              circle = FALSE,
                                              up=FALSE,
-                                             right=TRUE
+                                             right=TRUE,
+                                             width = "30vw",
+                                             textAreaInput(inputId="absvalstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
 
                                            )
                                          )
@@ -244,7 +248,8 @@ ui <- fluidPage(
                                                             circle = FALSE,
                                                             up=FALSE,
                                                             right=TRUE,
-                                                            textAreaInput(inputId="absvalstoryboard",label="Story Board")
+                                                            width = "30vw",
+                                                            textAreaInput(inputId="absvalstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
                                                           )
                                                         )),
                                                  column(1, div(downloadButton('downloadPlotChart',NULL,download = "barCharts.png",  class = "download_button"),
@@ -261,8 +266,9 @@ ui <- fluidPage(
                                                             label="Storyboard",
                                                             circle = FALSE,
                                                             up=FALSE,
-                                                            right=TRUE
-                                                            textAreaInput(inputId="absdifstoryboard",label="Story Board")
+                                                            right=TRUE,
+                                                            width = "30vw",
+                                                            textAreaInput(inputId="absdifstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
                                                           )
                                                         )),
                                                  column(1, div(downloadButton('downloadPlotChart1',NULL,download = "barCharts.png",  class = "download_button"),
@@ -279,8 +285,9 @@ ui <- fluidPage(
                                                             label="Storyboard",
                                                             circle = FALSE,
                                                             up=FALSE,
-                                                            right=TRUE
-                                                            textAreaInput(inputId="percdifstoryboard",label="Story Board")
+                                                            right=TRUE,
+                                                            width = "30vw",
+                                                            textAreaInput(inputId="percdifstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
                                                           )
                                                         )),
                                                  column(1, div(downloadButton('downloadPlotChart2',NULL,download = "barCharts.png",  class = "download_button"),
@@ -311,7 +318,8 @@ ui <- fluidPage(
                                                circle = FALSE,
                                                up=FALSE,
                                                right=TRUE,
-                                               textAreaInput(inputId="mapstoryboard",label="Story Board")
+                                               width = "30vw",
+                                               textAreaInput(inputId="mapstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
                                              )
                                            )),
                                         column(1, div(br(),downloadButton('downloadMap',NULL,download = "map.png",
