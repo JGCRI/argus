@@ -50,29 +50,11 @@ server <- function(input, output, session) {
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
 
   #...........................
-  # Storyboard
-  #...........................
-  if(T){
-    observeEvent(input$linestoryboard, {
-      
-      print(input$linestoryboard)
-      }
-      
-    
-    )
-
-  }
-
-
-
-
-  #...........................
   # Preloaded Data
   #...........................
   if(T){
 
     preloaded_df <- argus::preloaded_data()
-    print(preloaded_df)
 
     output$gcamPreloadInput = renderUI({
       selectInput(
@@ -98,7 +80,8 @@ server <- function(input, output, session) {
       if (input$gcamPreload == ""){
         return()
       }
-      session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$gcamPreload)$link)
+      rv$dataGCAM = dplyr::filter(preloaded_df, name==input$gcamPreload)$link
+      #session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$gcamPreload)$link)
       updatePickerInput(
         inputId = "gcamPreload",
         session=session,
@@ -109,8 +92,15 @@ server <- function(input, output, session) {
     observeEvent(input$examplesPreload, {
       if (input$examplesPreload == ""){
         return()
-      }
-      session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$examplesPreload)$link)
+      }      
+      temp <- tempfile()
+        utils::download.file(dplyr::filter(preloaded_df, name==input$examplesPreload)$link, temp)
+        state <- readRDS(temp)
+        rv$data <- state$data
+        updateVals(state)
+        print("oof")
+      #session$sendCustomMessage("setsetting", c("focusMapScenarioSelected", settingfocusMapScenarioSelected))
+      #session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$examplesPreload)$link)
       updatePickerInput(
         inputId = "examplesPreload",
         session=session,
@@ -929,6 +919,8 @@ server <- function(input, output, session) {
 
   # Read in Raw Data
   data_raw <- reactive({
+
+
 
     if (is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
 
