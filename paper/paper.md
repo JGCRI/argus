@@ -30,9 +30,9 @@ and relationships to others.
 Features of the application include selecting which scenarios will run and choosing relevant parameters and regions of interest. The designated parameters can be viewed as line plots over time, categorical bar graphs, maps broken apart by region, or as a table.
 All results can be downloaded onto a local machine, or the user can obtain a bookmark to save their work.
 
-`Argus` can be accessed via this [Home Page](https://jgcri.github.io/argus/index.html). We provide an R vignette guide walking users through `Argus` and its features, which is accessible here: [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html)
+![`Argus` landing page](figure1.png)
 
-![Figure 1. Argus landing page.](figure_app.png)
+`Argus` can be accessed via this [Home Page](https://jgcri.github.io/argus/index.html). We provide an R vignette guide walking users through `Argus` and its features, which is accessible here: [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html)
 
 # Statement of need
 There has often been cosnidered a "gap" or "distance" between science and the public, which can be problematic since democracies depend on educated citizens to make informed decisions for their own lives and the lives of others. 
