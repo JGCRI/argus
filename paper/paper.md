@@ -26,19 +26,23 @@ Existing scientific literature and case studies display the gap found in science
 In order to increase the public understanding of science, use of interactive data visualization dashboards is crucial to allow users to explore and modify data. A tool creating simple, easy to understand visuals is also necessary in order to quickly communicate the most important results
 and relationships to others.
 
-`Argus` is an R Shiny App to interactively visualize data across scenarios, parameters, and regions. In can accommodate data inputs of the user's choice or load a GCAM directory.
+`Argus` is an R Shiny App to interactively visualize data across scenarios, parameters, and regions. It can accommodate data inputs of the user's choice or load a GCAM directory.
 Features of the application include selecting which scenarios will run and choosing relevant parameters and regions of interest. The designated parameters can be viewed as line plots over time, categorical bar graphs, maps broken apart by region, or as a table.
 All results can be downloaded onto a local machine, or the user can obtain a bookmark to save their work.
 
 `Argus` can be accessed via this [Home Page](https://jgcri.github.io/argus/index.html). We provide an R vignette guide walking users through `Argus` and its features, which is accessible here: [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html)
 
+![Figure 1. Argus landing page.](figure_app.png)
+
 # Statement of need
-According to a 1989 survey of the United States and Britain, levels of interest in science, technology, and medicine were relatively high, but levels of knowledge in these fields was much lower, suggesting flaws in science communication tools [@durant1989pus].
-There has often been considered a "gap" or "distance" between science and the public, which has been considered a threat to America's future because of the political and economic involvements of the science-media relationship [@peters2013gap].
-In order to bridge this gap between science and decision makers, a special effort must be made in communicating scientific research finding to those creating policies and making decisions. One method of effectively communicating scientific findings is through data visualization tools.
+There has often been cosnidered a "gap" or "distance" between science and the public, which can be problematic since democracies depend on educated citizens to make informed decisions for their own lives and the lives of others. 
+Public understanding of science is even more important today when citizens are regularly exposed to contradicting information on complex topics through various media sources [@sinatra2016pus].
+Data from a five-country survey suggests that scientists agree it is essential to create communication between scientists and the public, but they are also not convinced of the public's ability to understand scientific findings and participate in decision-making about research policy [@peters2013gap].
+In order to create a better relationship between science and the media, the gap between internal science communication and public science communication needs to be narrowed, meaning a special effort must be made in communicating scientific research finding to those creating policies and making decisions. 
+One method of effectively communicating scientific findings is through data visualization tools.
 Visual communication helps highlight important data and interactions, and it helps clearly communicate the most significant aspects in a short amount of time [@otten2015infographics]. This can be especially helpful for media interactions and relaying information to the public.
 Visual and interactive learning tools are also very effective in formal education. In an experiment comparing university students' comprehension of material either with or without the aid of online interactive learning tools, the final grade distribution found 90 percent of students using online learning tools to receive a passing grade,
-while only 70 percent of students received a passing grade without the aid of interactive tools [mcintyre1998www].
+while only 70 percent of students received a passing grade without the aid of interactive tools [@mcintyre1998www].
 
 Interactive data visualization dashboards are becoming widely used across several fields of study to analyze large, complex data sets. They have an advantage over static applications because they allow the user to choose their information and formatting to be the most useful for communication and decision making [@janvrin2014idv].
 The purpose of the development of `Argus` was to create a widely accessible and easy to use interactive platform to help create data visualizations that are simple and easily understood by the public. It not only includes features allowing the user to customize their visualizations based on needs,
