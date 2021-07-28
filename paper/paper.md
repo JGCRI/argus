@@ -35,7 +35,7 @@ All results can be downloaded onto a local machine, or the user can obtain a boo
 `Argus` can be accessed via this [Home Page](https://jgcri.github.io/argus/index.html). We provide an R vignette guide walking users through `Argus` and its features, which is accessible here: [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html)
 
 # Statement of need
-There has often been cosnidered a "gap" or "distance" between science and the public, which can be problematic since democracies depend on educated citizens to make informed decisions for their own lives and the lives of others. 
+There has often been considered a "gap" or "distance" between science and the public, which can be problematic since democracies depend on educated citizens to make informed decisions for their own lives and the lives of others. 
 Public understanding of science is even more important today when citizens are regularly exposed to contradicting information on complex topics through various media sources [@sinatra2016pus].
 Data from a five-country survey suggests that scientists agree it is essential to create communication between scientists and the public, but they are also not convinced of the public's ability to understand scientific findings and participate in decision-making about research policy [@peters2013gap].
 In order to create a better relationship between science and the media, the gap between internal science communication and public science communication needs to be narrowed, meaning a special effort must be made in communicating scientific research finding to those creating policies and making decisions. 
