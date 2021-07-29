@@ -34,7 +34,7 @@ Existing scientific literature and case studies display the gap found in science
 In order to increase the public understanding of science, use of interactive data visualization dashboards is crucial to allow users to explore and modify data. A tool creating simple, easy to understand visuals is also necessary in order to quickly communicate the most important results
 and relationships to others.
 
-`Argus` is an R Shiny App to interactively visualize data across scenarios, parameters, and regions. It can accommodate data inputs of the user's choice or load a GCAM directory.
+`Argus` is an R Shiny App to interactively visualize data across scenarios, parameters, and regions. It can accommodate data inputs of the user's choice or load a Global Change Analysis Model (GCAM) [@Calvin2019] directory.
 Features of the application include selecting which scenarios will run and choosing relevant parameters and regions of interest. The designated parameters can be viewed as line plots over time, categorical bar graphs, maps broken apart by region, or as a table.
 All results can be downloaded onto a local machine, or the user can obtain a bookmark to save their work.
 
