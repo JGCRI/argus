@@ -1,5 +1,5 @@
 ---
-title: 'Argus: An interactive app to enable scientific discovery through multi-sector and multi-scale visual analytics'
+title: 'Argus: An interactive application to enable scientific discovery through multi-sector and multi-scale visual analytics'
 tags:
   - 
 authors:
