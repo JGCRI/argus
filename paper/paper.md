@@ -6,18 +6,26 @@ authors:
   - name: Zarrar Khan
     orcid: 0000-0002-8147-8553
     affiliation: 1
-  - name: Chris R. Vernon
-    orcid: 0000-0002-3406-6214
-    affiliation: 1  
   - name: Sean X. Tang
     orcid: 0000-0003-3248-5607
     affiliation: 1
   - name: Anna M. Warmka
     orcid: 0000-0001-6790-4512
     affiliation: 1
+  - name: Chris R. Vernon
+    orcid: 0000-0002-3406-6214
+    affiliation: 1  
+  - name: Mengqi Zhao
+    orcid: 0000-0001-5385-2758
+    affiliation: 2 
+  - name: Thomas Wild
+    orcid: 0000-0002-6045-7729
+    affiliation: "1, 2"
 affiliations:
  - name: Joint Global Change Research Institute, Pacific Northwest National Laboratory, College Park, MD, USA
    index: 1
+ - name: Earth System Science Interdisciplinary Center (ESSIC), University of Maryland, College Park, MD, USA
+   index: 2
 date: 27 July 2021
 bibliography: paper.bib
 ---
