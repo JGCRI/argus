@@ -50,55 +50,133 @@ server <- function(input, output, session) {
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
 
   #...........................
+  # Storyboard
+  #...........................
+
+  # Toggle Sidebar
+
+  # observeEvent(input$storyboard, {
+  #   shinyjs::toggle(id = "Sidebar")
+  #
+  #   if (input$toggleSidebar %% 2 == 1) {
+  #     icon <-  icon("caret-down","fa-1x")
+  #   } else {
+  #     icon <-  icon("caret-up","fa-1x")
+  #   }
+  #   updateActionButton(session,
+  #                      "toggleSidebar",
+  #                      icon = icon)
+  #
+  # })
+
+  observeEvent(input$linestoryboardtoggle, {
+    text = input$linestoryboard
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textAreaInput(inputId="linestoryboard",label="Story Board", value = text, width = "100%", height="50vh", resize="vertical")
+    ))
+  })
+
+  output$linestoryboardtext <- renderText({
+    input$linestoryboard
+  })
+
+  observeEvent(input$compregstoryboardtoggle, {
+    text = input$compregstoryboard
+        showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textAreaInput(inputId="compregstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+
+  observeEvent(input$absvalstoryboardtoggle, {
+    text = input$absvalstoryboard
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textAreaInput(inputId="absvalstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+
+
+  observeEvent(input$absdifstoryboardtoggle, {
+    text = input$absdifstoryboard
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textAreaInput(inputId="absdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+
+
+  observeEvent(input$percdifstoryboardtoggle, {
+    text = input$percdifstoryboard
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textAreaInput(inputId="percdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+
+
+  observeEvent(input$percdifstoryboardtoggle, {
+    text = input$mapstoryboard
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textAreaInput(inputId="mapstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+
+  #...........................
   # Preloaded Data
   #...........................
   if(T){
 
     preloaded_df <- argus::preloaded_data()
 
-    output$gcamPreloadInput = renderUI({
-      selectInput(
-        inputId = "gcamPreload",
-        label = "Select GCAM preload",
-        choices = c(dplyr::filter(preloaded_df, group=="GCAM")$name, ""),
-        selected = "",
-        multiple = F
-      )
-    })
+    print(preloaded_df)
 
     output$examplesPreloadInput = renderUI({
       selectInput(
         inputId = "examplesPreload",
         label = "Select example preload",
-        choices = c(dplyr::filter(preloaded_df, group=="examples")$name,""),
+        choices = c(preloaded_df$name,""),
         selected = "",
         multiple = F
       )
     })
 
-    observeEvent(input$gcamPreload, {
-      if (input$gcamPreload == ""){
-        return()
-      }
-      rv$dataGCAM = dplyr::filter(preloaded_df, name==input$gcamPreload)$link
-      #session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$gcamPreload)$link)
-      updatePickerInput(
-        inputId = "gcamPreload",
-        session=session,
-        selected = ""
-      )
-    })
 
     observeEvent(input$examplesPreload, {
       if (input$examplesPreload == ""){
         return()
-      }      
+      }
       temp <- tempfile()
-        utils::download.file(dplyr::filter(preloaded_df, name==input$examplesPreload)$link, temp)
-        state <- readRDS(temp)
-        rv$data <- state$data
-        updateVals(state)
-        print("oof")
+      utils::download.file(preloaded_df$link, temp)
+      state <- readRDS(temp)
+      rv$data <- state$data
+      updateVals(state)
+      print("oof")
       #session$sendCustomMessage("setsetting", c("focusMapScenarioSelected", settingfocusMapScenarioSelected))
       #session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$examplesPreload)$link)
       updatePickerInput(
@@ -351,7 +429,7 @@ server <- function(input, output, session) {
             selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
           )
         }
-        
+
         # Line story board
         settingslinestoryboard <- state$linestoryboard
         updateTextAreaInput(
@@ -359,7 +437,7 @@ server <- function(input, output, session) {
           inputId = "linestoryboard",
           value = settingslinestoryboard
         )
-        
+
         # Line story board
         settingscompregstoryboard <- state$compregstoryboard
         updateTextAreaInput(
@@ -367,7 +445,7 @@ server <- function(input, output, session) {
           inputId = "compregstoryboard",
           value = settingscompregstoryboard
         )
-        
+
                 # Line story board
         settingsabsvalstoryboard <- state$absvalstoryboard
         updateTextAreaInput(
@@ -375,7 +453,7 @@ server <- function(input, output, session) {
           inputId = "absvalstoryboard",
           value = settingsabsvalstoryboard
         )
-        
+
                 # Line story board
         settingsabsdifstoryboard<- state$absdifstoryboard
         updateTextAreaInput(
@@ -383,20 +461,20 @@ server <- function(input, output, session) {
           inputId = "absdifstoryboard",
           value = settingsabsdifstoryboard
         )
-        
+
          settingspercdifstoryboard<- state$percdifstoryboard
         updateTextAreaInput(
           session=session,
           inputId = "percdifstoryboard",
           value = settingspercdifstoryboard
-        )     
-        
+        )
+
          settingsmapstoryboard<- state$mapstoryboard
         updateTextAreaInput(
           session=session,
           inputId = "mapstoryboard",
           value = settingsmapstoryboard
-        )     
+        )
     }
 
 

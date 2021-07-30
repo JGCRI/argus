@@ -45,7 +45,7 @@ ui <- function(request) { fluidPage(
     Shiny.setInputValue('regionsSelected', value);
     });
   "),
-  
+
   tags$script("
     Shiny.addCustomMessageHandler('openlink', function(value) {
     window.open(value, '_blank');
@@ -68,7 +68,6 @@ ui <- function(request) { fluidPage(
         circle = FALSE,
         up=FALSE,
         right=TRUE,
-        uiOutput('gcamPreloadInput'),
         uiOutput('examplesPreloadInput')
       ),
       class="dropdown_button"
@@ -188,6 +187,14 @@ ui <- function(request) { fluidPage(
                   #---------------------------
     tabPanel("Lines",
              div(align="center",
+                 # dropdownButton(
+                 #   label="Storyboard",
+                 #   circle = FALSE,
+                 #   up=FALSE,
+                 #   right=TRUE,
+                 #   width = "30vw",
+                 #   textAreaInput(inputId="linestoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
+                 # )
                   tabsetPanel(type="tabs",
                        tabPanel("All",
                                     fluidRow(
@@ -198,20 +205,26 @@ ui <- function(request) { fluidPage(
                                       column(1,
                                               div(
                                                 style="float:right",
-                                                dropdownButton(
-                                                  label="Storyboard",
-                                                  circle = FALSE,
-                                                  up=FALSE,
-                                                  right=TRUE,
-                                                  width = "30vw",
-                                                  textAreaInput(inputId="linestoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
-                                                )
+                                                # dropdownButton(
+                                                #   label="Storyboard",
+                                                #   circle = FALSE,
+                                                #   up=FALSE,
+                                                #   right=TRUE,
+                                                #   width = "30vw",
+                                                #   textAreaInput(inputId="linestoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
+                                                # )
+                                               actionButton(inputId = "linestoryboardtoggle", label = "Story Board")
                                               )
                                               ),
                                       column(1, downloadButton(
                                             'downloadPlotSum',NULL,download = "summaryChart.png",
                                             class = "download_button_in"),style="float:left")
                                       ),
+                                div(
+                                  align = "left",
+                                  style = "background-color: #e8e8e8;height: 10vh;",
+                                  textOutput("linestoryboardtext")
+                                ),
                                     plotOutput(outputId = "summary")),
                        tabPanel("Compare Regions",
                                 fluidRow(
@@ -219,15 +232,16 @@ ui <- function(request) { fluidPage(
                                   column(1,
                                          div(
                                            style="float:right;",
-                                           dropdownButton(
-                                             label="Storyboard",
-                                             circle = FALSE,
-                                             up=FALSE,
-                                             right=TRUE,
-                                             width = "30vw",
-                                             textAreaInput(inputId="compregstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
-
-                                           )
+                                           # dropdownButton(
+                                           #   label="Storyboard",
+                                           #   circle = FALSE,
+                                           #   up=FALSE,
+                                           #   right=TRUE,
+                                           #   width = "30vw",
+                                           #   textAreaInput(inputId="compregstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
+                                           #
+                                           # )
+                                           actionButton(inputId = "compregstoryboardtoggle", label = "Story Board")
                                          )
                                   ),
                                   column(1, downloadButton('downloadPlotSumReg',NULL,download = "summaryChartReg.png",
@@ -248,14 +262,15 @@ ui <- function(request) { fluidPage(
                                                  column(1,
                                                         div(
                                                           style="float:right",
-                                                          dropdownButton(
-                                                            label="Storyboard",
-                                                            circle = FALSE,
-                                                            up=FALSE,
-                                                            right=TRUE,
-                                                            width = "30vw",
-                                                            textAreaInput(inputId="absvalstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
-                                                          )
+                                                          # dropdownButton(
+                                                          #   label="Storyboard",
+                                                          #   circle = FALSE,
+                                                          #   up=FALSE,
+                                                          #   right=TRUE,
+                                                          #   width = "30vw",
+                                                          #   textAreaInput(inputId="absvalstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
+                                                          # )
+                                                          actionButton(inputId = "absvalstoryboardtoggle", label = "Story Board")
                                                         )),
                                                  column(1, div(downloadButton('downloadPlotChart',NULL,download = "barCharts.png",  class = "download_button"),
                                                                style = "float: right"))),
@@ -267,14 +282,15 @@ ui <- function(request) { fluidPage(
                                                  column(1,
                                                         div(
                                                           style="float:right",
-                                                          dropdownButton(
-                                                            label="Storyboard",
-                                                            circle = FALSE,
-                                                            up=FALSE,
-                                                            right=TRUE,
-                                                            width = "30vw",
-                                                            textAreaInput(inputId="absdifstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
-                                                          )
+                                                          # dropdownButton(
+                                                          #   label="Storyboard",
+                                                          #   circle = FALSE,
+                                                          #   up=FALSE,
+                                                          #   right=TRUE,
+                                                          #   width = "30vw",
+                                                          #   textAreaInput(inputId="absdifstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
+                                                          # )
+                                                          actionButton(inputId = "absdifstoryboardtoggle", label = "Story Board")
                                                         )),
                                                  column(1, div(downloadButton('downloadPlotChart1',NULL,download = "barCharts.png",  class = "download_button"),
                                                                style = "float: right"))),
@@ -286,14 +302,15 @@ ui <- function(request) { fluidPage(
                                                  column(1,
                                                         div(
                                                           style="float:right",
-                                                          dropdownButton(
-                                                            label="Storyboard",
-                                                            circle = FALSE,
-                                                            up=FALSE,
-                                                            right=TRUE,
-                                                            width = "30vw",
-                                                            textAreaInput(inputId="percdifstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
-                                                          )
+                                                          # dropdownButton(
+                                                          #   label="Storyboard",
+                                                          #   circle = FALSE,
+                                                          #   up=FALSE,
+                                                          #   right=TRUE,
+                                                          #   width = "30vw",
+                                                          #   textAreaInput(inputId="percdifstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
+                                                          # )
+                                                          actionButton(inputId = "percdifstoryboardtoggle", label = "Story Board")
                                                         )),
                                                  column(1, div(downloadButton('downloadPlotChart2',NULL,download = "barCharts.png",  class = "download_button"),
                                                                style = "float: right"))),
@@ -318,14 +335,15 @@ ui <- function(request) { fluidPage(
                                            br(),
                                            div(
                                              style="float:right",
-                                             dropdownButton(
-                                               label="Storyboard",
-                                               circle = FALSE,
-                                               up=FALSE,
-                                               right=TRUE,
-                                               width = "30vw",
-                                               textAreaInput(inputId="mapstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
-                                             )
+                                             # dropdownButton(
+                                             #   label="Storyboard",
+                                             #   circle = FALSE,
+                                             #   up=FALSE,
+                                             #   right=TRUE,
+                                             #   width = "30vw",
+                                             #   textAreaInput(inputId="mapstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
+                                             # )
+                                             actionButton(inputId = "mapstoryboardtoggle", label = "Story Board")
                                            )),
                                         column(1, div(br(),downloadButton('downloadMap',NULL,download = "map.png",
                                                          class = "download_button"),style="float:left"))),
