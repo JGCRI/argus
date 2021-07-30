@@ -367,10 +367,11 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
       theme(legend.position="bottom",
             legend.title = element_blank(),
             strip.text.y = element_blank(),
-            legend.margin=margin(0,0,0,0,"pt"),
+            legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
             text = element_text(size = 15),
-            plot.margin=margin(20,20,20,0,"pt"))
+            plot.margin=margin(20,20,20,0,"pt"),
+            axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
     x = x+2
 
 
@@ -389,10 +390,11 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
       theme(legend.position="bottom",
             strip.text.y = element_blank(),
             legend.title = element_blank(),
-            legend.margin=margin(0,0,0,0,"pt"),
+            legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
             text = element_text(size = 15),
-            plot.margin=margin(20,0,20,0,"pt"))
+            plot.margin=margin(20,0,20,0,"pt"),
+            axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
   }
   cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
 }
@@ -459,10 +461,11 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
       theme(legend.position="bottom",
             legend.title = element_blank(),
             strip.text.y = element_blank(),
-            legend.margin=margin(0,0,0,0,"pt"),
+            legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
             text = element_text(size = 15),
-            plot.margin=margin(20,20,20,0,"pt"))
+            plot.margin=margin(t = 20, r = 5, b = 0, l = 0, "pt"),
+            axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
     x = x+2
 
 
@@ -481,10 +484,11 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
       theme(legend.position="bottom",
             strip.text.y = element_blank(),
             legend.title = element_blank(),
-            legend.margin=margin(0,0,0,0,"pt"),
+            legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
             text = element_text(size = 15),
-            plot.margin=margin(20,0,20,0,"pt"))
+            plot.margin=margin(t = 20, r = 5, b = 0, l = 0, "pt"),
+            axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
   }
   cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
 }
@@ -499,12 +503,11 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
 #' @export
 plotAbs <- function(dataChartPlot, scenarioRefSelected){
 
-  NULL -> filter -> param -> scenario -> input -> value
-
-  g <- 1
+  NULL -> filter -> param -> scenario -> input -> value -> x
 
   plist <- list()
-  x = 1
+  count_i = 1
+
   for(i in 1:length(unique(dataChartPlot$param))){
 
     dataChartPlot <- dataChartPlot %>%
@@ -525,20 +528,11 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected){
     }
 
     chartz <- dataChartPlot %>%
-      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario == scenarioRefSelected)
-    z<-x
-
-    chartz <- dataChartPlot %>%
       dplyr::filter(param==unique(dataChartPlot$param)[i])
-    x=x+1
 
-    temp <- dataChartPlot %>%
-      dplyr::filter(param==unique(dataChartPlot$param)[i], scenario != scenarioRefSelected)%>%
-      droplevels()
+    palCharts <- palCharts[names(palCharts) %in% unique(chartz$class)]
 
-    palCharts <- palCharts[names(palCharts) %in% unique(temp$class)]
-
-    plist[[z]] <-  ggplot2::ggplot(chartz%>%
+    plist[[count_i]] <-  ggplot2::ggplot(chartz%>%
                                      droplevels(),
                                    aes(x=x,y=value,
                                        group=scenario,
@@ -553,12 +547,140 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected){
       theme(legend.position="bottom",
             strip.text.y = element_blank(),
             legend.title = element_blank(),
-            legend.margin=margin(0,0,0,0,"pt"),
+            legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
             text = element_text(size = 15),
-            plot.margin=margin(20,0,20,0,"pt"))
+            plot.margin=margin(t = 20, r = 5, b = 0, l = 0, "pt"),
+            axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
+
+    count_i = count_i + 1
+
   }
-  cowplot::plot_grid(plotlist = plist, ncol=g, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
+  cowplot::plot_grid(plotlist = plist, ncol=1, align="v", rel_widths = c(1, length(unique(dataChartPlot$scenario))-1))
 }
 
+
+#' plotMap
+#'
+#' generate chart plot for absolute value
+#' @param mapData mapData: dataMapx()
+#' @param mapX input$mapYear
+#' @param scenRef scenRef
+#' @param diff either "absolute", "percent" or NULL in the case of no diff
+#' @importFrom magrittr %>%
+#' @export
+plotMap <- function(mapData = NULL,
+                    mapX = NULL,
+                    scenRef = NULL,
+                    diff = NULL){
+
+  NULL -> filter -> param -> scenario -> input -> value -> x
+
+  plist <- list()
+  count_i = 1
+
+  mapData <- mapData %>%
+    dplyr::filter(x == mapX)
+
+  if(nrow(mapData)>0){
+
+    print("......................mapData")
+    print(unique(mapData$param))
+
+  for(i in 1:length(unique(mapData$param))){
+
+   chartz <- mapData %>%
+      dplyr::filter(param==unique(mapData$param)[i])
+
+    if(!is.null(diff)){
+      chartz_ref <- chartz %>%
+        dplyr::filter(scenario %in% scenRef)
+    } else {
+      chartz_ref <- chartz
+    }
+
+    mapx_abs <- rmap::map(data = chartz_ref,
+                      underLayer = rmap::mapCountries,
+                      background = T,
+                      save = F,
+                      show = F,
+                      title = F,
+                      combinedOnly = T)
+
+    print("......................mapx_abs")
+    print(names(mapx_abs))
+    print(chartz$param%>%unique())
+
+    if(!is.null(diff)){
+
+    mapx_diff <- rmap::map(data = chartz,
+                      underLayer = rmap::mapCountries,
+                      background = T,
+                      save = F,
+                      show = F,
+                      title = F,
+                      combinedOnly = T,
+                      diffOnly = T,
+                      scenRef = scenRef)
+
+    print("......................mapx_diff")
+    print(names(mapx_diff))
+
+
+    if(grepl("abs",diff,ignore.case=T)){
+    names_selected = names(mapx_diff)[grepl("absDiff",names(mapx_diff), ignore.case = T)]} else {
+      names_selected = names(mapx_diff)[grepl("prcntDiff",names(mapx_diff), ignore.case = T)]
+    }
+    }
+
+    plist[[count_i]] <-  mapx_abs[[1]] +
+      xlab(NULL) +
+      ylab(unique(mapData$param)[i])+
+      scale_y_continuous(position = "left")+
+      theme(legend.position="bottom",
+            strip.text.y = element_blank(),
+            legend.title = element_blank(),
+            legend.margin=margin(t =0, r = 0, b = 0, l =0, "pt"),
+            legend.key.height=unit(0, "cm"),
+            text = element_text(size = 20),
+            plot.margin=margin(t = 10, r = 5, b = 0, l = 0, "pt"),
+            axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))+
+      guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+    if(!is.null(diff)){
+    plist[[count_i+1]] <-  mapx_diff[[names_selected]] +
+      xlab(NULL) +
+      ylab("")+
+      scale_y_continuous(position = "left")+
+      theme(legend.position="bottom",
+            strip.text.y = element_blank(),
+            legend.title = element_blank(),
+            legend.margin=margin(t =0, r = 0, b = 0, l =0, "pt"),
+            legend.key.height=unit(0, "cm"),
+            text = element_text(size = 20),
+            plot.margin=margin(t = 10, r = 5, b = 0, l = 0, "pt"),
+            axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))+
+      guides(fill=guide_legend(nrow=3,byrow=TRUE))
+    }
+
+    if(!is.null(diff)){
+    count_i = count_i + 2} else {
+      count_i = count_i + 1
+    }
+
+  }
+
+  # Set cowplot columns based on diff choice
+  if(!is.null(diff)){
+    ncolx = 2
+    rel_widthsx = c(1, length(unique(mapData$scenario))-1)
+  } else {
+    ncolx = 1
+    rel_widthsx = 1
+  }
+
+    cowplot::plot_grid(plotlist = plist, ncol=ncolx, align="v", rel_widths = rel_widthsx)
+
+  } # Close if nrow mapData >0
+}
 

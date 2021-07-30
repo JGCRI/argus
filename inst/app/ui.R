@@ -62,7 +62,6 @@ ui <- fluidPage(
                     bottom = "auto",
                     width = 330,
                     height = "auto",
-
       selectInput(
         inputId = "inputz",
         label = "Input",
@@ -81,8 +80,6 @@ ui <- fluidPage(
       uiOutput('selectParams'),
       # Regions
       uiOutput('selectRegions'),
-      # div(id="map", class="maps")
-      # leafletOutput(outputId = "mymap")
     )),
 
 
@@ -127,8 +124,11 @@ ui <- fluidPage(
                                             class = "download_button_in"),style="float:right")),
                                     plotOutput(outputId = "summary")),
                        tabPanel("Compare Regions",
+                                br(),
                                 fluidRow(
-                                  column(6,div(uiOutput('subsetRegions'))),
+                                  column(6,
+                                         div(actionButton("button_subset_regions", "Choose Regions to Compare",class = "update_button"),
+                                             align="left")),
                                   column(6, downloadButton('downloadPlotSumReg',NULL,download = "summaryChartReg.png",
                                       class = "download_button_in"),style="float:right")),
                                 plotOutput(outputId = "summaryReg"))
@@ -169,23 +169,26 @@ ui <- fluidPage(
                                           multiple = F))),
                                         column(1, div(br(),downloadButton('downloadMap',NULL,download = "map.png",
                                                          class = "download_button"),style="float:right"))),
-                           tabsetPanel(type="tabs",
+                           div(align="center",
+                               tabsetPanel(type="tabs",
                                            tabPanel("Absolute Value",
-                                                    div(
-                                                    h2("Argus Maps are under development and will be released soon!"),
-                                                    style="margin-top:100px")
+                                                    div(class="charts",
+                                                        plotOutput(outputId = "mapAbs", width = "100%", height="100%"),
+                                                        style = "margin-right: 20px;margin-left: 20px;")
                                                     ),
                                            tabPanel("Absolute Difference",
-                                                    div(
-                                                      h2("Argus Maps are under development and will be released soon!"),
-                                                      style="margin-top:100px")
-                                                   ),
+                                                    div(class="charts",
+                                                        plotOutput(outputId = "mapDiffAbs", width = "100%", height="100%"),
+                                                        style = "margin-right: 20px;margin-left: 20px;")
+                                                    ),
                                           tabPanel("Percent Difference",
-                                                   div(
-                                                     h2("Argus Maps are under development and will be released soon!"),
-                                                     style="margin-top:100px")
+                                                   div(class="charts",
+                                                       plotOutput(outputId = "mapDiffPrcnt", width = "100%", height="100%"),
+                                                       style = "margin-right: 20px;margin-left: 20px;")
                                                    )
-                               )),
+                                          )
+                               )
+                           ),
                   #---------------------------
                   # Main Panel: Table Tab
                   #---------------------------

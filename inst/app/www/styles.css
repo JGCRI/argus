@@ -44,6 +44,21 @@ body{
 .leaflet-control-layers{ z-index: 500 !important; }
 .legend { z-index: 100 !important; }
 
+.update_button{
+  font-size:15px !important;
+  background-color: #F5F5F5;
+}
+
+.shiny-notification {
+           height: 100px;
+           width: 800px;
+           position:fixed;
+           top: calc(50% - 50px);
+           left: calc(50% - 400px);
+           font-size: 250%;
+           text-align: center;
+           }
+
 .download_button{
   font-size:15px !important;
   color:#595959;
