@@ -71,12 +71,15 @@ server <- function(input, output, session) {
 
   observeEvent(input$linestoryboardtoggle, {
     text = input$linestoryboard
+    title = input$linestoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
         footer = NULL,
-        textAreaInput(inputId="linestoryboard",label="Story Board", value = text, width = "100%", height="50vh", resize="vertical")
+        label = "Story Board",
+        textInput(inputId="linestoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="linestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
     ))
   })
 
@@ -84,66 +87,159 @@ server <- function(input, output, session) {
     input$linestoryboard
   })
 
+  output$linestoryboardtexttitle <- renderText({
+    input$linestoryboardtitle
+  })
+
   observeEvent(input$compregstoryboardtoggle, {
     text = input$compregstoryboard
+    title = input$compregstoryboardtitle
         showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
         footer = NULL,
-        textAreaInput(inputId="compregstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        label = "Story Board",
+        textInput(inputId="compregstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="compregstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
       ))
+  })
+
+  output$compregstoryboardtext <- renderText({
+    input$compregstoryboard
+  })
+
+  output$compregstoryboardtexttitle <- renderText({
+    input$compregstoryboardtitle
   })
 
 
   observeEvent(input$absvalstoryboardtoggle, {
     text = input$absvalstoryboard
+    title = input$absvalstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
         footer = NULL,
-        textAreaInput(inputId="absvalstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        label = "Story Board",
+        textInput(inputId="absvalstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="absvalstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
       ))
   })
 
+  output$absvalstoryboardtext <- renderText({
+    input$absvalstoryboard
+  })
 
+  output$absvalstoryboardtexttitle <- renderText({
+    input$absvalstoryboard
+  })
 
   observeEvent(input$absdifstoryboardtoggle, {
     text = input$absdifstoryboard
+    title = input$absdifstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
         footer = NULL,
+        textInput(inputId="absdifstoryboardtitle", label="Title", value = title, width = "100%"),
         textAreaInput(inputId="absdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
       ))
   })
 
+  output$absdifstoryboardtext <- renderText({
+    input$absdifstoryboard
+  })
 
+  output$absdifstoryboardtexttitle <- renderText({
+    input$absdifstoryboardtitle
+  })
 
   observeEvent(input$percdifstoryboardtoggle, {
     text = input$percdifstoryboard
+    title = input$percdifstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
         footer = NULL,
+        textInput(inputId="percdifstoryboardtitle", label="Title", value = title, width = "100%"),
         textAreaInput(inputId="percdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
       ))
   })
 
+  output$percdifstoryboardtext <- renderText({
+    input$percdifstoryboard
+  })
+
+  output$percdifstoryboardtexttitle <- renderText({
+    input$percdifstoryboardtitle
+  })
 
 
-  observeEvent(input$percdifstoryboardtoggle, {
-    text = input$mapstoryboard
+  observeEvent(input$mapabsstoryboardtoggle, {
+    text = input$mapabsstoryboard
+    title = input$mapabsstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
         footer = NULL,
-        textAreaInput(inputId="mapstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        textInput(inputId="mapabsstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mapabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
       ))
+  })
+
+  output$mapabsstoryboardtext <- renderText({
+    input$mapabsstoryboard
+  })
+
+  output$mapabsstoryboardtitle <- renderText({
+    input$mapabsstoryboardtitle
+  })
+
+  observeEvent(input$mapabsdifstoryboardtoggle, {
+    text = input$mapabsdifstoryboard
+    title = input$mapabsdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="mapabsdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mapabsdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$mapabsstoryboardtext <- renderText({
+    input$mapabsstoryboard
+  })
+
+  output$mapabsdifstoryboardtexttitle <- renderText({
+    input$mapabsdifstoryboardtitle
+  })
+
+  observeEvent(input$mappercdifstoryboardtoggle, {
+    text = input$mappercdifstoryboard
+    title = input$mappercdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="mappercdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mappercdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$mappercdifstoryboardtext <- renderText({
+    input$mappercdifstoryboard
+  })
+
+  output$mappercdifstoryboardtexttitle <- renderText({
+    input$mappercdifstoryboardtitle
   })
 
 

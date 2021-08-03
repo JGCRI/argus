@@ -107,3 +107,6 @@ body{
 .dropdown-button{
   background-color: rgba(200,200,200,0.6) !important;
 }
+
+
+.storyboardtext {white-space: pre-wrap;}
