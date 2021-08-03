@@ -208,7 +208,6 @@ ui <- function(request) { fluidPage(
                                            bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                            div(actionButton(style="float:right;", inputId='linestoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                            br(),
-                                                           br(),
                                                            # div(
                                                            #   height="10vh",
                                                            #   width = "100%",
@@ -216,8 +215,9 @@ ui <- function(request) { fluidPage(
                                                            #   textOutput("linestoryboardtexttitle",  inline = TRUE),
                                                            #   tags$style(type="text/css","#linestoryboardtexttitle {width:auto;text-align: center;}")
                                                            # ),
-                                                           verbatimTextOutput("linestoryboardtexttitle",  placeholder  = TRUE),
-                                                           tags$style(type="text/css","#linestoryboardtexttitle {width:auto;text-align: center;}"),
+                                                           #verbatimTextOutput("linestoryboardtexttitle",  placeholder  = TRUE),
+                                                           #tags$style(type="text/css","#linestoryboardtexttitle {width:auto;text-align: center;}"),
+                                                           uiOutput("linestoryboardtexttitle"),
                                                            br(),
                                                            # div(
                                                            #   height="10vh",
@@ -227,7 +227,7 @@ ui <- function(request) { fluidPage(
                                                            #   tags$style(type="text/css","#linestoryboardtext {white-space: pre-wrap;text-align: left;width;100%;display: 'inline-block'}")
                                                            # ),
                                                            verbatimTextOutput("linestoryboardtext", placeholder = TRUE),
-                                                           tags$style(type="text/css","#linestoryboardtext {white-space: pre-wrap;text-align: left;width;100%;display: 'inline-block'}")
+                                                           tags$style(type="text/css","#linestoryboardtext {white-space: pre-wrap;text-align: left;width;100%;height:10vh;display: 'inline-block'}")
 
                                            )),
                                     plotOutput(outputId = "summary")),
@@ -255,15 +255,15 @@ ui <- function(request) { fluidPage(
                                            bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                            div(actionButton(style="float:right;", inputId='compregstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                            br(),
-                                                           br(),
                                                            # div(
                                                            #   height="10vh",
                                                            #   style="float:left;",
                                                            #   verbatimTextOutput("compregstoryboardtitle",  inline = TRUE),
                                                            #   tags$style(type="text/css","#compregstoryboardtitle {width:auto;text-align: center;}")
                                                            # ),
-                                                           verbatimTextOutput("compregstoryboardtitle",  placeholder = TRUE),
-                                                           tags$style(type="text/css","#compregstoryboardtitle {width:auto;text-align: center;}"),
+                                                           #verbatimTextOutput("compregstoryboardtitle",  placeholder = TRUE),
+                                                           #tags$style(type="text/css","#compregstoryboardtitle {width:auto;text-align: center;}"),
+                                                           uiOutput("compregstoryboardtitle"),
                                                            br(),
                                                            # div(
                                                            #   height="10vh",
@@ -272,7 +272,7 @@ ui <- function(request) { fluidPage(
                                                            #   tags$style(type="text/css","#compregstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
                                                            # )
                                                            verbatimTextOutput("compregstoryboardtext", placeholder = TRUE),
-                                                           tags$style(type="text/css","#compregstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
+                                                           tags$style(type="text/css","#compregstoryboardtext {white-space: pre-wrap;text-align: left;width:auto;height:10vh;}")
 
                                            )),
                                 plotOutput(outputId = "summaryReg"))
@@ -307,15 +307,15 @@ ui <- function(request) { fluidPage(
                                                           bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                           div(actionButton(style="float:right;", inputId='absvalstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                           br(),
-                                                                          br(),
                                                                           # div(
                                                                           #   height="10vh",
                                                                           #   style="float:left;",
                                                                           #   verbatimTextOutput("absvalstoryboardtitle",  inline = TRUE),
                                                                           #   tags$style(type="text/css","#absvalstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}")
                                                                           # ),
-                                                                          verbatimTextOutput("absvalstoryboardtitle",  placeholder = TRUE),
-                                                                          tags$style(type="text/css","#absvalstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                          #verbatimTextOutput("absvalstoryboardtitle",  placeholder = TRUE),
+                                                                          #tags$style(type="text/css","#absvalstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                          uiOutput("absvalstoryboardtitle"),
                                                                           br(),
                                                                           # div(
                                                                           #   height="10vh",
@@ -324,7 +324,7 @@ ui <- function(request) { fluidPage(
                                                                           #   tags$style(type="text/css","#absvalstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
                                                                           # )
                                                                           verbatimTextOutput("absvalstoryboardtext", placeholder = TRUE),
-                                                                          tags$style(type="text/css","#absvalstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
+                                                                          tags$style(type="text/css","#absvalstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;height:10vh;}")
 
                                                           )),
                                                div(class="charts",plotOutput(outputId = "plotAbs", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
@@ -351,15 +351,16 @@ ui <- function(request) { fluidPage(
                                                           bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                           div(actionButton(style="float:right;", inputId='absdifstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                           br(),
-                                                                          br(),
+                                                                          #br(),
                                                                           # div(
                                                                           #   height="10vh",
                                                                           #   style="float:left;",
                                                                           #   textOutput("absdifstoryboardtitle",  inline = TRUE),
                                                                           #   tags$style(type="text/css","#absdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}")
                                                                           # ),
-                                                                          verbatimTextOutput("absdifstoryboardtitle",  placeholder = TRUE),
-                                                                          tags$style(type="text/css","#absdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                          #verbatimTextOutput("absdifstoryboardtitle",  placeholder = TRUE),
+                                                                          #tags$style(type="text/css","#absdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                          uiOutput("absdifstoryboardtitle"),
                                                                           br(),
                                                                           # div(
                                                                           #   height="10vh",
@@ -368,7 +369,7 @@ ui <- function(request) { fluidPage(
                                                                           #   tags$style(type="text/css","#absdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
                                                                           # )
                                                                           verbatimTextOutput("absdifstoryboardtext", placeholder = TRUE),
-                                                                          tags$style(type="text/css","#absdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
+                                                                          tags$style(type="text/css","#absdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;height:10vh;}")
 
                                                           )),
                                                div(class="charts",plotOutput(outputId = "plotDiff", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
@@ -395,15 +396,16 @@ ui <- function(request) { fluidPage(
                                                           bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                           div(actionButton(style="float:right;", inputId='percdifstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                           br(),
-                                                                          br(),
+                                                                          #br(),
                                                                           # div(
                                                                           #   height="10vh",
                                                                           #   style="float:left;",
                                                                           #   textOutput("percdifstoryboardtitle",  inline = TRUE),
                                                                           #   tags$style(type="text/css","#percdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}")
                                                                           # ),
-                                                                          verbatimTextOutput("percdifstoryboardtitle",  placeholder  = TRUE),
-                                                                          tags$style(type="text/css","#percdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                          #verbatimTextOutput("percdifstoryboardtitle",  placeholder  = TRUE),
+                                                                          #tags$style(type="text/css","#percdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                          uiOutput("percdifstoryboardtitle"),
                                                                           br(),
                                                                           # div(
                                                                           #   height="10vh",
@@ -412,7 +414,7 @@ ui <- function(request) { fluidPage(
                                                                           #   tags$style(type="text/css","#percdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
                                                                           # )
                                                                           verbatimTextOutput("percdifstoryboardtext", placeholder = TRUE),
-                                                                          tags$style(type="text/css","#percdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
+                                                                          tags$style(type="text/css","#percdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;height:10vh;}")
 
                                                           )),
                                                div(class="charts",plotOutput(outputId = "plotPerc", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
@@ -450,20 +452,22 @@ ui <- function(request) { fluidPage(
                                                          class = "download_button"),style="float:left"))),
                            tabsetPanel(type="tabs",
                                            tabPanel("Absolute Value",
+                                                    br(),
                                                     div(align="center",
                                                     bsCollapse(id = "collapse", multiple = FALSE,
                                                       bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                     div(actionButton(style="float:right;", inputId='mapabsstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                     br(),
-                                                                    br(),
+                                                                    #br(),
                                                                     # div(
                                                                     #   height="10vh",
                                                                     #   style="float:left;",
                                                                     #   textOutput("mapabsstoryboardtitle",  inline = TRUE),
                                                                     #   tags$style(type="text/css","#mapabsstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}")
                                                                     # ),
-                                                                    verbatimTextOutput("mapabsstoryboardtitle",  placeholder = TRUE),
-                                                                    tags$style(type="text/css","#mapabsstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                    #verbatimTextOutput("mapabsstoryboardtitle",  placeholder = TRUE),
+                                                                    #tags$style(type="text/css","#mapabsstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                    uiOutput("mapabsstoryboardtitle"),
                                                                     br(),
                                                                     # div(
                                                                     #   height="10vh",
@@ -472,7 +476,7 @@ ui <- function(request) { fluidPage(
                                                                     #   tags$style(type="text/css","mapabsstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
                                                                     # )
                                                                     verbatimTextOutput("mapabsstoryboardtext", placeholder = TRUE),
-                                                                    tags$style(type="text/css","mapabsstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
+                                                                    tags$style(type="text/css","#mapabsstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;height:10vh;}")
                                                                     ))),
                                                     div(
                                                     h2("Argus Maps are under development and will be released soon!"),
@@ -480,19 +484,21 @@ ui <- function(request) { fluidPage(
                                                     ),
                                            tabPanel("Absolute Difference",
                                                     div(align="center",
+                                                        br(),
                                                     bsCollapse(id = "collapse", multiple = FALSE,
                                                                bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                                div(actionButton(style="float:right;", inputId='mapabsdifstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                                br(),
-                                                                               br(),
+                                                                               #br(),
                                                                                # div(
                                                                                #   height="10vh",
                                                                                #   style="float:left;",
                                                                                #   textOutput("mapabsdifstoryboardtitle",  inline = TRUE),
                                                                                #   tags$style(type="text/css","#mapabsdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}")
                                                                                # ),
-                                                                               verbatimTextOutput("mapabsdifstoryboardtitle",  placeholder = TRUE),
-                                                                               tags$style(type="text/css","#mapabsdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                               uiOutput("mapabsdifstoryboardtitle"),
+                                                                               #verbatimTextOutput("mapabsdifstoryboardtitle",  placeholder = TRUE),
+                                                                               #tags$style(type="text/css","#mapabsdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
                                                                                br(),
                                                                                # div(
                                                                                #   height="10vh",
@@ -501,7 +507,7 @@ ui <- function(request) { fluidPage(
                                                                                #   tags$style(type="text/css","#mapabsdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
                                                                                # )
                                                                                verbatimTextOutput("mapabsdifstoryboardtext", placeholder = TRUE),
-                                                                               tags$style(type="text/css","#mapabsdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
+                                                                               tags$style(type="text/css","#mapabsdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;height:10vh;}")
 
                                                                                ))),
                                                     div(
@@ -510,19 +516,21 @@ ui <- function(request) { fluidPage(
                                                    ),
                                           tabPanel("Percent Difference",
                                                    div(align="center",
+                                                       br(),
                                                    bsCollapse(id = "collapse", multiple = FALSE,
                                                               bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                               div(actionButton(style="float:right;", inputId='mappercdifstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                               br(),
-                                                                              br(),
+                                                                              #br(),
                                                                               # div(
                                                                               #   height="10vh",
                                                                               #   style="float:left;",
                                                                               #   textOutput("mappercdifstoryboardtitle",  inline = TRUE),
                                                                               #   tags$style(type="text/css","#mappercdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}")
                                                                               # ),
-                                                                              verbatimTextOutput("mappercdifstoryboardtitle",  placeholder = TRUE),
-                                                                              tags$style(type="text/css","#mappercdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                              #verbatimTextOutput("mappercdifstoryboardtitle",  placeholder = TRUE),
+                                                                              #tags$style(type="text/css","#mappercdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
+                                                                              uiOutput("mappercdifstoryboardtitle"),
                                                                               br(),
                                                                               # div(
                                                                               #   height="10vh",
@@ -531,7 +539,7 @@ ui <- function(request) { fluidPage(
                                                                               #   tags$style(type="text/css","#mappercdifstor {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
                                                                               # )
                                                                               verbatimTextOutput("mappercdifstoryboardtext", placeholder = TRUE),
-                                                                              tags$style(type="text/css","#mappercdifstor {width:auto;white-space: pre-wrap;text-align: left;width:94vw;}")
+                                                                              tags$style(type="text/css","#mappercdifstoryboardtext {width:auto;white-space: pre-wrap;text-align: left;height:10vh;}")
                                                                               ))),
                                                    div(
                                                      h2("Argus Maps are under development and will be released soon!"),

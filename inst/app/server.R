@@ -87,8 +87,8 @@ server <- function(input, output, session) {
     input$linestoryboard
   })
 
-  output$linestoryboardtexttitle <- renderText({
-    input$linestoryboardtitle
+  output$linestoryboardtexttitle <- renderUI({
+    HTML(paste("<b>", input$linestoryboardtitle, "</b>"))
   })
 
   observeEvent(input$compregstoryboardtoggle, {
@@ -132,8 +132,9 @@ server <- function(input, output, session) {
     input$absvalstoryboard
   })
 
-  output$absvalstoryboardtexttitle <- renderText({
-    input$absvalstoryboard
+  output$absvalstoryboardtexttitle <- renderUI({
+    HTML(paste("<b>",     input$absvalstoryboard, "</b>"))
+
   })
 
   observeEvent(input$absdifstoryboardtoggle, {
@@ -153,8 +154,8 @@ server <- function(input, output, session) {
     input$absdifstoryboard
   })
 
-  output$absdifstoryboardtexttitle <- renderText({
-    input$absdifstoryboardtitle
+  output$absdifstoryboardtexttitle <- renderUI({
+    HTML(paste("<b>",     input$absdifstoryboardtitle, "</b>"))
   })
 
   observeEvent(input$percdifstoryboardtoggle, {
@@ -174,8 +175,8 @@ server <- function(input, output, session) {
     input$percdifstoryboard
   })
 
-  output$percdifstoryboardtexttitle <- renderText({
-    input$percdifstoryboardtitle
+  output$percdifstoryboardtexttitle <- renderUI({
+    HTML(paste("<b>", input$percdifstoryboardtitle, "</b>"))
   })
 
 
@@ -196,8 +197,8 @@ server <- function(input, output, session) {
     input$mapabsstoryboard
   })
 
-  output$mapabsstoryboardtitle <- renderText({
-    input$mapabsstoryboardtitle
+  output$mapabsstoryboardtitle <- renderUI({
+    HTML(paste("<b>", input$mapabsstoryboardtitle, "</b>"))
   })
 
   observeEvent(input$mapabsdifstoryboardtoggle, {
@@ -217,8 +218,8 @@ server <- function(input, output, session) {
     input$mapabsstoryboard
   })
 
-  output$mapabsdifstoryboardtexttitle <- renderText({
-    input$mapabsdifstoryboardtitle
+  output$mapabsdifstoryboardtexttitle <- renderUI({
+    HTML(paste("<b>",    input$mapabsdifstoryboardtitle, "</b>"))
   })
 
   observeEvent(input$mappercdifstoryboardtoggle, {
@@ -238,8 +239,8 @@ server <- function(input, output, session) {
     input$mappercdifstoryboard
   })
 
-  output$mappercdifstoryboardtexttitle <- renderText({
-    input$mappercdifstoryboardtitle
+  output$mappercdifstoryboardtexttitle <- renderUI({
+    HTML(paste("<b>",input$mappercdifstoryboardtitle, "</b>"))
   })
 
 
