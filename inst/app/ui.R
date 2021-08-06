@@ -204,7 +204,7 @@ ui <- function(request) { fluidPage(
                                             'downloadPlotSum',NULL,download = "summaryChart.png",
                                             class = "download_button_in"),style="float:left")
                                       ),
-                                bsCollapse(id = "collapse", multiple = FALSE,
+                                bsCollapse(id = "collapse1", multiple = FALSE,
                                            bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                            div(actionButton(style="float:right;", inputId='linestoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                            br(),
@@ -217,7 +217,9 @@ ui <- function(request) { fluidPage(
                                                            # ),
                                                            #verbatimTextOutput("linestoryboardtexttitle",  placeholder  = TRUE),
                                                            #tags$style(type="text/css","#linestoryboardtexttitle {width:auto;text-align: center;}"),
-                                                           uiOutput("linestoryboardtexttitle"),
+                                                           #uiOutput("linestoryboardtexttitle"),
+                                                           textOutput("linestoryboardtexttitle"),
+                                                           tags$style("#linestoryboardtexttitle {font-weight: bold;}"),
                                                            br(),
                                                            # div(
                                                            #   height="10vh",
@@ -251,7 +253,7 @@ ui <- function(request) { fluidPage(
                                   ),
                                   column(1, downloadButton('downloadPlotSumReg',NULL,download = "summaryChartReg.png",
                                       class = "download_button_in"),style="float:right")),
-                                bsCollapse(id = "collapse", multiple = FALSE,
+                                bsCollapse(id = "collapse2", multiple = FALSE,
                                            bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                            div(actionButton(style="float:right;", inputId='compregstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                            br(),
@@ -263,7 +265,8 @@ ui <- function(request) { fluidPage(
                                                            # ),
                                                            #verbatimTextOutput("compregstoryboardtitle",  placeholder = TRUE),
                                                            #tags$style(type="text/css","#compregstoryboardtitle {width:auto;text-align: center;}"),
-                                                           uiOutput("compregstoryboardtitle"),
+                                                           textOutput("compregstoryboardtexttitle"),
+                                                           tags$style("#compregstoryboardtexttitle {font-weight: bold;}"),
                                                            br(),
                                                            # div(
                                                            #   height="10vh",
@@ -303,7 +306,7 @@ ui <- function(request) { fluidPage(
                                                         )),
                                                  column(1, div(downloadButton('downloadPlotChart',NULL,download = "barCharts.png",  class = "download_button"),
                                                                style = "float: right"))),
-                                               bsCollapse(id = "collapse", multiple = FALSE,
+                                               bsCollapse(id = "collapse3", multiple = FALSE,
                                                           bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                           div(actionButton(style="float:right;", inputId='absvalstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                           br(),
@@ -315,7 +318,8 @@ ui <- function(request) { fluidPage(
                                                                           # ),
                                                                           #verbatimTextOutput("absvalstoryboardtitle",  placeholder = TRUE),
                                                                           #tags$style(type="text/css","#absvalstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
-                                                                          uiOutput("absvalstoryboardtitle"),
+                                                                          textOutput("absvalstoryboardtexttitle"),
+                                                                          tags$style("#absvalstoryboardtexttitle {font-weight: bold;}"),
                                                                           br(),
                                                                           # div(
                                                                           #   height="10vh",
@@ -347,7 +351,7 @@ ui <- function(request) { fluidPage(
                                                         )),
                                                  column(1, div(downloadButton('downloadPlotChart1',NULL,download = "barCharts.png",  class = "download_button"),
                                                                style = "float: right"))),
-                                               bsCollapse(id = "collapse", multiple = FALSE,
+                                               bsCollapse(id = "collapse4", multiple = FALSE,
                                                           bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                           div(actionButton(style="float:right;", inputId='absdifstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                           br(),
@@ -360,7 +364,8 @@ ui <- function(request) { fluidPage(
                                                                           # ),
                                                                           #verbatimTextOutput("absdifstoryboardtitle",  placeholder = TRUE),
                                                                           #tags$style(type="text/css","#absdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
-                                                                          uiOutput("absdifstoryboardtitle"),
+                                                                          textOutput("absdifstoryboardtexttitle"),
+                                                                          tags$style("#absdifstoryboardtexttitle {font-weight: bold;}"),
                                                                           br(),
                                                                           # div(
                                                                           #   height="10vh",
@@ -392,7 +397,7 @@ ui <- function(request) { fluidPage(
                                                         )),
                                                  column(1, div(downloadButton('downloadPlotChart2',NULL,download = "barCharts.png",  class = "download_button"),
                                                                style = "float: right"))),
-                                               bsCollapse(id = "collapse", multiple = FALSE,
+                                               bsCollapse(id = "collapse5", multiple = FALSE,
                                                           bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                           div(actionButton(style="float:right;", inputId='percdifstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                           br(),
@@ -405,7 +410,8 @@ ui <- function(request) { fluidPage(
                                                                           # ),
                                                                           #verbatimTextOutput("percdifstoryboardtitle",  placeholder  = TRUE),
                                                                           #tags$style(type="text/css","#percdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
-                                                                          uiOutput("percdifstoryboardtitle"),
+                                                                          textOutput("percdifstoryboardtexttitle"),
+                                                                          tags$style("#percdifstoryboardtexttitle {font-weight: bold;}"),
                                                                           br(),
                                                                           # div(
                                                                           #   height="10vh",
@@ -454,7 +460,7 @@ ui <- function(request) { fluidPage(
                                            tabPanel("Absolute Value",
                                                     br(),
                                                     div(align="center",
-                                                    bsCollapse(id = "collapse", multiple = FALSE,
+                                                    bsCollapse(id = "collapse6", multiple = FALSE,
                                                       bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                     div(actionButton(style="float:right;", inputId='mapabsstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                     br(),
@@ -467,7 +473,8 @@ ui <- function(request) { fluidPage(
                                                                     # ),
                                                                     #verbatimTextOutput("mapabsstoryboardtitle",  placeholder = TRUE),
                                                                     #tags$style(type="text/css","#mapabsstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
-                                                                    uiOutput("mapabsstoryboardtitle"),
+                                                                    textOutput("mapabsstoryboardtexttitle"),
+                                                                    tags$style("#mapabsstoryboardtexttitle {font-weight: bold;}"),
                                                                     br(),
                                                                     # div(
                                                                     #   height="10vh",
@@ -485,7 +492,7 @@ ui <- function(request) { fluidPage(
                                            tabPanel("Absolute Difference",
                                                     div(align="center",
                                                         br(),
-                                                    bsCollapse(id = "collapse", multiple = FALSE,
+                                                    bsCollapse(id = "collapse7", multiple = FALSE,
                                                                bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                                div(actionButton(style="float:right;", inputId='mapabsdifstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                                br(),
@@ -496,7 +503,8 @@ ui <- function(request) { fluidPage(
                                                                                #   textOutput("mapabsdifstoryboardtitle",  inline = TRUE),
                                                                                #   tags$style(type="text/css","#mapabsdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}")
                                                                                # ),
-                                                                               uiOutput("mapabsdifstoryboardtitle"),
+                                                                               textOutput("mapabsdifstoryboardtexttitle"),
+                                                                               tags$style("#mapabsdifstoryboardtexttitle {font-weight: bold;}"),
                                                                                #verbatimTextOutput("mapabsdifstoryboardtitle",  placeholder = TRUE),
                                                                                #tags$style(type="text/css","#mapabsdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
                                                                                br(),
@@ -517,7 +525,7 @@ ui <- function(request) { fluidPage(
                                           tabPanel("Percent Difference",
                                                    div(align="center",
                                                        br(),
-                                                   bsCollapse(id = "collapse", multiple = FALSE,
+                                                   bsCollapse(id = "collapse8", multiple = FALSE,
                                                               bsCollapsePanel("Storyboard",#<i class="fas "></i>
                                                                               div(actionButton(style="float:right;", inputId='mappercdifstoryboardtoggle', label='', class = "download-button", icon = icon("edit","fa-1x"))),
                                                                               br(),
@@ -530,7 +538,8 @@ ui <- function(request) { fluidPage(
                                                                               # ),
                                                                               #verbatimTextOutput("mappercdifstoryboardtitle",  placeholder = TRUE),
                                                                               #tags$style(type="text/css","#mappercdifstoryboardtitle {width:auto;white-space: pre-wrap;text-align: left;}"),
-                                                                              uiOutput("mappercdifstoryboardtitle"),
+                                                                              textOutput("mappercdifstoryboardtexttitle"),
+                                                                              tags$style("#mappercdifstoryboardtexttitle {font-weight: bold;}"),
                                                                               br(),
                                                                               # div(
                                                                               #   height="10vh",
