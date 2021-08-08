@@ -33,6 +33,7 @@ library(sp)
 options(shiny.maxRequestSize=100*1024^2)
 #options(shiny.trace = TRUE)
 pal_all <- rmap::mappings()$pal_all
+enableBookmarking(store = c("server"))
 
 #...........................
 # Server object
@@ -40,15 +41,274 @@ pal_all <- rmap::mappings()$pal_all
 
 server <- function(input, output, session) {
 
+  #toggling on dropdown menus to ensure loading of bookmark data
+
+  toggleDropdownButton("inputx", session = session)
+  toggleDropdownButton("linestoryboard", session = session)
   # NOTE:
   # To collapse code for easy reading place cursor here and enter: ALT+0
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
+
+  #...........................
+  # Storyboard
+  #...........................
+
+  # Toggle Sidebar
+
+  # observeEvent(input$storyboard, {
+  #   shinyjs::toggle(id = "Sidebar")
+  #
+  #   if (input$toggleSidebar %% 2 == 1) {
+  #     icon <-  icon("caret-down","fa-1x")
+  #   } else {
+  #     icon <-  icon("caret-up","fa-1x")
+  #   }
+  #   updateActionButton(session,
+  #                      "toggleSidebar",
+  #                      icon = icon)
+  #
+  # })
+
+  observeEvent(input$collapse1, {
+    print(input$linestoryboard)
+  })
+
+  observeEvent(input$linestoryboardtoggle, {
+    print(input$linestoryboard)
+    text = input$linestoryboard
+    title = input$linestoryboardtitle
+    print(text)
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        label = "Story Board",
+        textInput(inputId="linestoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="linestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+    ))
+    print(text)
+  })
+
+  output$linestoryboardtext <- renderText({
+    input$linestoryboard
+  })
+
+  output$linestoryboardtexttitle <- renderText({
+    input$linestoryboardtitle
+#    HTML(paste("<b>", input$linestoryboardtitle, "</b>"))
+  })
+
+  observeEvent(input$compregstoryboardtoggle, {
+    text = input$compregstoryboard
+    title = input$compregstoryboardtitle
+        showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        label = "Story Board",
+        textInput(inputId="compregstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="compregstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$compregstoryboardtext <- renderText({
+    input$compregstoryboard
+  })
+
+  output$compregstoryboardtexttitle <- renderText({
+    input$compregstoryboardtitle
+  })
+
+
+  observeEvent(input$absvalstoryboardtoggle, {
+    text = input$absvalstoryboard
+    title = input$absvalstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        label = "Story Board",
+        textInput(inputId="absvalstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="absvalstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$absvalstoryboardtext <- renderText({
+    input$absvalstoryboard
+  })
+
+  output$absvalstoryboardtexttitle <- renderText({
+    input$absvalstoryboardtitle
+    #HTML(paste("<b>",     input$absvalstoryboard, "</b>"))
+  })
+
+  observeEvent(input$absdifstoryboardtoggle, {
+    text = input$absdifstoryboard
+    title = input$absdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="absdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="absdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$absdifstoryboardtext <- renderText({
+    input$absdifstoryboard
+  })
+
+  output$absdifstoryboardtexttitle <- renderText({
+    input$absdifstoryboardtitle
+    #HTML(paste("<b>",     input$absdifstoryboardtitle, "</b>"))
+  })
+
+  observeEvent(input$percdifstoryboardtoggle, {
+    text = input$percdifstoryboard
+    title = input$percdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="percdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="percdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$percdifstoryboardtext <- renderText({
+    input$percdifstoryboard
+  })
+
+  output$percdifstoryboardtexttitle <- renderText({
+    input$percdifstoryboardtitle
+    #    HTML(paste("<b>", input$percdifstoryboardtitle, "</b>"))
+  })
+
+
+  observeEvent(input$mapabsstoryboardtoggle, {
+    text = input$mapabsstoryboard
+    title = input$mapabsstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="mapabsstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mapabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$mapabsstoryboardtext <- renderText({
+    input$mapabsstoryboard
+  })
+
+  output$mapabsstoryboardtexttitle <- renderText({
+    input$mapabsstoryboardtitle
+#    HTML(paste("<b>", input$mapabsstoryboardtitle, "</b>"))
+  })
+
+  observeEvent(input$mapabsdifstoryboardtoggle, {
+    text = input$mapabsdifstoryboard
+    title = input$mapabsdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="mapabsdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mapabsdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$mapabsdifstoryboardtext <- renderText({
+    input$mapabsdifstoryboard
+  })
+
+  output$mapabsdifstoryboardtexttitle <- renderText({
+    input$mapabsdifstoryboardtitle
+    #HTML(paste("<b>",    input$mapabsdifstoryboardtitle, "</b>"))
+  })
+
+  observeEvent(input$mappercdifstoryboardtoggle, {
+    text = input$mappercdifstoryboard
+    title = input$mappercdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="mappercdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mappercdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$mappercdifstoryboardtext <- renderText({
+    input$mappercdifstoryboard
+  })
+
+  output$mappercdifstoryboardtexttitle <- renderText({
+    input$mappercdifstoryboardtitle
+    #HTML(paste("<b>",input$mappercdifstoryboardtitle, "</b>"))
+  })
+
 
   #...........................
   # Preloaded Data
   #...........................
   if(T){
     preloaded_df <- argus::preloaded_data()
+    print(preloaded_df)
+
+    output$examplesPreloadInput = renderUI({
+      selectInput(
+        inputId = "examplesPreload",
+        label = "Select example preload",
+        choices = c(preloaded_df$name,""),
+        selected = "",
+        multiple = F
+      )
+    })
+
+
+    observeEvent(input$examplesPreload, {
+      if (input$examplesPreload == ""){
+        return()
+      }
+      temp <- tempfile()
+      utils::download.file(preloaded_df$link, temp)
+      state <- readRDS(temp)
+      rv$data <- state$data
+      updateVals(state)
+      print("oof")
+      #session$sendCustomMessage("setsetting", c("focusMapScenarioSelected", settingfocusMapScenarioSelected))
+      #session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$examplesPreload)$link)
+      updatePickerInput(
+        inputId = "examplesPreload",
+        session=session,
+        selected = ""
+      )
+    })
+    #
+    # output$examplePreload = renderUI({
+    #   pickerInput(
+    #     inputId = "scenariosSelected",
+    #     label = "Select example preload",
+    #     choices = unique(data()$scenario),
+    #     selected = unique(data()$scenario),
+    #     multiple = TRUE,
+    #     options = list(
+    #       `actions-box` = TRUE,
+    #       `deselect-all-text` = "None",
+    #       `select-all-text` = "All",
+    #       `none-selected-text` = "None Selected"
+    #     )
+    #   )
+    # })
   }
 
 
@@ -106,26 +366,121 @@ server <- function(input, output, session) {
     # URL Bookmark
     #...........................
 
-    setBookmarkExclude(c("urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "inputz"))
+    setBookmarkExclude(c("mappercdifstoryboardtoggle","mapabsdifstoryboardtoggle","mapabsstoryboardtoggle","percdifstoryboardtoggle","absdifstoryboardtoggle","absvalstoryboardtoggle","compregstoryboardtoggle","linestoryboardtoggle","urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "._bookmark_", "loadbookmark"))
 
     #URL bookmark onbookmark
     onBookmark(function(state) {
       state$values$data <- rv$data
+      print(input$linestoryboard)
     })
 
     #URL bookmark onRestore
     onRestore(function(state) {
+      print(state)
       rv$data <- state$values$data
-      updatePickerInput(
-        inputId = "mapLegend",
-        session=session,
-        selected = state$input$mapLegend
-      )
+      session$sendCustomMessage("setsetting", c("inputz", ""))
+      session$sendCustomMessage("setsetting", c("linestoryboardtitle", input$linestoryboardtitle))
+      session$sendCustomMessage("setsetting", c("linestoryboard", input$linestoryboard))
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          label = "Story Board",
+          textInput(inputId="linestoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="linestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          label = "Story Board",
+          textInput(inputId="compregstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="compregstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          label = "Story Board",
+          textInput(inputId="absvalstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="absvalstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="absdifstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="absdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="percdifstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="percdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="mapabsstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="mapabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="mapabsdifstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="mapabsdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="mappercdifstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="mappercdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+
     })
 
     #...........................
     # RDS Bookmark
     #...........................
+
+
 
     #rds bookmark download handler
     output$bookmark <- downloadHandler(
@@ -277,6 +632,157 @@ server <- function(input, output, session) {
             selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
           )
         }
+
+        # Line story board
+        settingslinestoryboard <- state$linestoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "linestoryboard",
+          value = settingslinestoryboard
+        )
+        session$sendCustomMessage("setsetting", c("linestoryboard", settingslinestoryboard))
+
+        settingslinestoryboardtitle <- state$linestoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "linestoryboardtitle",
+          value = settingslinestoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("linestoryboardtitle", settingslinestoryboardtitle))
+
+        # Line story board
+        settingscompregstoryboard <- state$compregstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "compregstoryboard",
+          value = settingscompregstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("compregstoryboard", settingscompregstoryboard))
+
+        # Line story board
+        settingscompregstoryboardtitle <- state$compregstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "compregstoryboardtitle",
+          value = settingscompregstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("compregstoryboardtitle", settingscompregstoryboardtitle))
+
+
+                # Line story board
+        settingsabsvalstoryboard <- state$absvalstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "absvalstoryboard",
+          value = settingsabsvalstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("absvalstoryboard", settingsabsvalstoryboard))
+
+        # Line story board
+        settingsabsvalstoryboardtitle <- state$absvalstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "absvalstoryboardtitle",
+          value = settingsabsvalstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("absvalstoryboardtitle", settingsabsvalstoryboardtitle))
+                # Line story board
+        settingsabsdifstoryboard<- state$absdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "absdifstoryboard",
+          value = settingsabsdifstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("absdifstoryboard", settingsabsdifstoryboard))
+
+        # Line story board
+        settingsabsdifstoryboardtitle<- state$absdifstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "absdifstoryboardtitle",
+          value = settingsabsdifstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("absdifstoryboardtitle", settingsabsdifstoryboardtitle))
+
+
+         settingspercdifstoryboard<- state$percdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "percdifstoryboard",
+          value = settingspercdifstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("percdifstoryboard", settingspercdifstoryboard))
+
+        settingspercdifstoryboardtitle<- state$percdifstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "percdifstoryboardtitle",
+          value = settingspercdifstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("percdifstoryboardtitle", settingspercdifstoryboardtitle))
+
+         settingsmapabsdifstoryboard<- state$mapabsdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "mapabsdifstoryboard",
+          value = settingsmapabsdifstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("mapabsdifstoryboard", settingsmapabsdifstoryboard))
+
+        settingsmapabsdifstoryboardtitle<- state$mapabsdifstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "mapabsdifstoryboardtitle",
+          value = settingsmapabsdifstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("mapabsdifstoryboardtitle", settingsmapabsdifstoryboardtitle))
+
+        settingsmapabsstoryboard<- state$mapabsstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "mapabsstoryboard",
+          value = settingsmapabsstoryboard
+        )
+        session$sendCustomMessage("setsetting", c("mapabsstoryboard", settingsmapabsstoryboard))
+
+        settingsmapabsstoryboardtitle<- state$mapabsstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "mapabsstoryboardtitle",
+          value = settingsmapabsstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("mapabsstoryboardtitle", settingsmapabsstoryboardtitle))
+
+        settingsmappercdifstoryboard<- state$mappercdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "mappercdifstoryboard",
+          value =  settingsmappercdifstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("mappercdifstoryboard", settingsmappercdifstoryboard))
+
+        settingsmappercdifstoryboardtitle<- state$mappercdifstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "mappercdifstoryboardtitle",
+          value =  settingsmappercdifstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("mappercdifstoryboardtitle", settingsmappercdifstoryboardtitle))
+
     }
 
 
@@ -799,6 +1305,8 @@ server <- function(input, output, session) {
 
   # Read in Raw Data
   data_raw <- reactive({
+
+
 
     if (is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
 

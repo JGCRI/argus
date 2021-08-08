@@ -605,7 +605,7 @@ plotMap <- function(mapData = NULL,
                       save = F,
                       show = F,
                       title = F,
-                      combinedOnly = T)
+                      forceFacets = T)
 
     print("......................mapx_abs")
     print(names(mapx_abs))
@@ -619,7 +619,6 @@ plotMap <- function(mapData = NULL,
                       save = F,
                       show = F,
                       title = F,
-                      combinedOnly = T,
                       diffOnly = T,
                       scenRef = scenRef)
 
@@ -628,8 +627,8 @@ plotMap <- function(mapData = NULL,
 
 
     if(grepl("abs",diff,ignore.case=T)){
-    names_selected = names(mapx_diff)[grepl("absDiff",names(mapx_diff), ignore.case = T)]} else {
-      names_selected = names(mapx_diff)[grepl("prcntDiff",names(mapx_diff), ignore.case = T)]
+    names_selected = names(mapx_diff)[grepl("DiffAbs",names(mapx_diff), ignore.case = T)]} else {
+      names_selected = names(mapx_diff)[grepl("DiffPrcnt",names(mapx_diff), ignore.case = T)]
     }
     }
 

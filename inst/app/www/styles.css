@@ -31,6 +31,11 @@ body{
   padding-top:60px;
 }
 
+.panel-title{
+    font-size:25px !important;
+}
+
+
 .window{
  min-height=700px
 }
@@ -109,3 +114,19 @@ body{
   left: 0;
   background-color: #111; /* Black */ /* Disable horizontal scroll */
 }
+
+
+.dropdown_button{
+  font-size:15px !important;
+  color:#595959;
+  margin-top:10px;
+  margin-right:10px;
+  float: right;
+}
+
+.dropdown-button{
+  background-color: rgba(200,200,200,0.6) !important;
+}
+
+
+.storyboardtext {white-space: pre-wrap;}
