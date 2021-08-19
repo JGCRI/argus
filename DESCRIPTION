@@ -4,7 +4,7 @@ Version: 0.1.0
 Authors@R: c(person("Zarrar", "Khan", email = "zarrar.khan@pnnl.gov", role = c("aut", "cre"),
 		   comment = c(ORCID ="0000-0002-8147-8553")),
 		   person("Sean", "Tang", role = c("aut")),
-		   person("Anna", "Warmka", role = c("aut")),
+		   person("Anna", "Warmka", role = c("aut"), comment = c(ORCID="0000-0001-6790-4512")),
 		   person("Chris", "Vernon", role = c("aut"), comment = c(ORCID="0000-0002-3406-6214")))
 Description: R shiny package to interactively visualize data across scenarios, parameters and regions.
 URL: https://github.com/JGCRI/argus

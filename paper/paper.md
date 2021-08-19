@@ -1,105 +1,71 @@
 ---
-title: 'rfasst: An R tool to estimate air pollution impacts on health and agriculture'
+title: 'Argus: An interactive application to enable scientific discovery through multi-sector and multi-scale visual analytics'
 tags:
-  - R
-  - emissions
+  - 
 authors:
-  - name: Jon Sampedro
-    orcid: 0000-0002-2277-1530
-    affiliation: 1
   - name: Zarrar Khan
     orcid: 0000-0002-8147-8553
+    affiliation: 1
+  - name: Sean X. Tang
+    orcid: 0000-0003-3248-5607
+    affiliation: 1
+  - name: Anna M. Warmka
+    orcid: 0000-0001-6790-4512
     affiliation: 1
   - name: Chris R. Vernon
     orcid: 0000-0002-3406-6214
     affiliation: 1  
-  - name: Steven J. Smith
-    orcid: 0000-0003-3248-5607
-    affiliation: 1
-  - name: Stephanie Waldhoff
-    orcid: 0000-0002-8073-0868
-    affiliation: 1
-  - name: Rita Van Dingenen
-    orcid: 0000-0003-2521-4972
-    affiliation: 2
+  - name: Mengqi Zhao
+    orcid: 0000-0001-5385-2758
+    affiliation: 2 
+  - name: Thomas Wild
+    orcid: 0000-0002-6045-7729
+    affiliation: "1, 2"
 affiliations:
  - name: Joint Global Change Research Institute, Pacific Northwest National Laboratory, College Park, MD, USA
    index: 1
- - name: European Commission, Joint Research Centre (JRC), Ispra, Italy
+ - name: Earth System Science Interdisciplinary Center (ESSIC), University of Maryland, College Park, MD, USA
    index: 2
-date: 17 April 2021
+date: 27 July 2021
 bibliography: paper.bib
 ---
 # Summary
-Existing scientific literature shows that health and agricultural impacts attributable to air pollution are significant and should be considered in the integrated analysis of human and Earth-system interactions.
-The implementation of policies that affect the power sector, the composition of the vehicle fleet or the investments and deployment of different energy sources will in turn result in different levels of air pollution. 
-Even though the various methodologies for estimating the impacts of air pollution, such as exposure-response functions, are extensively applied by the scientific community, 
-they are normally not included in integrated assessment modeling outputs.
+`Argus` is an R Shiny App to interactively visualize data across scenarios, parameters, and regions. Argus is designed to ingest simple `.csv` data tables which can be loaded directly into the applciation or from a `url` if the data is hosted online. The platform comes preloaded with various shapefiles for countries, states, river basins and in the case of the United States, U.S. counties. The platform processes the input data into interactive maps, charts and tables to allow users to easily explore their data across regions, parameters, time periods and scenarios. The primary purpose of Argus is for users to be able to highlight key messages from their datasets and to this end the application allows users to subset their data by choosing relevant scenarios, regions and time periods, annotate each page with storylines and then save the state of the application via bookmarks to be shared as urls or `.rds` files which can be loaded back up in the application at a later time and place. The application is designed to be used as a tool by scientists to easily curate and share large datasets with their audiences, in an impactful and interacive way. While Argus can be used for any data that is spatial and temporal in nature the  application has been developed specifically for large multi-sector global modeling outputs such as those from the open source Global Change Analysis Model (GCAM) model [@Calvin2019]. 
 
-`rfasst` is an R package designed to estimate future human-health and agricultural damages attributable to air pollution using scenario outputs from the Global Change Analysis Model (GCAM), namely emission pathways and agricultural production and prices. 
-The package combines these with the calculations from the TM5-FASST air quality model to estimate the associated adverse health and agricultural impacts. 
-The structure of the `rfasst` package is summarized in Figure 1.
+![`Argus` landing page](figure1.PNG)
 
-![Structure of the `rfasst` package](figure_rfasst.png)
-
-`rfasst` can be accessed via the web at the public domain https://github.com/JGCRI/rfasst. We provide an R vignette step-by-step tutorial for users to get started with `rfasst` which is accessible here: [Tutorial](https://jgcri.github.io/rfasst/).
-
+`Argus` can be accessed via this [Home Page](https://jgcri.github.io/argus/index.html). A detailed [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html) is also available which walks users through all the features of `Argus`.
 
 # Statement of need
 
-According to the World Health Organization's (WHO) [Ambient air quality database](https://www.who.int/data/gho/data/themes/topics/topic-details/GHO/ambient-air-pollution), more than 90% of people breathe unhealthy air at a global level.
-Therefore, premature mortality associated with air pollution is one of the biggest threats for human health, accounting for more than 8 million deaths globally per year [@burnett2018global], but heavily concentrated in developing Asia.
-Likewise, air pollution leads to a significant decrease of crop yields. 
-Ozone, which is formed by the reaction of air pollutants with solar radiation, is considered the most hazardous pollutant for crop yields [@emberson2018ozone]. 
-Current high ozone concentration levels entail substantial economic damages and would increase pressures on several measures associated with food security [@van2009global]. 
-The integration of these effects into integrated assessment models, such as GCAM, can provide valuable insights for scenario analysis.
+Global multi-sector models have advanced significantly over the years and continue to push the boundaries of spatial, sectoral and temproal resolution and detail. This push towards more detail results in increasing complextiy as well as a larger number of both inputs and outputs. Output databases from these models (e.g. GCAM [@Calvin2019], MESSAGE [@huppmann2019messageix]) can have up to several GB of data capturing combinations of thousands of sectors and sub-sectors; subregions ranging from countries to cities to river basins; and time periods ranging from decades to hours. Climate models outputs such as those from the Weather Research & Forecasting (WRF) model [@powers2017weather] or the Coupled Model Intercomparison Project Phase (CMIP) series [eyring2016overview] can be even larger and range up to several Tera Bytes of data at globally gridded resolutions.
 
-The GCAM model [@calvin2019gcam], developed at the Joint Global Change Research Institute (JGCRI), is an integrated assessment multi-sector model designed to explore human and Earth-system dynamics. 
-For each scenario representing an alternate future, GCAM reports a full suite of emissions of greenhouse gases and air pollutants, by region and time period through 2100. 
-GCAM outputs also include regional agricultural production projections for a range of crops, detailed in online [documentation](https://github.com/JGCRI/gcam-doc/blob/gh-pages/aglu.md). However, GCAM does not include the atmospheric 
-and meteorological information required to translate the greenhouse gas and air pollutant emissions into particulate matter ($PM_{2.5}$) and ozone ($O_{3}$) concentration levels. 
-This transformation from emissions to concentration is addressed by full chemistry models or by simplified air quality emulators, such as TM5-FASST [@van2018tm5].
-These concentration levels are the inputs for the exposure-response functions that are normally used to calculate adverse human-health and agricultural effects associated with exposure to $PM_{2.5}$ and $O_{3}$.  
+A key challenge that continues to become more critical with this increasing complexity of models is the ability to synthesize the outputs and extract relevant trends and messages. Visual and interactive communications are a particularly effective method of delivering key messages from complex topics and large datasets, with audeinces having been shown to have a higher retention of knowledge and comprehension of ideas when using such tools [@otten2015infographics, @mcintyre1998www, @janvrin2014idv]. 
 
-Therefore, the combined use of these models, which is the essence of `rfasst`, is a powerful methodology to estimate a consistent range of health and agricultural damages and the co-benefits associated with different strategies or climate policies.
-Prior to the development of this package, we have used GCAM and TM5-FASST to analyze these co-benefits in different studies. We showed that health co-benefits attributable to air pollution are larger than mitigation costs 
-for different technological scenarios consistent with the 2°C target of the Paris Agreement [@sampedro_2020a]. 
-Previously, we demonstrated that these health co-benefits outweigh mitigation costs in multiple decarbonization scenarios based on different emissions abatement efforts across regions [@markandya2018health]. 
-In addition, we have applied this methodology to show how high $O_{3}$ levels generate substantial crop losses and, subsequently, negative economic impacts in the agricultural sector [@sampedro_2020b].
-Taking all these results into consideration, we understand that a tool that systematically addresses air pollution driven human-health and agricultural damages within an integrated assessment modeling framework, 
-is a significant contribution to this community, and of interest for a range of stakeholders, particularly for the designers of alternative transition strategies. 
+In response to this, interactive data visualization dashboards are starting to be used across several fields of study to analyze large, complex data sets. Examples include the World Resources Institute's (WRI's) [WRI Aqueduct]()[@wri2021aqueduct], the International Institute for Applied Systems Analysis's (IIASA's) [Global Hotspots Explorer](https://hotspots-explorer.org/) [@iiasa2021globalhotspots], the Pacific Northwest National Lab's (PNNL's) [Hector UI](https://jgcri.shinyapps.io/HectorUI/) [@evanoff2020hectorui], the Intergovernmental Panel on Climate Change's (IPCC's) [WGI Interactive atlas](https://interactive-atlas.ipcc.ch/) for the IPCC Sixth Assessment Report [] and the Model for the Assessment of Greenhouse Gas Induced Climate Change ([MAGICC](https://v2.magicc.org/))[@meinshausen2011emulating]. These interactive applciations have an advantage over static applications because they allow users to choose and subset information that is most relevant and useful for their own purposes [@janvrin2014idv].
 
-
+`Argus` addresses these key issues by allowing users to interactively visualize and subset relevant portions of their datasets as well as annotate the outputs in order to deliver a final product that highlights key messages and storylines from complex and large datasets. Users are also able to save the state of Argus at any point in time so they can return to it later on further modification as well as for easy sharing with other users and audiences, who can then interact with the data themselves. Additionally, while most of other applications come with limited preloaded datasets (with good reason as they are meant to be viewers for particular data), Argus is designed to be used with user datasets and is thus not restricted to any particular model or type of analysis.
 
 # Functionality
-The package includes several functions that have been classified in four different modules. 
-Note that all the functions are listed in the [Tutorial](https://jgcri.github.io/rfasst/), which includes individual documentation pages for each of these modules.
+An Argus user can choose to input their own spatial and temporal data via a URL or .csv file. In addition `Argus` has also been customized to be used directly with the Global CHange Analysis Model output databases [@Calvin2019]. Users can at any time change which scenarios are selected, set the reference scenario, and select or deselect different parameters and regions. Changing these selections will instantaneously change the data visualizations throughout the application.
 
-+ Module 1: Static downscaling of GCAM emissions to country-level and re-aggregation into a new regional distribution (consistent with TM5-FASST), and some additional pollutant-related adjustments (e.g., organic carbon to organic matter).
-+ Module 2: Calculation of regional fine particulate matter ($PM_{2.5}$) and ozone ($O_{3}$) concentration levels using different indicators.
-+ Module 3: Estimation of health impacts attributable to $PM_{2.5}$ and $O_{3}$ exposure. The package reports both physical damages, such as premature mortality, years of life lost (YLLs), and disability adjusted life years (DALYs),
-and the associated monetized damages based on the Value of Statistical Life (VSL).
-+ Module 4: Estimation of agricultural damages attributable to $O_{3}$ exposure, including relative yield losses (RYLs) and losses in agricultural production and revenue ($Revenue=Prod \cdot Price$).
+Argus includes several functions for data visualization, separated as different tabs within the application.
+Note that all functions are explained in full detail in the [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html), which includes documentation for each individual tab.
 
-The package also includes additional input information, namely constant values and mapping files, that need to be read in for running the different functions and can be modifiable by the user.
-The [Tutorial](https://jgcri.github.io/rfasst/) explains which values can be changed within each module. These include the time horizon (from 2010 to 2100 in 10-year periods, +2005), 
-the crop categories to be included in the analysis (see @kyle2011gcam for a detailed mapping of GCAM crop categories), the coefficients or counterfactual values for the exposure-response functions (both for health and agricultural damages),
-the base Value of Statistical Life (VSL) or Value of Statistical Life Year (VSLY), and additional ancillary information.
++ Focus: The focus tab gives an overview of the inputted data, and the user can select a year, parameter, and scenario they would like to visualize. Based on the selections, a world map, comparative line plot, and categorical bar chart will populate.
++ Lines: The lines tab creates line plots of each parameter by scenario over time. Within this tab there is also a compare regions option, which will create several line graphs for each parameter, broken up by region.
++ Charts: The charts tab shows bar charts for each parameter by scenario over time, breaking the parameters up categorically. Within this tab, there are also difference charts that compare each scenario to the specified reference scenario.
++ Maps: The maps tab shows maps for each parameter by scenario, splitting up the map by the desired regions. In this tab, there is also an option to look at the regional differences between each scenario compared to the reference scenario.
++ Table: The table tab displays all inputted data, within which the user can search for specific values using the search bar. Additionally, the table can be filtered in each column.
++ Bookmarks: Argus also includes a function to create a bookmark to save any changes made and allow others to view the application exactly how the user left it. Detailed instructions on creating, sharing, and loading bookmarks can be found in the [Bookmarks](https://jgcri.github.io/argus/articles/vignette_argus.html#bookmarks-1) section of the User Guide.
++ Preloaded Data: `Argus` comes with a number of preloaded datasets which will be updated regularly. These include curated data sets from official GCAM model releases as well other datasets of interests. 
++ Data Story: Each tab in `Argus` has a collapsable `Data Story` button on top which allows users to annotate the visuals seen on the particular tab in order to highlight particular aspects of what is being seen.
 
-The outputs generated by the package consist of both comma-separated values (CSV) files and maps (as Portable Network Graphic files) that can be controlled by the user. If the parameter `saveOutput` is set to `TRUE`, the function writes a CSV file with the selected outcome in the corresponding sub-directory. 
-In addition, if `map` is set to `TRUE`, the function generates a suite of maps and animations for the corresponding output. We note that these maps are generated using the [rmap](https://github.com/JGCRI/rmap) package, documented in the following [website](https://jgcri.github.io/rmap).
-As an example, the following Figure 2 shows the average $PM_{2.5}$ concentration levels per region, for a GCAM-v5.3 reference scenario.
+Within Argus, the user can also download all figures created based on their data, or they can choose to download figures from specific tabs.
 
-
-![$PM_{2.5}$ concentration per country and period in a reference scenario (ug/m3)](figure_conc.png){ height=200% }
-
-
-Finally, the package is continually being developed to address science objectives and some additional features are scheduled for future releases. For example, an alternative dynamic GDP-based downscaling technique
-for re-scaling GCAM emissions in Module 1 (as developed in @gidden2019global), additional age-specific functions for the health impact assessment, as well as a more flexible structure, to allow users to be able to read in emission pathways from different models. 
-
+Finally, the application is continually being developed to support the needs of its users, and some of the features described may change. Additionally, new features are likely to be included in future releases. Updated documentation of all features and their functionality will always be available in the [User Guide](https://jgcri.github.io/argus/articles/vignette_argus.html).
 
 # Acknowledgements
-The research described in this paper was conducted under the Laboratory Directed Research and Development Program at Pacific Northwest National Laboratory, a multiprogram national laboratory operated by Battelle for the U.S. Department of Energy. 
-The views and opinions expressed in this paper are those of the authors alone.
+This research was supported by the US Department of Energy, Office of Science, as part of research in MultiSector Dynamics, Earth and Environmental System Modeling Program. The Pacific Northwest National Laboratory is operated for DOE by Battelle Memorial Institute under contract DE-AC05-76RL01830. The views and opinions expressed in this paper are those of the authors alone.
 
 # References

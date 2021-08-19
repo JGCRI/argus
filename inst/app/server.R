@@ -33,6 +33,7 @@ library(sp)
 options(shiny.maxRequestSize=100*1024^2)
 #options(shiny.trace = TRUE)
 pal_all <- rmap::mappings()$pal_all
+enableBookmarking(store = c("server"))
 
 #...........................
 # Server object
@@ -40,15 +41,276 @@ pal_all <- rmap::mappings()$pal_all
 
 server <- function(input, output, session) {
 
+  #toggling on dropdown menus to ensure loading of bookmark data
+
+  toggleDropdownButton("inputx", session = session)
+  toggleDropdownButton("linestoryboard", session = session)
+
   # NOTE:
   # To collapse code for easy reading place cursor here and enter: ALT+0
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
+
+  #...........................
+  # Storyboard
+  #...........................
+
+  observeEvent(input$collapse1, {
+    print(input$linestoryboard)
+  })
+
+  observeEvent(input$linestoryboardtoggle, {
+    print(input$linestoryboard)
+    text = input$linestoryboard
+    title = input$linestoryboardtitle
+    print(text)
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = tagList(
+          modalButton("Submit")),
+        label = "Story Board",
+        textInput(inputId="linestoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="linestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+    ))
+    print(text)
+  })
+
+  output$linestoryboardtext <- renderText({
+    input$linestoryboard
+  })
+
+  output$linestoryboardtexttitle <- renderText({
+    input$linestoryboardtitle
+#    HTML(paste("<b>", input$linestoryboardtitle, "</b>"))
+  })
+
+  # Focus story board .......................
+
+  observeEvent(input$collapse0, {
+    print(input$focusstoryboard)
+  })
+
+  observeEvent(input$focusstoryboardtoggle, {
+    print(input$focusstoryboard)
+    text = input$focusstoryboard
+    title = input$focusstoryboardtitle
+    print(text)
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = tagList(
+          modalButton("Submit")),
+        label = "Story Board",
+        textInput(inputId="focusstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="focusstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+      ))
+    print(text)
+  })
+
+  output$focusstoryboardtext <- renderText({
+    input$focusstoryboard
+  })
+
+  output$focusstoryboardtexttitle <- renderText({
+    input$focusstoryboardtitle
+    #    HTML(paste("<b>", input$focusstoryboardtitle, "</b>"))
+  })
+
+
+
+  observeEvent(input$compregstoryboardtoggle, {
+    text = input$compregstoryboard
+    title = input$compregstoryboardtitle
+        showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        label = "Story Board",
+        textInput(inputId="compregstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="compregstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$compregstoryboardtext <- renderText({
+    input$compregstoryboard
+  })
+
+  output$compregstoryboardtexttitle <- renderText({
+    input$compregstoryboardtitle
+  })
+
+
+  observeEvent(input$absvalstoryboardtoggle, {
+    text = input$absvalstoryboard
+    title = input$absvalstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        label = "Story Board",
+        textInput(inputId="absvalstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="absvalstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$absvalstoryboardtext <- renderText({
+    input$absvalstoryboard
+  })
+
+  output$absvalstoryboardtexttitle <- renderText({
+    input$absvalstoryboardtitle
+    #HTML(paste("<b>",     input$absvalstoryboard, "</b>"))
+  })
+
+  observeEvent(input$absdifstoryboardtoggle, {
+    text = input$absdifstoryboard
+    title = input$absdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="absdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="absdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$absdifstoryboardtext <- renderText({
+    input$absdifstoryboard
+  })
+
+  output$absdifstoryboardtexttitle <- renderText({
+    input$absdifstoryboardtitle
+    #HTML(paste("<b>",     input$absdifstoryboardtitle, "</b>"))
+  })
+
+  observeEvent(input$percdifstoryboardtoggle, {
+    text = input$percdifstoryboard
+    title = input$percdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="percdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="percdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$percdifstoryboardtext <- renderText({
+    input$percdifstoryboard
+  })
+
+  output$percdifstoryboardtexttitle <- renderText({
+    input$percdifstoryboardtitle
+    #    HTML(paste("<b>", input$percdifstoryboardtitle, "</b>"))
+  })
+
+
+  observeEvent(input$mapabsstoryboardtoggle, {
+    text = input$mapabsstoryboard
+    title = input$mapabsstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="mapabsstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mapabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$mapabsstoryboardtext <- renderText({
+    input$mapabsstoryboard
+  })
+
+  output$mapabsstoryboardtexttitle <- renderText({
+    input$mapabsstoryboardtitle
+#    HTML(paste("<b>", input$mapabsstoryboardtitle, "</b>"))
+  })
+
+  observeEvent(input$mapabsdifstoryboardtoggle, {
+    text = input$mapabsdifstoryboard
+    title = input$mapabsdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="mapabsdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mapabsdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$mapabsdifstoryboardtext <- renderText({
+    input$mapabsdifstoryboard
+  })
+
+  output$mapabsdifstoryboardtexttitle <- renderText({
+    input$mapabsdifstoryboardtitle
+    #HTML(paste("<b>",    input$mapabsdifstoryboardtitle, "</b>"))
+  })
+
+  observeEvent(input$mappercdifstoryboardtoggle, {
+    text = input$mappercdifstoryboard
+    title = input$mappercdifstoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = NULL,
+        textInput(inputId="mappercdifstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mappercdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$mappercdifstoryboardtext <- renderText({
+    input$mappercdifstoryboard
+  })
+
+  output$mappercdifstoryboardtexttitle <- renderText({
+    input$mappercdifstoryboardtitle
+    #HTML(paste("<b>",input$mappercdifstoryboardtitle, "</b>"))
+  })
+
 
   #...........................
   # Preloaded Data
   #...........................
   if(T){
     preloaded_df <- argus::preloaded_data()
+    print(preloaded_df)
+
+    output$examplesPreloadInput = renderUI({
+      selectInput(
+        inputId = "examplesPreload",
+        label = "Select example preload",
+        choices = c(preloaded_df$name,""),
+        selected = "",
+        multiple = F
+      )
+    })
+
+
+    observeEvent(input$examplesPreload, {
+      if (input$examplesPreload == ""){
+        return()
+      }
+      temp <- tempfile()
+      utils::download.file(preloaded_df$link, temp)
+      state <- readRDS(temp)
+      rv$data <- state$data
+      updateVals(state)
+      updatePickerInput(
+        inputId = "examplesPreload",
+        session=session,
+        selected = ""
+      )
+    })
   }
 
 
@@ -106,26 +368,136 @@ server <- function(input, output, session) {
     # URL Bookmark
     #...........................
 
-    setBookmarkExclude(c("urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "inputz"))
+    setBookmarkExclude(c("mappercdifstoryboardtoggle","mapabsdifstoryboardtoggle","mapabsstoryboardtoggle",
+                         "percdifstoryboardtoggle","absdifstoryboardtoggle","absvalstoryboardtoggle","compregstoryboardtoggle",
+                         "linestoryboardtoggle","focusstoryboardtoggle",
+                         "urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "._bookmark_", "loadbookmark"))
 
     #URL bookmark onbookmark
     onBookmark(function(state) {
       state$values$data <- rv$data
+      print(input$linestoryboard)
     })
 
     #URL bookmark onRestore
     onRestore(function(state) {
+      print(state)
       rv$data <- state$values$data
-      updatePickerInput(
-        inputId = "mapLegend",
-        session=session,
-        selected = state$input$mapLegend
-      )
+      session$sendCustomMessage("setsetting", c("inputz", ""))
+      session$sendCustomMessage("setsetting", c("linestoryboardtitle", input$linestoryboardtitle))
+      session$sendCustomMessage("setsetting", c("linestoryboard", input$linestoryboard))
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          label = "Story Board",
+          textInput(inputId="focusstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="focusstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          label = "Story Board",
+          textInput(inputId="linestoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="linestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          label = "Story Board",
+          textInput(inputId="compregstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="compregstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          label = "Story Board",
+          textInput(inputId="absvalstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="absvalstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="absdifstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="absdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="percdifstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="percdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="mapabsstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="mapabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="mapabsdifstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="mapabsdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="mappercdifstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="mappercdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+
     })
 
     #...........................
     # RDS Bookmark
     #...........................
+
+
 
     #rds bookmark download handler
     output$bookmark <- downloadHandler(
@@ -277,6 +649,175 @@ server <- function(input, output, session) {
             selected = unique(settingsRefScenario)[unique(settingsRefScenario) %in% unique(data()$scenario)],
           )
         }
+
+        # Line story board
+        settingslinestoryboard <- state$linestoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "linestoryboard",
+          value = settingslinestoryboard
+        )
+        session$sendCustomMessage("setsetting", c("linestoryboard", settingslinestoryboard))
+
+        settingslinestoryboardtitle <- state$linestoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "linestoryboardtitle",
+          value = settingslinestoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("linestoryboardtitle", settingslinestoryboardtitle))
+
+        # Focus story board
+        settingsfocusstoryboard <- state$focusstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "focusstoryboard",
+          value = settingsfocusstoryboard
+        )
+        session$sendCustomMessage("setsetting", c("focusstoryboard", settingsfocusstoryboard))
+
+        settingsfocusstoryboardtitle <- state$focusstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "focusstoryboardtitle",
+          value = settingsfocusstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("focusstoryboardtitle", settingsfocusstoryboardtitle))
+
+        # CompReg story board
+        settingscompregstoryboard <- state$compregstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "compregstoryboard",
+          value = settingscompregstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("compregstoryboard", settingscompregstoryboard))
+
+        # Line story board
+        settingscompregstoryboardtitle <- state$compregstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "compregstoryboardtitle",
+          value = settingscompregstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("compregstoryboardtitle", settingscompregstoryboardtitle))
+
+
+                # Line story board
+        settingsabsvalstoryboard <- state$absvalstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "absvalstoryboard",
+          value = settingsabsvalstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("absvalstoryboard", settingsabsvalstoryboard))
+
+        # Line story board
+        settingsabsvalstoryboardtitle <- state$absvalstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "absvalstoryboardtitle",
+          value = settingsabsvalstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("absvalstoryboardtitle", settingsabsvalstoryboardtitle))
+                # Line story board
+        settingsabsdifstoryboard<- state$absdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "absdifstoryboard",
+          value = settingsabsdifstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("absdifstoryboard", settingsabsdifstoryboard))
+
+        # Line story board
+        settingsabsdifstoryboardtitle<- state$absdifstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "absdifstoryboardtitle",
+          value = settingsabsdifstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("absdifstoryboardtitle", settingsabsdifstoryboardtitle))
+
+
+         settingspercdifstoryboard<- state$percdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "percdifstoryboard",
+          value = settingspercdifstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("percdifstoryboard", settingspercdifstoryboard))
+
+        settingspercdifstoryboardtitle<- state$percdifstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "percdifstoryboardtitle",
+          value = settingspercdifstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("percdifstoryboardtitle", settingspercdifstoryboardtitle))
+
+         settingsmapabsdifstoryboard<- state$mapabsdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "mapabsdifstoryboard",
+          value = settingsmapabsdifstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("mapabsdifstoryboard", settingsmapabsdifstoryboard))
+
+        settingsmapabsdifstoryboardtitle<- state$mapabsdifstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "mapabsdifstoryboardtitle",
+          value = settingsmapabsdifstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("mapabsdifstoryboardtitle", settingsmapabsdifstoryboardtitle))
+
+        settingsmapabsstoryboard<- state$mapabsstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "mapabsstoryboard",
+          value = settingsmapabsstoryboard
+        )
+        session$sendCustomMessage("setsetting", c("mapabsstoryboard", settingsmapabsstoryboard))
+
+        settingsmapabsstoryboardtitle<- state$mapabsstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "mapabsstoryboardtitle",
+          value = settingsmapabsstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("mapabsstoryboardtitle", settingsmapabsstoryboardtitle))
+
+        settingsmappercdifstoryboard<- state$mappercdifstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "mappercdifstoryboard",
+          value =  settingsmappercdifstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("mappercdifstoryboard", settingsmappercdifstoryboard))
+
+        settingsmappercdifstoryboardtitle<- state$mappercdifstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "mappercdifstoryboardtitle",
+          value =  settingsmappercdifstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("mappercdifstoryboardtitle", settingsmappercdifstoryboardtitle))
+
     }
 
 
@@ -454,6 +995,21 @@ server <- function(input, output, session) {
 
   observeEvent(input$help,{
     session$sendCustomMessage("handler1", unique(data()$subRegion))
+  })
+
+  # Toggle Preload
+  observeEvent(input$preload, {
+    shinyjs::toggle(id = "Sidebar")
+
+    if (input$preload %% 2 == 1) {
+      icon <-  icon("caret-down","fa-1x")
+    } else {
+      icon <-  icon("caret-up","fa-1x")
+    }
+    updateActionButton(session,
+                       "preload",
+                       icon = icon)
+
   })
 
   # Toggle Sidebar
@@ -800,6 +1356,8 @@ server <- function(input, output, session) {
   # Read in Raw Data
   data_raw <- reactive({
 
+
+
     if (is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
 
       data_raw_result <- argus::addMissing(
@@ -845,10 +1403,6 @@ server <- function(input, output, session) {
 
   })
 
-  data <- reactive({
-    return(rv$data)
-  })
-
   observeEvent(input$append, {
     tblAggsums <- data_raw() %>%
       dplyr::filter(aggregate == "sum") %>%
@@ -889,6 +1443,11 @@ server <- function(input, output, session) {
     removeModal()
   }, ignoreInit = TRUE)
 
+
+  data <- reactive({
+    return(rv$data)
+  })
+
   } # CSV / URL Inputs
 
   #...........................
@@ -899,6 +1458,7 @@ server <- function(input, output, session) {
 
     # Scenario Select
     output$selectScenarios = renderUI({
+
       pickerInput(
         inputId = "scenariosSelected",
         label = "Select Scenarios",
@@ -912,6 +1472,7 @@ server <- function(input, output, session) {
           `none-selected-text` = "None Selected"
         )
       )
+
     })
 
     # Ref Scenario Select
@@ -961,22 +1522,6 @@ server <- function(input, output, session) {
       )
     })
 
-    # Subset Regions Selected
-    output$subsetRegions = renderUI({
-      pickerInput(
-        inputId = "subsetRegions",
-        label = "Select Regions to Compare",
-        choices = unique(dataMap()$subRegion),
-        selected = subsetRegionsx(),
-        multiple = TRUE,
-        options = list(
-          `actions-box` = TRUE,
-          `deselect-all-text` = "None",
-          `select-all-text` = "All",
-          `none-selected-text` = "None Selected"
-        ))
-    })
-
     # Reactive year select Select based on inputs
     mapYearx <- function(){
       if(!is.null(isolate(input$mapYear))){
@@ -988,9 +1533,9 @@ server <- function(input, output, session) {
 
     # Select Years for Map
     output$selectMapYear = renderUI({
-      sliderInput("mapYear", label ="Year", min = min(dataMap()$x),
-                  max = max(dataMap()$x), step = 5,
-                  value=mapYearx(), sep="",
+      sliderInput("mapYear", label ="Year", min = min(dataMapx()$x),
+                  max = max(dataMapx()$x), step = 5,
+                  value=selectFocusMapYearx(), sep="",
                   animate =F)
     })
 
@@ -1003,6 +1548,29 @@ server <- function(input, output, session) {
       } else{
         return(input$subsetRegions)
       }
+    })
+
+    #Bookmark modal
+    observeEvent(input$button_subset_regions, {
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          pickerInput(
+            inputId = "subsetRegions",
+            label = "Select Regions to Compare",
+            choices = unique(dataMapx()$subRegion),
+            selected = unique(regionsSelectedx())[1:4],
+            multiple = TRUE,
+            options = list(
+              `actions-box` = TRUE,
+              `deselect-all-text` = "None",
+              `select-all-text` = "All",
+              `none-selected-text` = "None Selected"
+            ))
+        )
+      )
     })
 
     # Reactive Reference Scenario Select
@@ -1085,7 +1653,7 @@ server <- function(input, output, session) {
 
     selectFocusMapYearx <-  function(){
      if (is.null(isolate(input$focusMapYearSelected))){
-        return(sort(unique(dataMap()$x))[round(length(sort(unique(dataMap()$x)))/2)])
+        return(sort(unique(dataMapx()$x))[round(length(sort(unique(dataMapx()$x)))/2)])
       } else{
         return(isolate(input$focusMapYearSelected))
       }
@@ -1110,10 +1678,12 @@ server <- function(input, output, session) {
 
   if(T){ # Subsetting Data for Outputs
 
-    dataSum <- reactive({
+    dataSumx <- reactive({
       # Aggregate across classes
       tblAggsums <- data() %>%
         dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+        dplyr::filter(scenario %in% scenariosSelectedx(),
+                      param %in% paramsSelectedx()) %>%
         dplyr::mutate(scenario = as.character(scenario)) %>%
         dplyr::filter(aggregate == "sum") %>%
         dplyr::select(scenario, param, x, value) %>%
@@ -1121,6 +1691,8 @@ server <- function(input, output, session) {
         dplyr::summarize_at(c("value"), list( ~ sum(.)))
       tblAggmeans <- data() %>%
         dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+        dplyr::filter(scenario %in% scenariosSelectedx(),
+                      param %in% paramsSelectedx()) %>%
         dplyr::select(-class) %>%
         dplyr::mutate(scenario = as.character(scenario)) %>%
         dplyr::filter(aggregate == "mean") %>%
@@ -1131,41 +1703,37 @@ server <- function(input, output, session) {
       dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
     })
 
-    # Data for summary chart
-    dataSumx <- reactive({
-      x <- dataSum() %>%
-        dplyr::filter(scenario %in% scenariosSelectedx(),
-                      param %in% paramsSelectedx())
-      return(x)
-    })
-
     # Data for Bar Chart
     dataChartx <- reactive({
-      # Aggregate across classes
-      tblAggsums <- data() %>%
-        dplyr::filter(
-          scenario %in% input$scenariosSelected,
-          param %in% paramsSelectedx(),
-          subRegion %in% regionsSelectedx()
-        ) %>%
-        dplyr::mutate(scenario = as.character(scenario)) %>%
-        dplyr::filter(aggregate == "sum") %>%
-        dplyr::select(scenario, param, class, x, value) %>%
-        dplyr::group_by_at(dplyr::vars(-value)) %>%
-        dplyr::summarize_at(c("value"), list( ~ sum(.)))
-      tblAggmeans <- data() %>%
-        dplyr::filter(
-          scenario %in% input$scenariosSelected,
-          param %in% paramsSelectedx(),
-          subRegion %in% regionsSelectedx()
-        ) %>%
-        dplyr::mutate(scenario = as.character(scenario)) %>%
-        dplyr::filter(aggregate == "mean") %>%
-        dplyr::select(scenario, param, class, x, value) %>%
-        dplyr::group_by_at(dplyr::vars(-value)) %>%
-        dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
-      dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+        # Aggregate across classes
+        tblAggsums <- data() %>%
+          dplyr::filter(
+            scenario %in% input$scenariosSelected,
+            param %in% paramsSelectedx(),
+            subRegion %in% regionsSelectedx()
+          ) %>%
+          dplyr::mutate(scenario = as.character(scenario)) %>%
+          dplyr::filter(aggregate == "sum") %>%
+          dplyr::select(scenario, param, class, x, value) %>%
+          dplyr::group_by_at(dplyr::vars(-value)) %>%
+          dplyr::summarize_at(c("value"), list( ~ sum(.)))
+
+        tblAggmeans <- data() %>%
+          dplyr::filter(
+            scenario %in% input$scenariosSelected,
+            param %in% paramsSelectedx(),
+            subRegion %in% regionsSelectedx()
+          ) %>%
+          dplyr::mutate(scenario = as.character(scenario)) %>%
+          dplyr::filter(aggregate == "mean") %>%
+          dplyr::select(scenario, param, class, x, value) %>%
+          dplyr::group_by_at(dplyr::vars(-value)) %>%
+          dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+
+        dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+
     })
 
     # Data Bar Chart Absolute Diff
@@ -1309,163 +1877,38 @@ server <- function(input, output, session) {
 
 
     # Map Data
-    dataMap <- reactive({
-      # Aggregate across classes
-      tblAggsums <- data() %>%
-        dplyr::filter(subRegion %in% regionsSelectedx()) %>%
-        dplyr::mutate(scenario = as.character(scenario)) %>%
-        dplyr::filter(aggregate == "sum") %>%
-        dplyr::select(scenario, param, subRegion, x, value) %>%
-        dplyr::group_by_at(dplyr::vars(-value)) %>%
-        dplyr::summarize_at(c("value"), list( ~ sum(.)))
-      tblAggmeans <- data() %>%
-        dplyr::filter(subRegion %in% regionsSelectedx()) %>%
-        dplyr::select(-class) %>%
-        dplyr::mutate(scenario = as.character(scenario)) %>%
-        dplyr::filter(aggregate == "mean") %>%
-        dplyr::select(scenario, param, subRegion, x, value) %>%
-        dplyr::group_by_at(dplyr::vars(-value)) %>%
-        dplyr::summarize_at(c("value"), list( ~ mean(.)))
 
-      dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
-
-    })
-
-    # Filter Data After Chocie
     dataMapx <- reactive({
-      dataMap() %>%
-        dplyr::filter(scenario %in% input$scenariosSelected,
-                      param %in% paramsSelectedx()) %>%
-        dplyr::mutate(subRegion = gsub("-","_",subRegion))
+
+          # Aggregate across classes
+          tblAggsums <- data() %>%
+            dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+            dplyr::filter(scenario %in% input$scenariosSelected,
+                          param %in% paramsSelectedx()) %>%
+            dplyr::mutate(subRegion = gsub("-","_",subRegion)) %>%
+            dplyr::mutate(scenario = as.character(scenario)) %>%
+            dplyr::filter(aggregate == "sum") %>%
+            dplyr::select(scenario, param, subRegion, x, value) %>%
+            dplyr::group_by_at(dplyr::vars(-value)) %>%
+            dplyr::summarize_at(c("value"), list( ~ sum(.)))
+
+          tblAggmeans <- data() %>%
+            dplyr::filter(subRegion %in% regionsSelectedx()) %>%
+            dplyr::filter(scenario %in% input$scenariosSelected,
+                          param %in% paramsSelectedx()) %>%
+            dplyr::mutate(subRegion = gsub("-","_",subRegion)) %>%
+            dplyr::select(-class) %>%
+            dplyr::mutate(scenario = as.character(scenario)) %>%
+            dplyr::filter(aggregate == "mean") %>%
+            dplyr::select(scenario, param, subRegion, x, value) %>%
+            dplyr::group_by_at(dplyr::vars(-value)) %>%
+            dplyr::summarize_at(c("value"), list( ~ mean(.)))
+
+        dplyr::bind_rows(tblAggsums, tblAggmeans) %>% dplyr::ungroup()
+
     })
 
-    # Data Map Absolute Diff
-    dataDiffAbsMapx <- reactive({
-      diffText <- " Diff Abs"
 
-      if (is.null(input$scenarioRefSelected)) {
-        print(paste("No reference scenario provided", sep = ""))
-        print(paste(
-          "Using ",
-          unique(dataMapx()$scenario)[1],
-          " as reference",
-          sep = ""
-        ))
-        scenRef_i = unique(dataMapx()$scenario)[1]
-      } else{
-        if (!input$scenarioRefSelected %in% unique(dataMapx()$scenario)) {
-          print(paste(
-            "scenario ",
-            input$scenarioRefSelected,
-            " not in scenarios",
-            sep = ""
-          ))
-          print(paste(
-            "Using ",
-            unique(dataMapx()$scenario)[1],
-            " as reference",
-            sep = ""
-          ))
-          scenRef_i = unique(dataMapx()$scenario)[1]
-        } else{
-          scenRef_i <- input$scenarioRefSelected
-          print(scenRef_i)
-        }
-      } # Check if Ref Scenario Chosen
-
-      # Calculate Diff Values
-      tbl_pd <- dataMapx() %>%
-        dplyr::filter(scenario == scenRef_i)
-      for (k in unique(dataMapx()$scenario)[unique(dataMapx()$scenario) !=
-                                            scenRef_i]) {
-        tbl_temp <- dataMapx() %>%
-          dplyr::filter(scenario %in% c(scenRef_i, k))
-        tbl_temp <- tbl_temp %>%
-          tidyr::spread(scenario, value)
-
-        tbl_temp[is.na(tbl_temp)] <- 0
-
-        tbl_temp <- tbl_temp %>%
-          dplyr::mutate(!!paste(k, diffText, sep = "") := get(k) - get(scenRef_i)) %>%
-          dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
-        tbl_temp <- tbl_temp %>%
-          tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
-       tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
-
-        }
-
-      tbl_pd <- tbl_pd %>%
-        dplyr::mutate(scenario = factor(scenario,
-                                        levels = c(scenRef_i,
-                                                   unique(
-                                                     tbl_pd$scenario
-                                                   )[unique(tbl_pd$scenario) != scenRef_i])))
-     tbl_pd
-    })
-
-    # Data Map Percent Diff
-    dataPrcntAbsMapx <- reactive({
-      diffText <- " Prcent Abs"
-
-      if (is.null(input$scenarioRefSelected)) {
-        print(paste("No reference scenario provided", sep = ""))
-        print(paste(
-          "Using ",
-          unique(dataMapx()$scenario)[1],
-          " as reference",
-          sep = ""
-        ))
-        scenRef_i = unique(dataMapx()$scenario)[1]
-      } else{
-        if (!input$scenarioRefSelected %in% unique(dataMapx()$scenario)) {
-          print(paste(
-            "scenario ",
-            input$scenarioRefSelected,
-            " not in scenarios",
-            sep = ""
-          ))
-          print(paste(
-            "Using ",
-            unique(dataMapx()$scenario)[1],
-            " as reference",
-            sep = ""
-          ))
-          scenRef_i = unique(dataMapx()$scenario)[1]
-        } else{
-          scenRef_i <- input$scenarioRefSelected
-        }
-      } # Check if Ref Scenario Chosen
-
-      # Calculate Diff Values
-      tbl_pd <- dataMapx() %>%
-        dplyr::filter(scenario == scenRef_i)
-      for (k in unique(dataMapx()$scenario)[unique(dataMapx()$scenario) !=
-                                            scenRef_i]) {
-        tbl_temp <- dataMapx() %>%
-          dplyr::filter(scenario %in% c(scenRef_i, k))
-        tbl_temp <- tbl_temp %>%
-          tidyr::spread(scenario, value)
-
-        tbl_temp[is.na(tbl_temp)] <- 0
-
-        #Important Code
-
-        tbl_temp <- tbl_temp %>%
-          dplyr::mutate(!!paste(k, diffText, sep = "") := 100*((get(k)/get(scenRef_i))-1)) %>%
-          dplyr::select(-dplyr::one_of(c(k, scenRef_i)))
-        tbl_temp <- tbl_temp %>%
-          tidyr::gather(key = scenario, value = value, -c(names(tbl_temp)[!names(tbl_temp) %in% paste(k, diffText, sep = "")]))
-        tbl_pd <- dplyr::bind_rows(tbl_pd, tbl_temp)
-      }
-
-      tbl_pd <- tbl_pd %>%
-        dplyr::mutate(scenario = factor(scenario,
-                                        levels = c(scenRef_i,
-                                                   unique(
-                                                     tbl_pd$scenario
-                                                   )[unique(tbl_pd$scenario) != scenRef_i])))
-      tbl_pd
-    })
 
   } # Subsetting Data For Outputs
 
@@ -1481,8 +1924,6 @@ server <- function(input, output, session) {
   # Plotting Outputs
   #...........................
 
-  if(T){ # Plotting Outputs
-
   #...........................
   # Focus Page
   #...........................
@@ -1492,23 +1933,24 @@ server <- function(input, output, session) {
   output$focusMap <- renderLeaflet({
 
     # Read in Raw Data
-    dataMapFocus_raw <- dataMapx() %>%
-      dplyr::ungroup() %>%
-      dplyr::select(x,param,scenario,subRegion,value) %>%
-      filter(param == focusMapParamSelectedx(),
-             scenario == input$focusMapScenarioSelected,
-             x == input$focusMapYearSelected) %>%
-        dplyr::left_join(rmap::mappings("mappingGCAMBasins"),by="subRegion") %>%
-        dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
-                                                 TRUE~subRegion)) %>%
-        dplyr::select(-subRegionMap) %>%
-      dplyr::filter(subRegion!="South_Pacific_Islands")
+    dataMapFocus_raw <-
+        dataMapx() %>%
+          dplyr::ungroup() %>%
+          dplyr::select(x,param,scenario,subRegion,value) %>%
+          filter(param == focusMapParamSelectedx(),
+                 scenario == input$focusMapScenarioSelected,
+                 x == input$focusMapYearSelected) %>%
+            dplyr::left_join(rmap::mappings("mappingGCAMBasins"),by="subRegion") %>%
+            dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
+                                                     TRUE~subRegion)) %>%
+            dplyr::select(-subRegionMap) %>%
+          dplyr::filter(subRegion!="South_Pacific_Islands")
 
       if(length(dataMapFocus_raw$x)==0){
         my_title <- tags$p(tags$style("p {color: black; font-size:22px}"),tags$b("There is no data for this year"))
 
         mapFocus <- leaflet() %>%
-#          setView(lat = initial_lat, lng = initial_lng, zoom = initial_zoom) %>%
+        # setView(lat = initial_lat, lng = initial_lng, zoom = initial_zoom) %>%
           addTiles()%>%
           addControl(my_title, position = "topleft" )
         return(mapFocus)
@@ -1517,7 +1959,6 @@ server <- function(input, output, session) {
     mapdf <- rmap::map_find(dataMapFocus_raw)$subRegShapeFound;
 
     # Prepare for Polygons
-
     mapdf <- mapdf[mapdf$subRegion %in% dataMapFocus_raw$subRegion,]; mapdf
     mapdf@data <- mapdf@data %>%
       left_join(dataMapFocus_raw %>%
@@ -1592,7 +2033,7 @@ server <- function(input, output, session) {
                     opacity = 0.6,
                     title = NULL,
                     position = "bottomright")
-        }
+      }
 
 
     mapFocus
@@ -1612,12 +2053,15 @@ server <- function(input, output, session) {
        ggplottheme +
        geom_line() +
        geom_point() +
+       xlab(NULL) + ylab(NULL) +
+       ggtitle(paste0(focusMapParamSelectedx())) +
        theme(legend.position="bottom",
              legend.title = element_blank(),
-             plot.margin=margin(0,0,0,0,"pt"),
+             legend.margin=margin(t =0, r = 0, b = 0, l =0, "pt"),
+             plot.margin=margin(t =0, r = 0, b = 0, l =0,"pt"),
              text=element_text(size=12),
              aspect.ratio = NULL,
-             plot.title = element_text(hjust = 0.5)))%>%
+             plot.title = element_text(size =10)))%>%
       ggplotly(tooltip = c("x","value"))%>%
       config(displayModeBar = FALSE) %>%
       layout(legend = list(orientation = "h", x=0,y=-0.2),
@@ -1653,17 +2097,19 @@ server <- function(input, output, session) {
                          group=scenario,
                          fill=class))+
        ggplottheme +
+       ggtitle(paste0(input$focusMapScenarioSelected)) +
        scale_fill_manual(breaks=names(palCharts),values=palCharts) +
        scale_y_continuous(position = "left")+
        geom_bar(position="stack", stat="identity") +
        theme(legend.position="bottom",
               strip.text.y = element_blank(),
               legend.title = element_blank(),
-              legend.margin=margin(0,0,0,0,"pt"),
+              legend.margin=margin(t =0, r = 0, b = 0, l =0, "pt"),
               legend.key.height=unit(0, "cm"),
-              text = element_text(size = 15),
-              plot.margin=margin(0,0,0,0,"pt")) +
-      ylab(NULL) +  xlab(NULL))%>%
+              text = element_text(size = 12),
+              plot.margin=margin(t =0, r = 0, b = 0, l =0,"pt"),
+              plot.title = element_text(size =10)) +
+      ylab(NULL) + xlab(NULL))%>%
       ggplotly(tooltip = c("class","x","value"))%>%
       config(displayModeBar = FALSE) %>%
       layout(showlegend = TRUE, legend = list(font = list(size = 10)))%>%
@@ -1815,6 +2261,63 @@ server <- function(input, output, session) {
 
     if(T){ # Maps
 
+      #...........................
+      # Map Plot Abs
+      #...........................
+
+      output$mapAbs <- renderPlot({
+
+
+        print("==============")
+        print(paste0(unique(dataMapx()$param)))
+
+        withProgress(message = 'Rendering map...', value = 0, {
+        argus::plotMap(mapData = dataMapx(),
+                       mapX = input$mapYear,
+                       diff=NULL)
+        })
+
+      },
+      height=function(){400*length(unique((dataMapx() %>% dplyr::filter(x == input$mapYear))$param))}
+      )
+
+      #...........................
+      # Map Plot Diff Abs
+      #...........................
+
+      output$mapDiffAbs <- renderPlot({
+
+        withProgress(message = 'Rendering map...', value = 0, {
+        argus::plotMap(mapData = dataMapx(),
+                       mapX = input$mapYear,
+                       scenRef = input$scenarioRefSelected ,
+                       diff="absolute")
+        })
+
+      },
+      height=function(){400*length(unique((dataMapx() %>% dplyr::filter(x == input$mapYear))$param))}
+      )
+
+      #...........................
+      # Map Plot Diff Percent
+      #...........................
+
+
+     output$mapDiffPrcnt <- renderPlot({
+
+       withProgress(message = 'Rendering map...', value = 0, {
+       argus::plotMap(mapData = dataMapx(),
+                      mapX = input$mapYear,
+                      scenRef = input$scenarioRefSelected ,
+                      diff="percent")
+       })
+
+     },
+     height=function(){400*length(unique((dataMapx() %>% dplyr::filter(x == input$mapYear))$param))}
+     )
+
+
+
   # Download
   output$downloadMap <- downloadHandler(
     file = "map.png",
@@ -1830,7 +2333,7 @@ server <- function(input, output, session) {
 
     } # Maps
 
-  } # Plotting Outputs
+
 
   #...........................
   # Data Table

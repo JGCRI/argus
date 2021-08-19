@@ -1,0 +1,3 @@
+scenario,subRegion,param,class,x,value,units
+scenario,New_England_X_Canada,param,class,x,5,units
+scenario,New_England_X_USA,param,class,x,10,units
