@@ -45,6 +45,7 @@ server <- function(input, output, session) {
 
   toggleDropdownButton("inputx", session = session)
   toggleDropdownButton("linestoryboard", session = session)
+
   # NOTE:
   # To collapse code for easy reading place cursor here and enter: ALT+0
   # To Expand code again place cursor here and enter: ALT+SHIFT+O (O not 0)
@@ -52,22 +53,6 @@ server <- function(input, output, session) {
   #...........................
   # Storyboard
   #...........................
-
-  # Toggle Sidebar
-
-  # observeEvent(input$storyboard, {
-  #   shinyjs::toggle(id = "Sidebar")
-  #
-  #   if (input$toggleSidebar %% 2 == 1) {
-  #     icon <-  icon("caret-down","fa-1x")
-  #   } else {
-  #     icon <-  icon("caret-up","fa-1x")
-  #   }
-  #   updateActionButton(session,
-  #                      "toggleSidebar",
-  #                      icon = icon)
-  #
-  # })
 
   observeEvent(input$collapse1, {
     print(input$linestoryboard)
@@ -82,7 +67,8 @@ server <- function(input, output, session) {
       modalDialog(
         size = "s",
         easyClose = TRUE,
-        footer = NULL,
+        footer = tagList(
+          modalButton("Submit")),
         label = "Story Board",
         textInput(inputId="linestoryboardtitle", label="Title", value = title, width = "100%"),
         textAreaInput(inputId="linestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
@@ -98,6 +84,41 @@ server <- function(input, output, session) {
     input$linestoryboardtitle
 #    HTML(paste("<b>", input$linestoryboardtitle, "</b>"))
   })
+
+  # Focus story board .......................
+
+  observeEvent(input$collapse0, {
+    print(input$focusstoryboard)
+  })
+
+  observeEvent(input$focusstoryboardtoggle, {
+    print(input$focusstoryboard)
+    text = input$focusstoryboard
+    title = input$focusstoryboardtitle
+    print(text)
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = tagList(
+          modalButton("Submit")),
+        label = "Story Board",
+        textInput(inputId="focusstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="focusstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+      ))
+    print(text)
+  })
+
+  output$focusstoryboardtext <- renderText({
+    input$focusstoryboard
+  })
+
+  output$focusstoryboardtexttitle <- renderText({
+    input$focusstoryboardtitle
+    #    HTML(paste("<b>", input$focusstoryboardtitle, "</b>"))
+  })
+
+
 
   observeEvent(input$compregstoryboardtoggle, {
     text = input$compregstoryboard
@@ -284,31 +305,12 @@ server <- function(input, output, session) {
       state <- readRDS(temp)
       rv$data <- state$data
       updateVals(state)
-      print("oof")
-      #session$sendCustomMessage("setsetting", c("focusMapScenarioSelected", settingfocusMapScenarioSelected))
-      #session$sendCustomMessage("openlink", dplyr::filter(preloaded_df, name==input$examplesPreload)$link)
       updatePickerInput(
         inputId = "examplesPreload",
         session=session,
         selected = ""
       )
     })
-    #
-    # output$examplePreload = renderUI({
-    #   pickerInput(
-    #     inputId = "scenariosSelected",
-    #     label = "Select example preload",
-    #     choices = unique(data()$scenario),
-    #     selected = unique(data()$scenario),
-    #     multiple = TRUE,
-    #     options = list(
-    #       `actions-box` = TRUE,
-    #       `deselect-all-text` = "None",
-    #       `select-all-text` = "All",
-    #       `none-selected-text` = "None Selected"
-    #     )
-    #   )
-    # })
   }
 
 
@@ -366,7 +368,10 @@ server <- function(input, output, session) {
     # URL Bookmark
     #...........................
 
-    setBookmarkExclude(c("mappercdifstoryboardtoggle","mapabsdifstoryboardtoggle","mapabsstoryboardtoggle","percdifstoryboardtoggle","absdifstoryboardtoggle","absvalstoryboardtoggle","compregstoryboardtoggle","linestoryboardtoggle","urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "._bookmark_", "loadbookmark"))
+    setBookmarkExclude(c("mappercdifstoryboardtoggle","mapabsdifstoryboardtoggle","mapabsstoryboardtoggle",
+                         "percdifstoryboardtoggle","absdifstoryboardtoggle","absvalstoryboardtoggle","compregstoryboardtoggle",
+                         "linestoryboardtoggle","focusstoryboardtoggle",
+                         "urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "._bookmark_", "loadbookmark"))
 
     #URL bookmark onbookmark
     onBookmark(function(state) {
@@ -381,6 +386,18 @@ server <- function(input, output, session) {
       session$sendCustomMessage("setsetting", c("inputz", ""))
       session$sendCustomMessage("setsetting", c("linestoryboardtitle", input$linestoryboardtitle))
       session$sendCustomMessage("setsetting", c("linestoryboard", input$linestoryboard))
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          label = "Story Board",
+          textInput(inputId="focusstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="focusstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
 
       showModal(
         modalDialog(
@@ -651,7 +668,25 @@ server <- function(input, output, session) {
 
         session$sendCustomMessage("setsetting", c("linestoryboardtitle", settingslinestoryboardtitle))
 
-        # Line story board
+        # Focus story board
+        settingsfocusstoryboard <- state$focusstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "focusstoryboard",
+          value = settingsfocusstoryboard
+        )
+        session$sendCustomMessage("setsetting", c("focusstoryboard", settingsfocusstoryboard))
+
+        settingsfocusstoryboardtitle <- state$focusstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "focusstoryboardtitle",
+          value = settingsfocusstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("focusstoryboardtitle", settingsfocusstoryboardtitle))
+
+        # CompReg story board
         settingscompregstoryboard <- state$compregstoryboard
         updateTextAreaInput(
           session=session,
@@ -960,6 +995,21 @@ server <- function(input, output, session) {
 
   observeEvent(input$help,{
     session$sendCustomMessage("handler1", unique(data()$subRegion))
+  })
+
+  # Toggle Preload
+  observeEvent(input$preload, {
+    shinyjs::toggle(id = "Sidebar")
+
+    if (input$preload %% 2 == 1) {
+      icon <-  icon("caret-down","fa-1x")
+    } else {
+      icon <-  icon("caret-up","fa-1x")
+    }
+    updateActionButton(session,
+                       "preload",
+                       icon = icon)
+
   })
 
   # Toggle Sidebar
