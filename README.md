@@ -1,6 +1,7 @@
 <!-- badges: start -->
 [![build](https://github.com/JGCRI/argus/actions/workflows/build.yml/badge.svg)](https://github.com/JGCRI/argus/actions/workflows/build.yml)
-[![pkgdown](https://github.com/JGCRI/argus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/JGCRI/argus/actions/workflows/pkgdown.yaml)
+[![docs](https://github.com/JGCRI/argus/actions/workflows/docs.yaml/badge.svg?branch=main)](https://github.com/JGCRI/argus/actions/workflows/docs.yaml)
+[![test_coverage](https://github.com/JGCRI/argus/actions/workflows/test_coverage.yml/badge.svg?branch=main)](https://github.com/JGCRI/argus/actions/workflows/test_coverage.yml)
 [![codecov](https://codecov.io/gh/JGCRI/argus/branch/dev/graph/badge.svg?token=NDE0ZK7OHN)](https://codecov.io/gh/JGCRI/argus)
 <!-- badges: end -->
 
