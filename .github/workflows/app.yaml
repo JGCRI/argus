@@ -11,7 +11,7 @@ jobs:
     - name: Copy
       uses: andstor/copycat-action@v3
       with:
-        personal_token: ${{ secrets.GH_PAT }}
+        personal_token: ${{ secrets.DEPLOY_APP }}
         src_path: /inst/app
         dst_owner: JGCRI
         dst_repo_name: argus
