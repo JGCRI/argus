@@ -195,7 +195,7 @@ exportWidth<-function(max_width_in, numelement, lenperchart){
 
 summaryPlotReg <- function(titletext,
                            dataMapx,
-                           ggplottheme,
+                           ggplottheme = ggplot2::theme_bw(),
                            subsetRegionsx){
 
   # Initialize
@@ -226,7 +226,8 @@ summaryPlotReg <- function(titletext,
             legend.justification='left',
             text = element_text(size = 15),
             legend.title = element_blank(),
-            plot.margin=margin(10,10,10,10,"pt"))}
+            plot.margin=margin(10,10,10,10,"pt"))
+    }
 
   cowplot::plot_grid(plotlist=plist,ncol=1,align = "v")
 }
@@ -281,13 +282,17 @@ breaks <- function(dataMap_raw_param = NULL,
 #' @param textsize text size
 #' @param titletext title text
 #' @param dataSumx dataSumx()
+#' @param ggplottheme ggplot theme to use
 #' @importFrom magrittr %>%
 #' @export
 summaryPlot <- function(aspectratio,
                         textsize,
                         titletext,
-                        dataSumx){
-  NULL->x->value->scenario->ggplottheme
+                        dataSumx,
+                        ggplottheme = ggplot2::theme_bw()){
+
+  NULL->x->value->scenario
+
   ggplot2::ggplot(dataSumx,
                   aes(x=x,y=value,
                       group=scenario,
@@ -310,10 +315,12 @@ summaryPlot <- function(aspectratio,
 #'
 #' generate chart plot for absolute difference and percent difference
 #' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
-#' @param scenarioRefSelected scenarioRefSeleceted
+#' @param scenarioRefSelected scenarioRefSeleceted#'
+#' @param ggplottheme ggplot theme to use
 #' @importFrom magrittr %>%
 #' @export
-plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
+plotDiffAbs<- function(dataChartPlot, scenarioRefSelected,
+                       ggplottheme = ggplot2::theme_bw()){
 
   NULL -> filter -> param -> scenario -> input -> value
 
@@ -357,7 +364,7 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
                                      aes(x=x,y=value,
                                          group=class,
                                          fill=class))+
-      ggplot2::theme_bw() +
+      ggplottheme +
       xlab(NULL) +
       ylab(NULL) +
       scale_fill_manual(breaks=names(palCharts),values=palCharts) +
@@ -380,7 +387,7 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
                                    aes(x=x,y=value,
                                        group=class,
                                        fill=class))+
-      ggplot2::theme_bw()  +
+      ggplottheme +
       xlab(NULL) +
       ylab(unique(dataChartPlot$param)[i])+
       scale_fill_manual(breaks=names(palCharts),values=palCharts) +
@@ -404,9 +411,11 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected){
 #' generate chart plot for absolute difference and percent difference
 #' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
 #' @param scenarioRefSelected scenarioRefSeleceted
+#' @param ggplottheme ggplot theme to use
 #' @importFrom magrittr %>%
 #' @export
-plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
+plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected,
+                         ggplottheme = ggplot2::theme_bw()){
 
   NULL -> filter -> param -> scenario -> input -> value
 
@@ -451,7 +460,7 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
                                      aes(x=x,y=value,
                                          group=class,
                                          color=class))+
-      ggplot2::theme_bw() +
+      ggplottheme +
       xlab(NULL) +
       ylab(NULL) +
       scale_color_manual(breaks=names(palCharts),values=palCharts) +
@@ -474,7 +483,7 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
                                    aes(x=x,y=value,
                                        group=class,
                                        fill=class))+
-      ggplot2::theme_bw()  +
+      ggplottheme +
       xlab(NULL) +
       ylab(unique(dataChartPlot$param)[i])+
       scale_fill_manual(breaks=names(palCharts),values=palCharts) +
@@ -499,9 +508,11 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected){
 #' generate chart plot for absolute value
 #' @param dataChartPlot dataChartPlot: dataChartx()
 #' @param scenarioRefSelected scenarioRefSelected
+#' @param ggplottheme ggplot theme to use
 #' @importFrom magrittr %>%
 #' @export
-plotAbs <- function(dataChartPlot, scenarioRefSelected){
+plotAbs <- function(dataChartPlot, scenarioRefSelected,
+                    ggplottheme = ggplot2::theme_bw()){
 
   NULL -> filter -> param -> scenario -> input -> value -> x
 
@@ -537,7 +548,7 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected){
                                    aes(x=x,y=value,
                                        group=scenario,
                                        fill=class))+
-      ggplot2::theme_bw() +
+      ggplottheme +
       xlab(NULL) +
       ylab(unique(dataChartPlot$param)[i])+
       scale_fill_manual(breaks=names(palCharts),values=palCharts) +

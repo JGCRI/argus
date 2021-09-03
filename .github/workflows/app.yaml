@@ -1,0 +1,20 @@
+name: Create App branch
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Copy
+      uses: andstor/copycat-action@v3
+      with:
+        personal_token: ${{ secrets.GH_PAT }}
+        src_path: /inst/app
+        dst_owner: JGCRI
+        dst_repo_name: argus
+        src_branch: main
+        dst_branch: app
+        clean: true

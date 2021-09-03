@@ -4,12 +4,18 @@
 \alias{plotDiffPrcnt}
 \title{plotDiff}
 \usage{
-plotDiffPrcnt(dataChartPlot, scenarioRefSelected)
+plotDiffPrcnt(
+  dataChartPlot,
+  scenarioRefSelected,
+  ggplottheme = ggplot2::theme_bw()
+)
 }
 \arguments{
 \item{dataChartPlot}{dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()}
 
 \item{scenarioRefSelected}{scenarioRefSeleceted}
+
+\item{ggplottheme}{ggplot theme to use}
 }
 \description{
 generate chart plot for absolute difference and percent difference
