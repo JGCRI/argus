@@ -26,3 +26,4 @@ jobs:
         REPO: self
         BRANCH: app
         FOLDER: inst/app
+        GITHUB_TOKEN: ${{ secrets.DEPLOY_APP }}
