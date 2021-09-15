@@ -134,4 +134,28 @@ body{
   margin-right:10px;
   float: right;}
 
+/* .panel-title{
+    font-size: 12px !important;
+} */
+
+.panel-heading {
+    color: whitesmoke !important;
+    background-color: slategray !important;
+    border: 0.2 !important;
+    border-color: darkslategray !important;
+  }
+
+.panel-body {
+    color: black !important;
+    border: 0.2 !important;
+    border-color: darkslategray !important;
+  }
+
+.panel {
+    border: 0.2 !important;
+    border-color: darkslategray !important;
+    box-shadow: none !important;
+  }
+
+
 .storyboardtext {white-space: pre-wrap;}

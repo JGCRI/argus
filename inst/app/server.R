@@ -1029,7 +1029,9 @@ server <- function(input, output, session) {
 
   # Load Default Datasets from argus
   dataDefault <- argus::exampleData
-  ggplottheme <- ggplot2::theme_bw()
+  ggplottheme <- ggplot2::theme_bw() +
+    ggplot2::theme(strip.background = ggplot2::element_rect(color="black",size=0.1, fill="gray30"),
+                   strip.text = ggplot2::element_text(color = "white"))
 
   } # Initial Setting
 
@@ -1956,7 +1958,7 @@ server <- function(input, output, session) {
         return(mapFocus)
       }
 
-    mapdf <- rmap::map_find(dataMapFocus_raw)$subRegShapeFound;
+    mapdf <- df_to_shape(rmap::map_find_df(dataMapFocus_raw));
 
     # Prepare for Polygons
     mapdf <- mapdf[mapdf$subRegion %in% dataMapFocus_raw$subRegion,]; mapdf
@@ -2127,7 +2129,7 @@ server <- function(input, output, session) {
     if(T){ # Summary Plot
 
       output$summary <- renderPlot({
-        argus::summaryPlot(NULL, 17.5, 20, dataSumx())
+        argus::summaryPlot(NULL, 17.5, 20, dataSumx(), ggplottheme=ggplottheme)
       },
       height=function(){
         if (length(unique(dataChartx()$param))>3){
@@ -2148,7 +2150,7 @@ server <- function(input, output, session) {
         content = function(filename) {
           ggsave(
             filename,
-            plot=argus::summaryPlot(0.75, 10, 10, dataSumx()),
+            plot=argus::summaryPlot(0.75, 10, 10, dataSumx(), ggplottheme=ggplottheme),
             #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
             height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
             width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
@@ -2216,7 +2218,7 @@ server <- function(input, output, session) {
   #...........................
 
   output$plotAbs <- renderPlot({
-    argus::plotAbs(dataChartx(), input$scenarioRefSelected)
+    argus::plotAbs(dataChartx(), ggplottheme=ggplottheme,input$scenarioRefSelected)
   },
   height=function(){400*length(unique(dataChartx()$param))}#,
   #width=function(){500*length(unique(data()$scenario))}
@@ -2240,14 +2242,14 @@ server <- function(input, output, session) {
   #...........................
 
   output$plotDiff <- renderPlot({
-    argus::plotDiffAbs(dataDiffAbsx(), input$scenarioRefSelected)
+    argus::plotDiffAbs(dataDiffAbsx(), ggplottheme=ggplottheme, input$scenarioRefSelected)
   },
  height=function(){400*length(unique(dataChartx()$param))}#,
  #width=function(){500*length(unique(data()$scenario))}
   )
 
   output$plotPerc <- renderPlot({
-    argus::plotDiffPrcnt(dataPrcntAbsx(), input$scenarioRefSelected)
+    argus::plotDiffPrcnt(dataPrcntAbsx(), ggplottheme=ggplottheme, input$scenarioRefSelected)
   },
   height=function(){400*length(unique(dataChartx()$param))}#,
   #width=function(){500*length(unique(data()$scenario))}
@@ -2371,7 +2373,7 @@ server <- function(input, output, session) {
               "mapBase.png"
               )
       write.csv(data(), "table.csv")
-      ggsave("summaryChart.png", plot=argus::summaryPlot(0.75, 10, 10, dataSumx()),
+      ggsave("summaryChart.png", plot=argus::summaryPlot(0.75, 10, 10, dataSumx(), ggplottheme=ggplottheme),
              #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
              height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 4),
              width=argus::exportWidth(10, length(unique(dataChartx()$param)), 2),

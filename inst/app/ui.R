@@ -126,16 +126,16 @@ ui <- function(request) { fluidPage(
         #---------------------------
         tabPanel("Focus",
                  div(align="center",
-                     bsCollapse(id = "collapse0", multiple = FALSE,
+                     bsCollapse(id = "collapse_focus", multiple = FALSE,
                                 bsCollapsePanel("Data Story", style = "info",
                                                 actionButton(style="position:absolute; left:40px",
-                                                             inputId='compregstoryboardtoggle',
+                                                             inputId='focusstoryboardtoggle',
                                                              label='Edit',
                                                              class = "download-button", icon = icon("edit","fa-1x")),
-                                                textOutput("compregstoryboardtexttitle"),
-                                                tags$style("#compregstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
-                                                verbatimTextOutput("compregstoryboardtext", placeholder = TRUE),
-                                                tags$style(type="text/css","#compregstoryboardtext {white-space:pre-wrap;
+                                                textOutput("focusstoryboardtexttitle"),
+                                                tags$style("#focusstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                verbatimTextOutput("focusstoryboardtext", placeholder = TRUE),
+                                                tags$style(type="text/css","#focusstoryboardtext {white-space:pre-wrap;
                                                            text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
                                                                       text-align: left;width;100%;height:10vh;display: 'inline-block'}")
 
@@ -166,16 +166,16 @@ ui <- function(request) { fluidPage(
                                             class = "download_button_in"),style="float:right"),
                                 br(),
                                 div(align="center",
-                                    bsCollapse(id = "collapse1", multiple = FALSE,
+                                    bsCollapse(id = "collapse_lines_all", multiple = FALSE,
                                            bsCollapsePanel("Data Story", style = "info",
                                                            actionButton(style="position:absolute; left:40px",
-                                                                        inputId='linestoryboardtoggle',
+                                                                        inputId='linesalltoryboardtoggle',
                                                                         label='Edit',
                                                                         class = "download-button", icon = icon("edit","fa-1x")),
-                                                           textOutput("linestoryboardtexttitle"),
-                                                           tags$style("#linestoryboardtexttitle {font-weight: bold; font-size: 30px}"),
-                                                           verbatimTextOutput("linestoryboardtext", placeholder = TRUE),
-                                                           tags$style(type="text/css","#linestoryboardtext {white-space:pre-wrap;
+                                                           textOutput("linesalltoryboardtexttitle"),
+                                                           tags$style("#linesalltoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                           verbatimTextOutput("linesalltoryboardtext", placeholder = TRUE),
+                                                           tags$style(type="text/css","#linesalltoryboardtext {white-space:pre-wrap;
                                                            text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
                                                                       text-align: left;width;100%;height:10vh;display: 'inline-block'}")
 
@@ -185,23 +185,23 @@ ui <- function(request) { fluidPage(
                                 div(downloadButton('downloadPlotSumReg',NULL,download = "summaryChartReg.png",
                                                class = "download_button_in"),style="float:right"),
                                 br(),
+                                div(align="center",
+                                    bsCollapse(id = "collapse_lines_compare", multiple = FALSE,
+                                               bsCollapsePanel("Data Story", style = "info",
+                                                               actionButton(style="position:absolute; left:40px",
+                                                                            inputId='linescomparetoryboardtoggle',
+                                                                            label='Edit',
+                                                                            class = "download-button", icon = icon("edit","fa-1x")),
+                                                               textOutput("linescomparetoryboardtexttitle"),
+                                                               tags$style("#linescomparetoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                               verbatimTextOutput("linescomparetoryboardtext", placeholder = TRUE),
+                                                               tags$style(type="text/css","#linescomparetoryboardtext {white-space:pre-wrap;
+                                                           text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
+                                                                      text-align: left;width;100%;height:10vh;display: 'inline-block'}")
+
+                                               ))),
                                 div(actionButton("button_subset_regions", "Choose Regions to Compare",class = "update_button"),
                                              align="left"),
-                                # div(align="center",
-                                #     bsCollapse(id = "collapse2", multiple = FALSE,
-                                #                bsCollapsePanel("Data Story", style = "info",
-                                #                                actionButton(style="position:absolute; left:40px",
-                                #                                             inputId='compregstoryboardtoggle',
-                                #                                             label='Edit',
-                                #                                             class = "download-button", icon = icon("edit","fa-1x")),
-                                #                                textOutput("compregstoryboardtexttitle"),
-                                #                                tags$style("#compregstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
-                                #                                verbatimTextOutput("compregstoryboardtext", placeholder = TRUE),
-                                #                                tags$style(type="text/css","#compregstoryboardtext {white-space:pre-wrap;
-                                #                            text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
-                                #                                       text-align: left;width;100%;height:10vh;display: 'inline-block'}")
-                                #
-                                #                ))),
                                 plotOutput(outputId = "summaryReg"))
                   )
                  )
@@ -217,16 +217,16 @@ ui <- function(request) { fluidPage(
                                                    style = "float: right"),
                                                br(),
                                                div(align="center",
-                                                   bsCollapse(id = "collapse3", multiple = FALSE,
+                                                   bsCollapse(id = "collapse_charts_abs", multiple = FALSE,
                                                               bsCollapsePanel("Data Story", style = "info",
                                                                               actionButton(style="position:absolute; left:40px",
-                                                                                           inputId='absvalstoryboardtoggle',
+                                                                                           inputId='chartsabsstoryboardtoggle',
                                                                                            label='Edit',
                                                                                            class = "download-button", icon = icon("edit","fa-1x")),
-                                                                              textOutput("absvalstoryboardtexttitle"),
-                                                                              tags$style("#absvalstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
-                                                                              verbatimTextOutput("absvalstoryboardtext", placeholder = TRUE),
-                                                                              tags$style(type="text/css","#absvalstoryboardtext {white-space:pre-wrap;
+                                                                              textOutput("chartsabsstoryboardtexttitle"),
+                                                                              tags$style("#chartsabsstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                                              verbatimTextOutput("chartsabsstoryboardtext", placeholder = TRUE),
+                                                                              tags$style(type="text/css","#chartsabsstoryboardtext {white-space:pre-wrap;
                                                            text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
                                                                       text-align: left;width;100%;height:10vh;display: 'inline-block'}")
 
@@ -242,55 +242,45 @@ ui <- function(request) { fluidPage(
                                                div(class="charts",plotOutput(outputId = "plotAbs", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Absolute Difference",
+                                               div(downloadButton('downloadPlotChart1',NULL,download = "barCharts.png",  class = "download_button_in"),
+                                                   style = "float: right"),
                                                br(),
                                                div(align="center",
-                                                   bsCollapse(id = "collapse4", multiple = FALSE,
+                                                   bsCollapse(id = "collapse_charts_diffabs", multiple = FALSE,
                                                               bsCollapsePanel("Data Story", style = "info",
                                                                               actionButton(style="position:absolute; left:40px",
-                                                                                           inputId='absdifstoryboardtoggle',
+                                                                                           inputId='chartsdiffabsstoryboardtoggle',
                                                                                            label='Edit',
                                                                                            class = "download-button", icon = icon("edit","fa-1x")),
-                                                                              textOutput("absdifstoryboardtexttitle"),
-                                                                              tags$style("#absdifstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
-                                                                              verbatimTextOutput("absdifstoryboardtext", placeholder = TRUE),
-                                                                              tags$style(type="text/css","#absdifstoryboardtext {white-space:pre-wrap;
+                                                                              textOutput("chartsdiffabsstoryboardtexttitle"),
+                                                                              tags$style("#chartsdiffabsstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                                              verbatimTextOutput("chartsdiffabsstoryboardtext", placeholder = TRUE),
+                                                                              tags$style(type="text/css","#chartsdiffabsstoryboardtext {white-space:pre-wrap;
                                                            text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
                                                                       text-align: left;width;100%;height:10vh;display: 'inline-block'}")
 
                                                               ))),
-                                               fluidRow(
-                                                 column(10),
-                                                 column(1,
-                                                        div(
-                                                          style="float:right")),
-                                                 column(1, div(downloadButton('downloadPlotChart1',NULL,download = "barCharts.png",  class = "download_button_in"),
-                                                               style = "float: right"))),
-
                                                div(class="charts",plotOutput(outputId = "plotDiff", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Percent Difference",
-                                               fluidRow(
-                                                 column(10),
-                                                 column(1,
-                                                        div(
-                                                          style="float:right")),
-                                                 column(1, div(downloadButton('downloadPlotChart2',NULL,download = "barCharts.png",  class = "download_button"),
-                                                               style = "float: right"))),
-                                               # div(align="center",
-                                               #     bsCollapse(id = "collapse5", multiple = FALSE,
-                                               #                bsCollapsePanel("Data Story", style = "info",
-                                               #                                actionButton(style="position:absolute; left:40px",
-                                               #                                             inputId='percdifstoryboardtoggle',
-                                               #                                             label='Edit',
-                                               #                                             class = "download-button", icon = icon("edit","fa-1x")),
-                                               #                                textOutput("percdifstoryboardtexttitle"),
-                                               #                                tags$style("#percdifstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
-                                               #                                verbatimTextOutput("percdifstoryboardtext", placeholder = TRUE),
-                                               #                                tags$style(type="text/css","#percdifstoryboardtext {white-space:pre-wrap;
-                                               #             text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
-                                               #                        text-align: left;width;100%;height:10vh;display: 'inline-block'}")
-                                               #
-                                               #                ))),
+                                               div(downloadButton('downloadPlotChart2',NULL,download = "barCharts.png",  class = "download_button_in"),
+                                                   style = "float: right"),
+                                               br(),
+                                               div(align="center",
+                                                   bsCollapse(id = "collapse_charts_diffprcnt", multiple = FALSE,
+                                                              bsCollapsePanel("Data Story", style = "info",
+                                                                              actionButton(style="position:absolute; left:40px",
+                                                                                           inputId='chartsdiffprcntstoryboardtoggle',
+                                                                                           label='Edit',
+                                                                                           class = "download-button", icon = icon("edit","fa-1x")),
+                                                                              textOutput("chartsdiffprcntstoryboardtexttitle"),
+                                                                              tags$style("#chartsdiffprcntstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                                              verbatimTextOutput("chartsdiffprcntstoryboardtext", placeholder = TRUE),
+                                                                              tags$style(type="text/css","#chartsdiffprcntstoryboardtext {white-space:pre-wrap;
+                                                           text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
+                                                                      text-align: left;width;100%;height:10vh;display: 'inline-block'}")
+
+                                                              ))),
                                                div(class="charts",plotOutput(outputId = "plotPerc", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       )
                                 )
@@ -308,35 +298,71 @@ ui <- function(request) { fluidPage(
                                           choices = c("kmean","pretty"),
                                           selected = "kmean",
                                           multiple = F))),
-                                    column(1,
-                                           br(),
-                                           div(
-                                             style="float:right",
-                                             # dropdownButton(
-                                             #   label="Storyboard",
-                                             #   circle = FALSE,
-                                             #   up=FALSE,
-                                             #   right=TRUE,
-                                             #   width = "30vw",
-                                             #   textAreaInput(inputId="mapstoryboard",label="Story Board", width = "100%", height="50vh", resize="vertical")
-                                             # ),
-                                             # actionButton(inputId = "mapstoryboardtoggle", label = "Story Board")
-                                           )),
-                                        column(1, div(br(),downloadButton('downloadMap',NULL,download = "map.png",
-                                                         class = "download_button"),style="float:right"))),
+                                        column(1, )),
                            div(align="center",
                                tabsetPanel(type="tabs",
                                            tabPanel("Absolute Value",
+                                                    div(downloadButton('downloadMap',NULL,download = "map.png",class = "download_button_in"),style="float:right"),
+                                                    br(),
+                                                    div(align="center",
+                                                        bsCollapse(id = "collapse_maps_abs", multiple = FALSE,
+                                                                   bsCollapsePanel("Data Story", style = "info",
+                                                                                   actionButton(style="position:absolute; left:40px",
+                                                                                                inputId='mapsabsstoryboardtoggle',
+                                                                                                label='Edit',
+                                                                                                class = "download-button", icon = icon("edit","fa-1x")),
+                                                                                   textOutput("mapsabsstoryboardtexttitle"),
+                                                                                   tags$style("#mapsabsstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                                                   verbatimTextOutput("mapsabsstoryboardtext", placeholder = TRUE),
+                                                                                   tags$style(type="text/css","#mapsabsstoryboardtext {white-space:pre-wrap;
+                                                           text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
+                                                                      text-align: left;width;100%;height:10vh;display: 'inline-block'}")
+
+                                                                   ))),
                                                     div(class="charts",
                                                         plotOutput(outputId = "mapAbs", width = "100%", height="100%"),
                                                         style = "margin-right: 20px;margin-left: 20px;")
                                                     ),
                                            tabPanel("Absolute Difference",
+                                                    div(downloadButton('downloadMapDiffAbs',NULL,download = "map.png", class = "download_button_in"),style="float:right"),
+                                                    br(),
+                                                    div(align="center",
+                                                        bsCollapse(id = "collapse_maps_diffabs", multiple = FALSE,
+                                                                   bsCollapsePanel("Data Story", style = "info",
+                                                                                   actionButton(style="position:absolute; left:40px",
+                                                                                                inputId='mapsdiffabsstoryboardtoggle',
+                                                                                                label='Edit',
+                                                                                                class = "download-button", icon = icon("edit","fa-1x")),
+                                                                                   textOutput("mapsdiffabsstoryboardtexttitle"),
+                                                                                   tags$style("#mapsdiffabsstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                                                   verbatimTextOutput("mapsdiffabsstoryboardtext", placeholder = TRUE),
+                                                                                   tags$style(type="text/css","#mapsdiffabsstoryboardtext {white-space:pre-wrap;
+                                                           text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
+                                                                      text-align: left;width;100%;height:10vh;display: 'inline-block'}")
+
+                                                                   ))),
                                                     div(class="charts",
                                                         plotOutput(outputId = "mapDiffAbs", width = "100%", height="100%"),
                                                         style = "margin-right: 20px;margin-left: 20px;")
                                                     ),
                                           tabPanel("Percent Difference",
+                                                   div(downloadButton('downloadMapDiffPrcnt',NULL,download = "map.png",class = "download_button_in"),style="float:right"),
+                                                   br(),
+                                                   div(align="center",
+                                                       bsCollapse(id = "collapse_maps_diffprcnt", multiple = FALSE,
+                                                                  bsCollapsePanel("Data Story", style = "info",
+                                                                                  actionButton(style="position:absolute; left:40px",
+                                                                                               inputId='mapsdiffprcntstoryboardtoggle',
+                                                                                               label='Edit',
+                                                                                               class = "download-button", icon = icon("edit","fa-1x")),
+                                                                                  textOutput("mapsdiffprcntstoryboardtexttitle"),
+                                                                                  tags$style("#mapsdiffprcntstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                                                  verbatimTextOutput("mapsdiffprcntstoryboardtext", placeholder = TRUE),
+                                                                                  tags$style(type="text/css","#mapsdiffprcntstoryboardtext {white-space:pre-wrap;
+                                                           text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
+                                                                      text-align: left;width;100%;height:10vh;display: 'inline-block'}")
+
+                                                                  ))),
                                                    div(class="charts",
                                                        plotOutput(outputId = "mapDiffPrcnt", width = "100%", height="100%"),
                                                        style = "margin-right: 20px;margin-left: 20px;")
@@ -349,9 +375,24 @@ ui <- function(request) { fluidPage(
                   #---------------------------
                   tabPanel(
                     "Table",
-                    fluidRow(
-                      column(12, div(downloadButton('downloadTable', NULL, download = "table.csv", class="download_button"),
-                                     style = "float: right"))),
+                    div(downloadButton('downloadTable', NULL, download = "table.csv", class="download_button"),
+                        style = "float: right"),
+                    br(),
+                    div(align="center",
+                        bsCollapse(id = "collapse_table", multiple = FALSE,
+                                   bsCollapsePanel("Data Story", style = "info",
+                                                   actionButton(style="position:absolute; left:40px",
+                                                                inputId='tablestoryboardtoggle',
+                                                                label='Edit',
+                                                                class = "download-button", icon = icon("edit","fa-1x")),
+                                                   textOutput("tablestoryboardtexttitle"),
+                                                   tags$style("#tablestoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                   verbatimTextOutput("tablestoryboardtext", placeholder = TRUE),
+                                                   tags$style(type="text/css","#tablestoryboardtext {white-space:pre-wrap;
+                                                           text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
+                                                                      text-align: left;width;100%;height:10vh;display: 'inline-block'}")
+
+                                   ))),
                     div(class="charts", DTOutput(outputId = "table"))
                   ),
 
@@ -361,11 +402,9 @@ ui <- function(request) { fluidPage(
 
     div(actionButton(inputId="toggleSidebar", label="Inputs", icon = icon("caret-up","fa-1x"),class = "download_button_input")),
     div(downloadButton('downloadAll', "All",  class = "download_button")),
-    div(actionButton(inputId="toggleSidebar", label="Inputs", icon = icon("caret-up","fa-1x"),class = "download_button_input")),
     div(actionLink(inputId='github', label='',class = "icon", icon = icon("github","fa-1x"),onclick ="window.open('https://github.com/JGCRI/argus', '_blank')")),
     div(actionLink(inputId='help', label='', class = "icon",icon = icon("question","fa-1x"),onclick ="window.open('https://jgcri.github.io/argus/', '_blank')")),
     div(actionLink(inputId='loadbookmark', label='', class = "icon", icon = icon("bookmark","fa-1x"))),
-    div(actionLink(inputId='togglepreload', label='', class="download_button")),
     tags$script(HTML("var header = $('.navbar> .container-fluid');
                    header.append($('#toggleSidebar'));
                    header.append($('#downloadAll'));

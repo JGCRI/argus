@@ -4,7 +4,12 @@
 \alias{summaryPlotReg}
 \title{summaryPlotReg}
 \usage{
-summaryPlotReg(titletext, dataMapx, ggplottheme, subsetRegionsx)
+summaryPlotReg(
+  titletext,
+  dataMapx,
+  ggplottheme = ggplot2::theme_bw(),
+  subsetRegionsx
+)
 }
 \arguments{
 \item{titletext}{plot title}
