@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  test_coverage:
     runs-on: macOS-latest
     
     env:

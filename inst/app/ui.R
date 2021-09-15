@@ -14,6 +14,12 @@ library(shinyjs)
 library(plotly)
 library(shinyBS)
 
+
+#...........................
+# Options
+#...........................
+options(shiny.sanitize.errors = FALSE)
+
 #---------------------------
 # ui object
 #---------------------------

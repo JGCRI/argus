@@ -30,6 +30,7 @@ library(sp)
 # Options
 #...........................
 
+options(shiny.sanitize.errors = FALSE)
 options(shiny.maxRequestSize=100*1024^2)
 #options(shiny.trace = TRUE)
 pal_all <- rmap::mappings()$pal_all
