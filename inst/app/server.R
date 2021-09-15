@@ -33,7 +33,6 @@ library(sp)
 options(shiny.maxRequestSize=100*1024^2)
 #options(shiny.trace = TRUE)
 pal_all <- rmap::mappings()$pal_all
-enableBookmarking(store = c("server"))
 
 #...........................
 # Server object
