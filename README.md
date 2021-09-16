@@ -56,10 +56,10 @@ If users want to use argus locally on their machines they can install the softwa
 2. Open R studio:
 
 ```r
-install.packages(“devtools”)
-devtools::install_github(“JGCRI/rgcam”)
-devtools::install_github(“JGCRI/rmap”)
-devtools::install_github(“JGCRI/argus”)
+install.packages("devtools")
+devtools::install_github("JGCRI/rgcam")
+devtools::install_github("JGCRI/rmap")
+devtools::install_github("JGCRI/argus")
 
 library(argus)
 argus::run()
