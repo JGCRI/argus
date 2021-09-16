@@ -37,19 +37,13 @@ jobs:
       
       - name: Install dependencies
         run: |
-          install.packages(c("remotes","rcmdcheck"), repos = "https://cloud.r-project.org")
+          install.packages(c("remotes","rcmdcheck","pkgdown"), repos = "https://cloud.r-project.org")
           remotes::install_github("JGCRI/jgcricolors")
+          remotes::install_github("JGCRI/rgcam")
+          remotes::install_github("JGCRI/rmap")
+          remotes::install_github("JGCRI/gcamextractor")
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
-        
-      - uses: r-lib/actions/setup-r@v1
-        with:
-          use-public-rspm: true
-
-      - uses: r-lib/actions/setup-r-dependencies@v1
-        with:
-          extra-packages: pkgdown
-          needs: website
 
       - name: Deploy package
         run: |
