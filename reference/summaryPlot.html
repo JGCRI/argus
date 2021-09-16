@@ -135,7 +135,13 @@
     <p>generate summary plot</p>
     </div>
 
-    <pre class="usage"><span class='fu'>summaryPlot</span><span class='op'>(</span><span class='va'>aspectratio</span>, <span class='va'>textsize</span>, <span class='va'>titletext</span>, <span class='va'>dataSumx</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>summaryPlot</span><span class='op'>(</span>
+  <span class='va'>aspectratio</span>,
+  <span class='va'>textsize</span>,
+  <span class='va'>titletext</span>,
+  <span class='va'>dataSumx</span>,
+  ggplottheme <span class='op'>=</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_bw</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -155,6 +161,10 @@
     <tr>
       <th>dataSumx</th>
       <td><p>dataSumx()</p></td>
+    </tr>
+    <tr>
+      <th>ggplottheme</th>
+      <td><p>ggplot theme to use</p></td>
     </tr>
     </table>
 
