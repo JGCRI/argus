@@ -55,16 +55,29 @@ If users want to use argus locally on their machines they can install the softwa
     
 2. Open R studio:
 
-```r
+```
 install.packages("devtools")
 devtools::install_github("JGCRI/rgcam")
 devtools::install_github("JGCRI/rmap")
+devtools::install_github("JGCRI/jgcricolors")
+devtools::install_github("JGCRI/gcamextractor")
 devtools::install_github("JGCRI/argus")
-
 library(argus)
 argus::run()
 ```
+Additional steps for UBUNTU from a terminal
+```
+sudo add-apt-repository ppa:ubuntugis/ppa
+sudo apt-get update
+sudo apt-get install libudunits2-dev libgdal-dev libgeos-dev libproj-dev libmagick++-dev
+```
 
+Additional steps for MACOSX from a terminal
+```
+brew install pkg-config
+brew install gdal
+brew install imagemagick@6
+```
 
 
   
