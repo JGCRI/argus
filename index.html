@@ -127,14 +127,22 @@
 </li>
 <li>Open R studio:</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/rgcam"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/rmap"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/argus"</span><span class="op">)</span>
-
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/argus">argus</a></span><span class="op">)</span>
-<span class="fu">argus</span><span class="fu">::</span><span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")
+devtools::install_github("JGCRI/rgcam")
+devtools::install_github("JGCRI/rmap")
+devtools::install_github("JGCRI/jgcricolors")
+devtools::install_github("JGCRI/gcamextractor")
+devtools::install_github("JGCRI/argus")
+library(argus)
+argus::run()</a></code></pre>
+<p>Additional steps for UBUNTU from a terminal</p>
+<pre><code>sudo add-apt-repository ppa:ubuntugis/ppa
+sudo apt-get update
+sudo apt-get install libudunits2-dev libgdal-dev libgeos-dev libproj-dev libmagick++-dev</code></pre>
+<p>Additional steps for MACOSX from a terminal</p>
+<pre><code>brew install pkg-config
+brew install gdal
+brew install imagemagick@6</code></pre>
 </div>
 
   </div>
