@@ -47,8 +47,8 @@ jobs:
           
       - name: Deploy package
         run: |
-          git config --global user.name "zarrarkhan"
-          git config --global user.email "khanzarrarkhan@gmail.com"
+          git config --global user.name "Zarrar Khan"
+          git config --global user.email "zarrar.khan@pnnl.gov"
           git clone https://github.com/JGCRI/argus.git
           cd argus
           Rscript -e 'devtools::install()'
