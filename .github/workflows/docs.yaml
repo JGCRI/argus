@@ -41,6 +41,10 @@ jobs:
           remotes::install_github("JGCRI/jgcricolors")
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
+        
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
