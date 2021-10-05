@@ -281,10 +281,10 @@ server <- function(input, output, session) {
     preloaded_df <- argus::preloaded_data()
     print(preloaded_df)
 
-    output$examplesPreloadInput = renderUI({
+    output$examplesPreloadedInput = renderUI({
       selectInput(
-        inputId = "examplesPreload",
-        label = "Select example preload",
+        inputId = "examplesPreloaded",
+        label = "Select example preloaded",
         choices = c(preloaded_df$name,""),
         selected = "",
         multiple = F
@@ -292,8 +292,8 @@ server <- function(input, output, session) {
     })
 
 
-    observeEvent(input$examplesPreload, {
-      if (input$examplesPreload == ""){
+    observeEvent(input$examplesPreloaded, {
+      if (input$examplesPreloaded == ""){
         return()
       }
       temp <- tempfile()
@@ -302,7 +302,7 @@ server <- function(input, output, session) {
       rv$data <- state$data
       updateVals(state)
       updatePickerInput(
-        inputId = "examplesPreload",
+        inputId = "examplesPreloaded",
         session=session,
         selected = ""
       )
@@ -993,17 +993,17 @@ server <- function(input, output, session) {
     session$sendCustomMessage("handler1", unique(data()$subRegion))
   })
 
-  # Toggle Preload
-  observeEvent(input$preload, {
+  # Toggle Preloaded
+  observeEvent(input$preloaded, {
     shinyjs::toggle(id = "Sidebar")
 
-    if (input$preload %% 2 == 1) {
+    if (input$preloaded %% 2 == 1) {
       icon <-  icon("caret-down","fa-1x")
     } else {
       icon <-  icon("caret-up","fa-1x")
     }
     updateActionButton(session,
-                       "preload",
+                       "preloaded",
                        icon = icon)
 
   })

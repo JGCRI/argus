@@ -69,15 +69,15 @@ ui <- function(request) { fluidPage(
   #Dropdown Button
   #---------------------------
 
-  div(id = "preload",
+  div(id = "preloaded",
       dropdownButton(
-        inputId = "Preloadbutton",
-        label="Preload",
+        inputId = "Preloadedbutton",
+        label="Preloaded",
         circle = FALSE,
         up=FALSE,
         right=TRUE,
-        uiOutput('examplesPreloadInput'),
-        status="preloadButton"
+        uiOutput('examplesPreloadedInput'),
+        status="preloadedButton"
       ),style="float:right;"
   ),
 
@@ -414,7 +414,7 @@ ui <- function(request) { fluidPage(
     tags$script(HTML("var header = $('.navbar> .container-fluid');
                    header.append($('#toggleSidebar'));
                    header.append($('#downloadAll'));
-                   header.append($('#preload'));
+                   header.append($('#preloaded'));
                    header.append($('#help'));
                    header.append($('#github'));
                    header.append($('#loadsetting'));
