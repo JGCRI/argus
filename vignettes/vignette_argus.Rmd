@@ -20,6 +20,7 @@ The figure below displays the landing page when you launch Argus. The app lands 
 <p align="center" style="font-size:18px;"> *General Layout* </p>
 <p align="center"> <img src="vignetteFigs/layout.PNG"></p>
 
+
 <!-- ------------------------>
 <!-- ------------------------>
 # Inputs
@@ -75,6 +76,7 @@ On the right side of the top bar, there are four additional icons along with the
 1. Github
 1. Help
 1. Download All
+1. Preload
 
 <p align="center"> <img src="vignetteFigs/top_bar.PNG"></p>
 
@@ -115,6 +117,12 @@ Clicking the help icon will take you to the webpage including the Installation a
 <!-- ------------------------>
 
 The download all button allows the user to download all figures from all tabs that are created for the inputted data into a single file.
+
+<!-- ------------------------>
+<!-- ------------------------>
+## 5. Preload
+<!-- ------------------------>
+<!-- ------------------------>
 
 <!-- ------------------------>
 <!-- ------------------------>
@@ -207,3 +215,15 @@ The landing page for this tab is the Absolute Value maps. The user can also navi
 The Table tab, shown in the image below, displays a table with every data point entered. This table can be downloaded using the download page button in the upper right corner. The table can be searched for specific values, years, etc. using the search bar, and the column filters can be used to display specified sets of data. The user can also navigate between pages using the icons in the bottom right corner.
 
 <p align="center"> <img src="vignetteFigs/table.PNG"></p>
+
+<!-- ------------------------>
+<!-- ------------------------>
+# Data Story
+<!-- ------------------------>
+<!-- ------------------------>
+
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
+Data story, shown in the image below, allows users to insert text and describe the story of the data. The story can be added by using Edit button after expanding the Data Story bar below the Tab bar. Choose a title and fill in the text body to guide your audiences through the background, analysis, and more about the data!
+
+<p align="center"> <img src="vignetteFigs/data_story.PNG"></p>
