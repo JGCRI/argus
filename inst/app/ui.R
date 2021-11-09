@@ -296,15 +296,19 @@ ui <- function(request) { fluidPage(
                   # Main Panel: Maps Tab
                   #---------------------------
                   tabPanel("Maps",
-                           fluidRow(column(6,div(uiOutput('selectMapYear')),style = "float: left"),
-                                        column(4,
-                                               div(br(),pickerInput(
-                                          inputId = "mapLegend",
-                                          label = "Legend Type",
-                                          choices = c("kmean","pretty"),
-                                          selected = "kmean",
-                                          multiple = F))),
-                                        column(1, )),
+                           fluidRow(column(6, div(uiOutput('selectMapYear')), style = "float: left"),
+                                    column(4,
+                                           div(
+                                             br(),
+                                             pickerInput(
+                                               inputId = "legendType",
+                                               label = "Legend Type",
+                                               choices = c("kmean", "pretty"),
+                                               selected = "kmean",
+                                               multiple = F
+                                             )
+                                           )),
+                                    column(1,)),
                            div(align="center",
                                tabsetPanel(type="tabs",
                                            tabPanel("Absolute Value",

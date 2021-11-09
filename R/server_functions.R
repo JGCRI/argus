@@ -575,12 +575,14 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected,
 #'
 #' generate chart plot for absolute value
 #' @param mapData mapData: dataMapx()
+#' @param legendType Default = "kmeans". Legend type can be "pretty" or "kmeans".
 #' @param mapX input$mapYear
 #' @param scenRef scenRef
 #' @param diff either "absolute", "percent" or NULL in the case of no diff
 #' @importFrom magrittr %>%
 #' @export
 plotMap <- function(mapData = NULL,
+                    legendType = "kmeans",
                     mapX = NULL,
                     scenRef = NULL,
                     diff = NULL){
@@ -610,30 +612,41 @@ plotMap <- function(mapData = NULL,
       chartz_ref <- chartz
     }
 
-    mapx_abs <- rmap::map(data = chartz_ref,
-                      underLayer = rmap::mapCountries,
-                      background = T,
-                      save = F,
-                      show = F,
-                      title = F,
-                      forceFacets = T)
 
-    print("......................mapx_abs")
+   print("......................mapx_abs")
+
+   mapx_abs <- rmap::map(data = chartz_ref,
+                         legendType = legendType,
+                         underLayer = rmap::mapCountries,
+                         background = T,
+                         save = F,
+                         show = F,
+                         title = F,
+                         forceFacets = T)
+
+
     print(names(mapx_abs))
     print(chartz$param%>%unique())
 
     if(!is.null(diff)){
 
-    mapx_diff <- rmap::map(data = chartz,
-                      underLayer = rmap::mapCountries,
-                      background = T,
-                      save = F,
-                      show = F,
-                      title = F,
-                      diffOnly = T,
-                      scenRef = scenRef)
-
     print("......................mapx_diff")
+
+    print("Printing chartz for diff ...")
+    print(chartz)
+    saveRDS(chartz,"chartz.RDS")
+    print(legendType)
+
+    mapx_diff <- rmap::map(data = chartz,
+                           legendType = legendType,
+                           underLayer = rmap::mapCountries,
+                           background = T,
+                           save = F,
+                           show = F,
+                           title = F,
+                           diffOnly = T,
+                           scenRef = scenRef)
+
     print(names(mapx_diff))
 
 

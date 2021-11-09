@@ -45,6 +45,8 @@ Uploaded data must be formatted in the following manner:
 
 <p align="center"> <img src="vignetteFigs/input_format.PNG"></p>
 
+For GCAM users, `gcamextractor` is a convient way to extract CGAM data into the format required by `argus`. More details can be accessed at [gcamextractor Github](https://github.com/JGCRI/gcamextractor/).
+
 <!-- ------------------------>
 <!-- ------------------------>
 ## Selections
