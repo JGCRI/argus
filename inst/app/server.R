@@ -569,15 +569,15 @@ server <- function(input, output, session) {
         session$sendCustomMessage("setsetting", c("focusMapParamSelected", settingfocusMapParamSelected))
       }
 
-        #mapLegend
-        settingsmapLegend <- state$mapLegend
+        #legendType
+        settingsmapLegend <- state$legendType
         if((settingsmapLegend %in% c("kmean","pretty")) && !is.null(settingsmapLegend)){
           updatePickerInput(
-            inputId = "mapLegend",
+            inputId = "legendType",
             session=session,
             selected = settingsmapLegend
           )
-          session$sendCustomMessage("setsetting", c("mapLegend", settingsmapLegend))
+          session$sendCustomMessage("setsetting", c("legendType", settingsmapLegend))
         }
 
         #mapYear
@@ -2271,6 +2271,7 @@ server <- function(input, output, session) {
 
         withProgress(message = 'Rendering map...', value = 0, {
         argus::plotMap(mapData = dataMapx(),
+                       legendType = input$legendType,
                        mapX = input$mapYear,
                        diff=NULL)
         })
@@ -2287,6 +2288,7 @@ server <- function(input, output, session) {
 
         withProgress(message = 'Rendering map...', value = 0, {
         argus::plotMap(mapData = dataMapx(),
+                       legendType = input$legendType,
                        mapX = input$mapYear,
                        scenRef = input$scenarioRefSelected ,
                        diff="absolute")
@@ -2305,6 +2307,7 @@ server <- function(input, output, session) {
 
        withProgress(message = 'Rendering map...', value = 0, {
        argus::plotMap(mapData = dataMapx(),
+                      legendType = input$legendType,
                       mapX = input$mapYear,
                       scenRef = input$scenarioRefSelected ,
                       diff="percent")

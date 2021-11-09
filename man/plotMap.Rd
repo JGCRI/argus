@@ -4,10 +4,18 @@
 \alias{plotMap}
 \title{plotMap}
 \usage{
-plotMap(mapData = NULL, mapX = NULL, scenRef = NULL, diff = NULL)
+plotMap(
+  mapData = NULL,
+  legendType = "kmeans",
+  mapX = NULL,
+  scenRef = NULL,
+  diff = NULL
+)
 }
 \arguments{
 \item{mapData}{mapData: dataMapx()}
+
+\item{legendType}{Default = "kmeans". Legend type can be "pretty" or "kmeans".}
 
 \item{mapX}{input$mapYear}
 

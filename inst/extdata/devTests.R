@@ -11,6 +11,23 @@ library(leaflet)
 library(mapview)
 library(RColorBrewer)
 
+
+# Debug mapping
+chartz <- readRDS("C:/Z/models/argus/inst/app/chartz.RDS")
+chartz
+chartz$scenario%>%unique()
+
+mapx_diff <- rmap::map(data = chartz,
+                       legendType = "pretty",
+                       underLayer = rmap::mapCountries,
+                       background = T,
+                       save = F,
+                       show = F,
+                       title = F,
+                       diffOnly = T,
+                       scenRef = "GCAM_SSP2")
+
+
 # factpal <- colorFactor(brewer.pal(n = 11, name ="Spectral") , gadmCHE$NAME_1)
 #
 # leaflet() %>%
