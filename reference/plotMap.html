@@ -135,7 +135,13 @@
     <p>generate chart plot for absolute value</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotMap</span><span class='op'>(</span>mapData <span class='op'>=</span> <span class='cn'>NULL</span>, mapX <span class='op'>=</span> <span class='cn'>NULL</span>, scenRef <span class='op'>=</span> <span class='cn'>NULL</span>, diff <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>plotMap</span><span class='op'>(</span>
+  mapData <span class='op'>=</span> <span class='cn'>NULL</span>,
+  legendType <span class='op'>=</span> <span class='st'>"kmeans"</span>,
+  mapX <span class='op'>=</span> <span class='cn'>NULL</span>,
+  scenRef <span class='op'>=</span> <span class='cn'>NULL</span>,
+  diff <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -143,6 +149,10 @@
     <tr>
       <th>mapData</th>
       <td><p>mapData: dataMapx()</p></td>
+    </tr>
+    <tr>
+      <th>legendType</th>
+      <td><p>Default = "kmeans". Legend type can be "pretty" or "kmeans".</p></td>
     </tr>
     <tr>
       <th>mapX</th>
