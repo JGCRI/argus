@@ -175,13 +175,13 @@ ui <- function(request) { fluidPage(
                                     bsCollapse(id = "collapse_lines_all", multiple = FALSE,
                                            bsCollapsePanel("Data Story", style = "info",
                                                            actionButton(style="position:absolute; left:40px",
-                                                                        inputId='linesalltoryboardtoggle',
+                                                                        inputId='linesallstoryboardtoggle',
                                                                         label='Edit',
                                                                         class = "download-button", icon = icon("edit","fa-1x")),
-                                                           textOutput("linesalltoryboardtexttitle"),
-                                                           tags$style("#linesalltoryboardtexttitle {font-weight: bold; font-size: 30px}"),
-                                                           verbatimTextOutput("linesalltoryboardtext", placeholder = TRUE),
-                                                           tags$style(type="text/css","#linesalltoryboardtext {white-space:pre-wrap;
+                                                           textOutput("linesallstoryboardtexttitle"),
+                                                           tags$style("#linesallstoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                           verbatimTextOutput("linesallstoryboardtext", placeholder = TRUE),
+                                                           tags$style(type="text/css","#linesallstoryboardtext {white-space:pre-wrap;
                                                            text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
                                                                       text-align: left;width;100%;height:10vh;display: 'inline-block'}")
 
@@ -195,13 +195,13 @@ ui <- function(request) { fluidPage(
                                     bsCollapse(id = "collapse_lines_compare", multiple = FALSE,
                                                bsCollapsePanel("Data Story", style = "info",
                                                                actionButton(style="position:absolute; left:40px",
-                                                                            inputId='linescomparetoryboardtoggle',
+                                                                            inputId='linescomparestoryboardtoggle',
                                                                             label='Edit',
                                                                             class = "download-button", icon = icon("edit","fa-1x")),
-                                                               textOutput("linescomparetoryboardtexttitle"),
-                                                               tags$style("#linescomparetoryboardtexttitle {font-weight: bold; font-size: 30px}"),
-                                                               verbatimTextOutput("linescomparetoryboardtext", placeholder = TRUE),
-                                                               tags$style(type="text/css","#linescomparetoryboardtext {white-space:pre-wrap;
+                                                               textOutput("linescomparestoryboardtexttitle"),
+                                                               tags$style("#linescomparestoryboardtexttitle {font-weight: bold; font-size: 30px}"),
+                                                               verbatimTextOutput("linescomparestoryboardtext", placeholder = TRUE),
+                                                               tags$style(type="text/css","#linescomparestoryboardtext {white-space:pre-wrap;
                                                            text-size:20px; background-color:rgba(0,0,0,0) ; border-color:rgba(0,0,0,0);
                                                                       text-align: left;width;100%;height:10vh;display: 'inline-block'}")
 

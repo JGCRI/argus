@@ -40,7 +40,6 @@ server <- function(input, output, session) {
   #toggling on dropdown menus to ensure loading of bookmark data
 
   toggleDropdownButton("inputx", session = session)
-  toggleDropdownButton("linestoryboard", session = session)
 
   # NOTE:
   # To collapse code for easy reading place cursor here and enter: ALT+0
@@ -50,42 +49,7 @@ server <- function(input, output, session) {
   # Storyboard
   #...........................
 
-  observeEvent(input$collapse1, {
-    print(input$linestoryboard)
-  })
-
-  observeEvent(input$linestoryboardtoggle, {
-    print(input$linestoryboard)
-    text = input$linestoryboard
-    title = input$linestoryboardtitle
-    print(text)
-    showModal(
-      modalDialog(
-        size = "s",
-        easyClose = TRUE,
-        footer = tagList(
-          modalButton("Submit")),
-        label = "Story Board",
-        textInput(inputId="linestoryboardtitle", label="Title", value = title, width = "100%"),
-        textAreaInput(inputId="linestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
-    ))
-    print(text)
-  })
-
-  output$linestoryboardtext <- renderText({
-    input$linestoryboard
-  })
-
-  output$linestoryboardtexttitle <- renderText({
-    input$linestoryboardtitle
-#    HTML(paste("<b>", input$linestoryboardtitle, "</b>"))
-  })
-
   # Focus story board .......................
-
-  observeEvent(input$collapse0, {
-    print(input$focusstoryboard)
-  })
 
   observeEvent(input$focusstoryboardtoggle, {
     print(input$focusstoryboard)
@@ -115,163 +79,240 @@ server <- function(input, output, session) {
   })
 
 
+  # Lines All story board .......................
 
-  observeEvent(input$compregstoryboardtoggle, {
-    text = input$compregstoryboard
-    title = input$compregstoryboardtitle
+  observeEvent(input$linesallstoryboardtoggle, {
+    print(input$linesallstoryboard)
+    text = input$linesallstoryboard
+    title = input$linesallstoryboardtitle
+    print(text)
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = tagList(
+          modalButton("Submit")),
+        label = "Story Board",
+        textInput(inputId="linesallstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="linesallstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+    ))
+    print(text)
+  })
+
+  output$linesallstoryboardtext <- renderText({
+    input$linesallstoryboard
+  })
+
+  output$linesallstoryboardtexttitle <- renderText({
+    input$linesallstoryboardtitle
+#    HTML(paste("<b>", input$linesallstoryboardtitle, "</b>"))
+  })
+
+
+  # Lines Compare story board .......................
+
+  observeEvent(input$linescomparestoryboardtoggle, {
+    text = input$linescomparestoryboard
+    title = input$linescomparestoryboardtitle
         showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
-        footer = NULL,
+        footer = tagList(
+          modalButton("Submit")),
         label = "Story Board",
-        textInput(inputId="compregstoryboardtitle", label="Title", value = title, width = "100%"),
-        textAreaInput(inputId="compregstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+        textInput(inputId="linescomparestoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="linescomparestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
       ))
   })
 
-  output$compregstoryboardtext <- renderText({
-    input$compregstoryboard
+  output$linescomparestoryboardtext <- renderText({
+    input$linescomparestoryboard
   })
 
-  output$compregstoryboardtexttitle <- renderText({
-    input$compregstoryboardtitle
+  output$linescomparestoryboardtexttitle <- renderText({
+    input$linescomparestoryboardtitle
   })
 
 
-  observeEvent(input$absvalstoryboardtoggle, {
-    text = input$absvalstoryboard
-    title = input$absvalstoryboardtitle
+  # Charts Abs story board .......................
+
+  observeEvent(input$chartsabsstoryboardtoggle, {
+    text = input$chartsabsstoryboard
+    title = input$chartsabsstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
-        footer = NULL,
+        footer = tagList(
+          modalButton("Submit")),
         label = "Story Board",
-        textInput(inputId="absvalstoryboardtitle", label="Title", value = title, width = "100%"),
-        textAreaInput(inputId="absvalstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
+        textInput(inputId="chartsabsstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="chartsabsstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
       ))
   })
 
-  output$absvalstoryboardtext <- renderText({
-    input$absvalstoryboard
+  output$chartsabsstoryboardtext <- renderText({
+    input$chartsabsstoryboard
   })
 
-  output$absvalstoryboardtexttitle <- renderText({
-    input$absvalstoryboardtitle
-    #HTML(paste("<b>",     input$absvalstoryboard, "</b>"))
+  output$chartsabsstoryboardtexttitle <- renderText({
+    input$chartsabsstoryboardtitle
+    #HTML(paste("<b>",     input$chartsabsstoryboard, "</b>"))
   })
 
-  observeEvent(input$absdifstoryboardtoggle, {
-    text = input$absdifstoryboard
-    title = input$absdifstoryboardtitle
+  # Charts Abs Diff story board .......................
+
+  observeEvent(input$chartsdiffabsstoryboardtoggle, {
+    text = input$chartsdiffabsstoryboard
+    title = input$chartsdiffabsstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
-        footer = NULL,
-        textInput(inputId="absdifstoryboardtitle", label="Title", value = title, width = "100%"),
-        textAreaInput(inputId="absdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        footer = tagList(
+          modalButton("Submit")),
+        textInput(inputId="chartsdiffabsstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="chartsdiffabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
       ))
   })
 
-  output$absdifstoryboardtext <- renderText({
-    input$absdifstoryboard
+  output$chartsdiffabsstoryboardtext <- renderText({
+    input$chartsdiffabsstoryboard
   })
 
-  output$absdifstoryboardtexttitle <- renderText({
-    input$absdifstoryboardtitle
-    #HTML(paste("<b>",     input$absdifstoryboardtitle, "</b>"))
+  output$chartsdiffabsstoryboardtexttitle <- renderText({
+    input$chartsdiffabsstoryboardtitle
+    #HTML(paste("<b>",     input$chartsdiffabsstoryboardtitle, "</b>"))
   })
 
-  observeEvent(input$percdifstoryboardtoggle, {
-    text = input$percdifstoryboard
-    title = input$percdifstoryboardtitle
+  # Charts Prcnt Diff story board .......................
+
+  observeEvent(input$chartsdiffprcntstoryboardtoggle, {
+    text = input$chartsdiffprcntstoryboard
+    title = input$chartsdiffprcntstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
-        footer = NULL,
-        textInput(inputId="percdifstoryboardtitle", label="Title", value = title, width = "100%"),
-        textAreaInput(inputId="percdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        footer = tagList(
+          modalButton("Submit")),
+        textInput(inputId="chartsdiffprcntstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="chartsdiffprcntstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
       ))
   })
 
-  output$percdifstoryboardtext <- renderText({
-    input$percdifstoryboard
+  output$chartsdiffprcntstoryboardtext <- renderText({
+    input$chartsdiffprcntstoryboard
   })
 
-  output$percdifstoryboardtexttitle <- renderText({
-    input$percdifstoryboardtitle
-    #    HTML(paste("<b>", input$percdifstoryboardtitle, "</b>"))
+  output$chartsdiffprcntstoryboardtexttitle <- renderText({
+    input$chartsdiffprcntstoryboardtitle
+    #    HTML(paste("<b>", input$chartsdiffprcntstoryboardtitle, "</b>"))
   })
 
+  # Maps Abs story board .......................
 
-  observeEvent(input$mapabsstoryboardtoggle, {
-    text = input$mapabsstoryboard
-    title = input$mapabsstoryboardtitle
+  observeEvent(input$mapsabsstoryboardtoggle, {
+    text = input$mapsabsstoryboard
+    title = input$mapsabsstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
-        footer = NULL,
-        textInput(inputId="mapabsstoryboardtitle", label="Title", value = title, width = "100%"),
-        textAreaInput(inputId="mapabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        footer = tagList(
+          modalButton("Submit")),
+        textInput(inputId="mapsabsstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mapsabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
       ))
   })
 
-  output$mapabsstoryboardtext <- renderText({
-    input$mapabsstoryboard
+  output$mapsabsstoryboardtext <- renderText({
+    input$mapsabsstoryboard
   })
 
-  output$mapabsstoryboardtexttitle <- renderText({
-    input$mapabsstoryboardtitle
-#    HTML(paste("<b>", input$mapabsstoryboardtitle, "</b>"))
+  output$mapsabsstoryboardtexttitle <- renderText({
+    input$mapsabsstoryboardtitle
+#    HTML(paste("<b>", input$mapsabsstoryboardtitle, "</b>"))
   })
 
-  observeEvent(input$mapabsdifstoryboardtoggle, {
-    text = input$mapabsdifstoryboard
-    title = input$mapabsdifstoryboardtitle
+
+  # Maps Abs Diff story board .......................
+
+  observeEvent(input$mapsdiffabsstoryboardtoggle, {
+    text = input$mapsdiffabsstoryboard
+    title = input$mapsdiffabsstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
-        footer = NULL,
-        textInput(inputId="mapabsdifstoryboardtitle", label="Title", value = title, width = "100%"),
-        textAreaInput(inputId="mapabsdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        footer = tagList(
+          modalButton("Submit")),
+        textInput(inputId="mapsdiffabsstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mapsdiffabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
       ))
   })
 
-  output$mapabsdifstoryboardtext <- renderText({
-    input$mapabsdifstoryboard
+  output$mapsdiffabsstoryboardtext <- renderText({
+    input$mapsdiffabsstoryboard
   })
 
-  output$mapabsdifstoryboardtexttitle <- renderText({
-    input$mapabsdifstoryboardtitle
-    #HTML(paste("<b>",    input$mapabsdifstoryboardtitle, "</b>"))
+  output$mapsdiffabsstoryboardtexttitle <- renderText({
+    input$mapsdiffabsstoryboardtitle
+    #HTML(paste("<b>",    input$mapsdiffabsstoryboardtitle, "</b>"))
   })
 
-  observeEvent(input$mappercdifstoryboardtoggle, {
-    text = input$mappercdifstoryboard
-    title = input$mappercdifstoryboardtitle
+  # Maps Prcnt Diff story board .......................
+
+  observeEvent(input$mapsdiffprcntstoryboardtoggle, {
+    text = input$mapsdiffprcntstoryboard
+    title = input$mapsdiffprcntstoryboardtitle
     showModal(
       modalDialog(
         size = "s",
         easyClose = TRUE,
-        footer = NULL,
-        textInput(inputId="mappercdifstoryboardtitle", label="Title", value = title, width = "100%"),
-        textAreaInput(inputId="mappercdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        footer = tagList(
+          modalButton("Submit")),
+        textInput(inputId="mapsdiffprcntstoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="mapsdiffprcntstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
       ))
   })
 
-  output$mappercdifstoryboardtext <- renderText({
-    input$mappercdifstoryboard
+  output$mapsdiffprcntstoryboardtext <- renderText({
+    input$mapsdiffprcntstoryboard
   })
 
-  output$mappercdifstoryboardtexttitle <- renderText({
-    input$mappercdifstoryboardtitle
-    #HTML(paste("<b>",input$mappercdifstoryboardtitle, "</b>"))
+  output$mapsdiffprcntstoryboardtexttitle <- renderText({
+    input$mapsdiffprcntstoryboardtitle
+    #HTML(paste("<b>",input$mapsdiffprcntstoryboardtitle, "</b>"))
   })
+
+
+  # Table story board
+
+  observeEvent(input$tablestoryboardtoggle, {
+    text = input$tablestoryboard
+    title = input$tablestoryboardtitle
+    showModal(
+      modalDialog(
+        size = "s",
+        easyClose = TRUE,
+        footer = tagList(
+          modalButton("Submit")),
+        textInput(inputId="tablestoryboardtitle", label="Title", value = title, width = "100%"),
+        textAreaInput(inputId="tablestoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+      ))
+  })
+
+  output$tablestoryboardtext <- renderText({
+    input$tablestoryboard
+  })
+
+  output$tablestoryboardtexttitle <- renderText({
+    input$tablestoryboardtitle
+    #HTML(paste("<b>",input$tablestoryboardtitle, "</b>"))
+  })
+
 
 
   #...........................
@@ -364,15 +405,12 @@ server <- function(input, output, session) {
     # URL Bookmark
     #...........................
 
-    setBookmarkExclude(c("mappercdifstoryboardtoggle","mapabsdifstoryboardtoggle","mapabsstoryboardtoggle",
-                         "percdifstoryboardtoggle","absdifstoryboardtoggle","absvalstoryboardtoggle","compregstoryboardtoggle",
-                         "linestoryboardtoggle","focusstoryboardtoggle",
-                         "urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton", "readgcambutton", "._bookmark_", "loadbookmark"))
+    setBookmarkExclude(c("urlfiledata","filedata","filedata","append", "close", "readfilebutton", "readurlbutton",
+                         "readgcambutton", "._bookmark_", "loadbookmark"))
 
     #URL bookmark onbookmark
     onBookmark(function(state) {
       state$values$data <- rv$data
-      print(input$linestoryboard)
     })
 
     #URL bookmark onRestore
@@ -380,8 +418,6 @@ server <- function(input, output, session) {
       print(state)
       rv$data <- state$values$data
       session$sendCustomMessage("setsetting", c("inputz", ""))
-      session$sendCustomMessage("setsetting", c("linestoryboardtitle", input$linestoryboardtitle))
-      session$sendCustomMessage("setsetting", c("linestoryboard", input$linestoryboard))
 
       showModal(
         modalDialog(
@@ -401,8 +437,8 @@ server <- function(input, output, session) {
           easyClose = TRUE,
           footer = NULL,
           label = "Story Board",
-          textInput(inputId="linestoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="linestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+          textInput(inputId="linesallstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="linesallstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
         ))
 
       removeModal()
@@ -413,8 +449,8 @@ server <- function(input, output, session) {
           easyClose = TRUE,
           footer = NULL,
           label = "Story Board",
-          textInput(inputId="compregstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="compregstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
+          textInput(inputId="linescomparestoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="linescomparestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
         ))
 
       removeModal()
@@ -425,8 +461,8 @@ server <- function(input, output, session) {
           easyClose = TRUE,
           footer = NULL,
           label = "Story Board",
-          textInput(inputId="absvalstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="absvalstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
+          textInput(inputId="chartsabsstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="chartsabsstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
         ))
 
       removeModal()
@@ -436,8 +472,8 @@ server <- function(input, output, session) {
           size = "s",
           easyClose = TRUE,
           footer = NULL,
-          textInput(inputId="absdifstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="absdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+          textInput(inputId="chartsdiffabsstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="chartsdiffabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
         ))
 
       removeModal()
@@ -447,8 +483,8 @@ server <- function(input, output, session) {
           size = "s",
           easyClose = TRUE,
           footer = NULL,
-          textInput(inputId="percdifstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="percdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+          textInput(inputId="chartsdiffprcntstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="chartsdiffprcntstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
         ))
 
       removeModal()
@@ -458,8 +494,8 @@ server <- function(input, output, session) {
           size = "s",
           easyClose = TRUE,
           footer = NULL,
-          textInput(inputId="mapabsstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="mapabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+          textInput(inputId="mapsabsstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="mapsabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
         ))
 
       removeModal()
@@ -469,8 +505,8 @@ server <- function(input, output, session) {
           size = "s",
           easyClose = TRUE,
           footer = NULL,
-          textInput(inputId="mapabsdifstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="mapabsdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+          textInput(inputId="mapsdiffabsstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="mapsdiffabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
         ))
 
       removeModal()
@@ -480,8 +516,19 @@ server <- function(input, output, session) {
           size = "s",
           easyClose = TRUE,
           footer = NULL,
-          textInput(inputId="mappercdifstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="mappercdifstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+          textInput(inputId="mapsdiffprcntstoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="mapsdiffprcntstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
+        ))
+
+      removeModal()
+
+      showModal(
+        modalDialog(
+          size = "s",
+          easyClose = TRUE,
+          footer = NULL,
+          textInput(inputId="tablestoryboardtitle", label="Title", value = title, width = "100%"),
+          textAreaInput(inputId="tablestoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
         ))
 
       removeModal()
@@ -647,22 +694,22 @@ server <- function(input, output, session) {
         }
 
         # Line story board
-        settingslinestoryboard <- state$linestoryboard
+        settingslinesallstoryboard <- state$linesallstoryboard
         updateTextAreaInput(
           session=session,
-          inputId = "linestoryboard",
-          value = settingslinestoryboard
+          inputId = "linesallstoryboard",
+          value = settingslinesallstoryboard
         )
-        session$sendCustomMessage("setsetting", c("linestoryboard", settingslinestoryboard))
+        session$sendCustomMessage("setsetting", c("linesallstoryboard", settingslinesallstoryboard))
 
-        settingslinestoryboardtitle <- state$linestoryboardtitle
+        settingslinesallstoryboardtitle <- state$linesallstoryboardtitle
         updateTextInput(
           session=session,
-          inputId = "linestoryboardtitle",
-          value = settingslinestoryboardtitle
+          inputId = "linesallstoryboardtitle",
+          value = settingslinesallstoryboardtitle
         )
 
-        session$sendCustomMessage("setsetting", c("linestoryboardtitle", settingslinestoryboardtitle))
+        session$sendCustomMessage("setsetting", c("linesallstoryboardtitle", settingslinesallstoryboardtitle))
 
         # Focus story board
         settingsfocusstoryboard <- state$focusstoryboard
@@ -683,136 +730,155 @@ server <- function(input, output, session) {
         session$sendCustomMessage("setsetting", c("focusstoryboardtitle", settingsfocusstoryboardtitle))
 
         # CompReg story board
-        settingscompregstoryboard <- state$compregstoryboard
+        settingslinescomparestoryboard <- state$linescomparestoryboard
         updateTextAreaInput(
           session=session,
-          inputId = "compregstoryboard",
-          value = settingscompregstoryboard
+          inputId = "linescomparestoryboard",
+          value = settingslinescomparestoryboard
         )
 
-        session$sendCustomMessage("setsetting", c("compregstoryboard", settingscompregstoryboard))
+        session$sendCustomMessage("setsetting", c("linescomparestoryboard", settingslinescomparestoryboard))
 
         # Line story board
-        settingscompregstoryboardtitle <- state$compregstoryboardtitle
+        settingslinescomparestoryboardtitle <- state$linescomparestoryboardtitle
         updateTextInput(
           session=session,
-          inputId = "compregstoryboardtitle",
-          value = settingscompregstoryboardtitle
+          inputId = "linescomparestoryboardtitle",
+          value = settingslinescomparestoryboardtitle
         )
 
-        session$sendCustomMessage("setsetting", c("compregstoryboardtitle", settingscompregstoryboardtitle))
+        session$sendCustomMessage("setsetting", c("linescomparestoryboardtitle", settingslinescomparestoryboardtitle))
 
 
+        # Line story board
+        settingschartsabsstoryboard <- state$chartsabsstoryboard
+        updateTextAreaInput(
+          session=session,
+          inputId = "chartsabsstoryboard",
+          value = settingschartsabsstoryboard
+        )
+
+        session$sendCustomMessage("setsetting", c("chartsabsstoryboard", settingschartsabsstoryboard))
+
+        # Line story board
+        settingschartsabsstoryboardtitle <- state$chartsabsstoryboardtitle
+        updateTextInput(
+          session=session,
+          inputId = "chartsabsstoryboardtitle",
+          value = settingschartsabsstoryboardtitle
+        )
+
+        session$sendCustomMessage("setsetting", c("chartsabsstoryboardtitle", settingschartsabsstoryboardtitle))
                 # Line story board
-        settingsabsvalstoryboard <- state$absvalstoryboard
+        settingschartsdiffabsstoryboard<- state$chartsdiffabsstoryboard
         updateTextAreaInput(
           session=session,
-          inputId = "absvalstoryboard",
-          value = settingsabsvalstoryboard
+          inputId = "chartsdiffabsstoryboard",
+          value = settingschartsdiffabsstoryboard
         )
 
-        session$sendCustomMessage("setsetting", c("absvalstoryboard", settingsabsvalstoryboard))
+        session$sendCustomMessage("setsetting", c("chartsdiffabsstoryboard", settingschartsdiffabsstoryboard))
 
         # Line story board
-        settingsabsvalstoryboardtitle <- state$absvalstoryboardtitle
+        settingschartsdiffabsstoryboardtitle<- state$chartsdiffabsstoryboardtitle
         updateTextInput(
           session=session,
-          inputId = "absvalstoryboardtitle",
-          value = settingsabsvalstoryboardtitle
+          inputId = "chartsdiffabsstoryboardtitle",
+          value = settingschartsdiffabsstoryboardtitle
         )
 
-        session$sendCustomMessage("setsetting", c("absvalstoryboardtitle", settingsabsvalstoryboardtitle))
-                # Line story board
-        settingsabsdifstoryboard<- state$absdifstoryboard
+        session$sendCustomMessage("setsetting", c("chartsdiffabsstoryboardtitle", settingschartsdiffabsstoryboardtitle))
+
+
+         settingschartsdiffprcntstoryboard<- state$chartsdiffprcntstoryboard
         updateTextAreaInput(
           session=session,
-          inputId = "absdifstoryboard",
-          value = settingsabsdifstoryboard
+          inputId = "chartsdiffprcntstoryboard",
+          value = settingschartsdiffprcntstoryboard
         )
 
-        session$sendCustomMessage("setsetting", c("absdifstoryboard", settingsabsdifstoryboard))
+        session$sendCustomMessage("setsetting", c("chartsdiffprcntstoryboard", settingschartsdiffprcntstoryboard))
 
-        # Line story board
-        settingsabsdifstoryboardtitle<- state$absdifstoryboardtitle
+        settingschartsdiffprcntstoryboardtitle<- state$chartsdiffprcntstoryboardtitle
         updateTextInput(
           session=session,
-          inputId = "absdifstoryboardtitle",
-          value = settingsabsdifstoryboardtitle
+          inputId = "chartsdiffprcntstoryboardtitle",
+          value = settingschartsdiffprcntstoryboardtitle
         )
 
-        session$sendCustomMessage("setsetting", c("absdifstoryboardtitle", settingsabsdifstoryboardtitle))
+        session$sendCustomMessage("setsetting", c("chartsdiffprcntstoryboardtitle", settingschartsdiffprcntstoryboardtitle))
 
-
-         settingspercdifstoryboard<- state$percdifstoryboard
+        settingsmapsabsstoryboard<- state$mapsabsstoryboard
         updateTextAreaInput(
           session=session,
-          inputId = "percdifstoryboard",
-          value = settingspercdifstoryboard
+          inputId = "mapsabsstoryboard",
+          value = settingsmapsabsstoryboard
         )
+        session$sendCustomMessage("setsetting", c("mapsabsstoryboard", settingsmapsabsstoryboard))
 
-        session$sendCustomMessage("setsetting", c("percdifstoryboard", settingspercdifstoryboard))
-
-        settingspercdifstoryboardtitle<- state$percdifstoryboardtitle
+        settingsmapsabsstoryboardtitle<- state$mapsabsstoryboardtitle
         updateTextInput(
           session=session,
-          inputId = "percdifstoryboardtitle",
-          value = settingspercdifstoryboardtitle
+          inputId = "mapsabsstoryboardtitle",
+          value = settingsmapsabsstoryboardtitle
         )
 
-        session$sendCustomMessage("setsetting", c("percdifstoryboardtitle", settingspercdifstoryboardtitle))
+        session$sendCustomMessage("setsetting", c("mapsabsstoryboardtitle", settingsmapsabsstoryboardtitle))
 
-         settingsmapabsdifstoryboard<- state$mapabsdifstoryboard
+        settingsmapsdiffabsstoryboard<- state$mapsdiffabsstoryboard
         updateTextAreaInput(
           session=session,
-          inputId = "mapabsdifstoryboard",
-          value = settingsmapabsdifstoryboard
+          inputId = "mapsdiffabsstoryboard",
+          value = settingsmapsdiffabsstoryboard
         )
 
-        session$sendCustomMessage("setsetting", c("mapabsdifstoryboard", settingsmapabsdifstoryboard))
+        session$sendCustomMessage("setsetting", c("mapsdiffabsstoryboard", settingsmapsdiffabsstoryboard))
 
-        settingsmapabsdifstoryboardtitle<- state$mapabsdifstoryboardtitle
+        settingsmapsdiffabsstoryboardtitle<- state$mapsdiffabsstoryboardtitle
         updateTextInput(
           session=session,
-          inputId = "mapabsdifstoryboardtitle",
-          value = settingsmapabsdifstoryboardtitle
+          inputId = "mapsdiffabsstoryboardtitle",
+          value = settingsmapsdiffabsstoryboardtitle
         )
 
-        session$sendCustomMessage("setsetting", c("mapabsdifstoryboardtitle", settingsmapabsdifstoryboardtitle))
+        session$sendCustomMessage("setsetting", c("mapsdiffabsstoryboardtitle", settingsmapsdiffabsstoryboardtitle))
 
-        settingsmapabsstoryboard<- state$mapabsstoryboard
+        settingsmapsdiffprcntstoryboard<- state$mapsdiffprcntstoryboard
         updateTextAreaInput(
           session=session,
-          inputId = "mapabsstoryboard",
-          value = settingsmapabsstoryboard
+          inputId = "mapsdiffprcntstoryboard",
+          value =  settingsmapsdiffprcntstoryboard
         )
-        session$sendCustomMessage("setsetting", c("mapabsstoryboard", settingsmapabsstoryboard))
 
-        settingsmapabsstoryboardtitle<- state$mapabsstoryboardtitle
+        session$sendCustomMessage("setsetting", c("mapsdiffprcntstoryboard", settingsmapsdiffprcntstoryboard))
+
+        settingsmapsdiffprcntstoryboardtitle<- state$mapsdiffprcntstoryboardtitle
         updateTextInput(
           session=session,
-          inputId = "mapabsstoryboardtitle",
-          value = settingsmapabsstoryboardtitle
+          inputId = "mapsdiffprcntstoryboardtitle",
+          value =  settingsmapsdiffprcntstoryboardtitle
         )
 
-        session$sendCustomMessage("setsetting", c("mapabsstoryboardtitle", settingsmapabsstoryboardtitle))
+        session$sendCustomMessage("setsetting", c("mapsdiffprcntstoryboardtitle", settingsmapsdiffprcntstoryboardtitle))
 
-        settingsmappercdifstoryboard<- state$mappercdifstoryboard
+
+        settingstablestoryboard<- state$tablestoryboard
         updateTextAreaInput(
           session=session,
-          inputId = "mappercdifstoryboard",
-          value =  settingsmappercdifstoryboard
+          inputId = "tablestoryboard",
+          value =  settingstablestoryboard
         )
 
-        session$sendCustomMessage("setsetting", c("mappercdifstoryboard", settingsmappercdifstoryboard))
+        session$sendCustomMessage("setsetting", c("tablestoryboard", settingstablestoryboard))
 
-        settingsmappercdifstoryboardtitle<- state$mappercdifstoryboardtitle
+        settingstablestoryboardtitle<- state$tablestoryboardtitle
         updateTextInput(
           session=session,
-          inputId = "mappercdifstoryboardtitle",
-          value =  settingsmappercdifstoryboardtitle
+          inputId = "tablestoryboardtitle",
+          value =  settingstablestoryboardtitle
         )
 
-        session$sendCustomMessage("setsetting", c("mappercdifstoryboardtitle", settingsmappercdifstoryboardtitle))
+        session$sendCustomMessage("setsetting", c("tablestoryboardtitle", settingstablestoryboardtitle))
 
     }
 
