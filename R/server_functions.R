@@ -633,9 +633,6 @@ plotMap <- function(mapData = NULL,
     print("......................mapx_diff")
 
     print("Printing chartz for diff ...")
-    print(chartz)
-    saveRDS(chartz,"chartz.RDS")
-    print(legendType)
 
     mapx_diff <- rmap::map(data = chartz,
                            legendType = legendType,
