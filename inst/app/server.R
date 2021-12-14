@@ -338,7 +338,15 @@ server <- function(input, output, session) {
         return()
       }
       temp <- tempfile()
-      utils::download.file(preloaded_df$link, temp)
+
+      download_link <- (preloaded_df %>%
+        dplyr::filter(name == input$examplesPreloaded))$link
+
+      print("...............")
+      print(download_link)
+      print(input$examplesPreloaded)
+
+      utils::download.file(download_link, temp)
       state <- readRDS(temp)
       rv$data <- state$data
       updateVals(state)

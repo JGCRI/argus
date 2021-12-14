@@ -2,7 +2,7 @@
 #' mappings
 #'
 #' preloaded_data that allows Argus to load up data from a github or zenodo link.
-#' Argus data is maintained on the https://github.com/JGCRI/argusbookmarks repo
+#' Argus data is maintained on the https://github.com/JGCRI/argusdata repo
 #' If new data is added to the repo users can directly change this file and
 #' commit on github at : https://github.com/JGCRI/argus/blob/main/R/preloaded_data.R
 #'
@@ -17,8 +17,8 @@ preloaded_data <- function(){
 
   preloaded_data <- tibble::tribble(
     ~"group", ~"name", ~"link",
-    "examples", "exampleData", "https://github.com/JGCRI/argusbookmarks/raw/main/argus_bookmark_exampleData.rds",
-    "GCAM", "GCAMvX.X_branch_name", "link_to_rds")
+    "examples", "exampleData", "https://github.com/JGCRI/argusdata/raw/main/argus_bookmark_exampleData.rds",
+    "examples", "argus_example_EU", "https://github.com/JGCRI/argusdata/raw/main/argus_example_EU.rds")
 
 invisible(preloaded_data)
 
