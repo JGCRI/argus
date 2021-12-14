@@ -27,7 +27,7 @@ To launch argus in your browser, click the blue **Launch App** button.
 <p align="center">
 <a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_user_guide.PNG?raw=true" alt="https://jgcri.github.io/argus/articles/vignette_argus.html" height="60"/></a>
 <img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_divider.PNG?raw=true" height="40"/>
-<a href="https://jgcri.shinyapps.io/argus/" target="_blank"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_launch_app.PNG?raw=true" alt="https://jgcri.shinyapps.io/argus/" height="60"/></a>
+<a href="http://ec2-3-21-37-120.us-east-2.compute.amazonaws.com/argus/inst/app/" target="_blank"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_launch_app.PNG?raw=true" alt="https://jgcri.shinyapps.io/argus/" height="60"/></a>
 </p>
 
 
