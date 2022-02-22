@@ -29,7 +29,7 @@ library(sp)
 options(shiny.sanitize.errors = FALSE)
 options(shiny.maxRequestSize=100*1024^2)
 #options(shiny.trace = TRUE)
-pal_all <- rmap::mappings()$pal_all
+pal_all <- jgcricolors::jgcricol()$pal_all
 
 #...........................
 # Server object
@@ -1281,7 +1281,7 @@ server <- function(input, output, session) {
   #.........................................
 
   gcamParamsx <- reactive({
-    unique((rmap::mappings()$mapParamQuery)$param)
+    unique((rmap::mapping_param_query)$param)
   })
 
   output$gcamParams = renderUI({
@@ -1305,7 +1305,7 @@ server <- function(input, output, session) {
   #.........................................
 
   gcamRegionsx <- reactive({
-   unique((rmap::mappings()$countryToGCAMReg32)$region)
+   unique((rmap::mapping_country_gcam32)$region)
   })
 
   output$gcamRegions = renderUI({
@@ -1428,8 +1428,6 @@ server <- function(input, output, session) {
   # Read in Raw Data
   data_raw <- reactive({
 
-
-
     if (is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
 
       data_raw_result <- argus::addMissing(
@@ -1442,12 +1440,16 @@ server <- function(input, output, session) {
 
       data_raw_result <- NULL
 
+      print("Checking csv reading 1......")
+      print(paste0(input$filedata$datapath))
+
       for (i in 1:length(input$filedata$datapath)){
         argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) %>%
-            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> data_raw_result_i
-        data_raw_result_i<-argus::addMissing(data_raw_result_i)
+            argus::addMissing() -> data_raw_result_i
         data_raw_result <- dplyr::bind_rows(data_raw_result, data_raw_result_i)
       }
+
+      print("Checking csv reading 2......")
 
       return(data_raw_result)
 
@@ -2012,7 +2014,7 @@ server <- function(input, output, session) {
           filter(param == focusMapParamSelectedx(),
                  scenario == input$focusMapScenarioSelected,
                  x == input$focusMapYearSelected) %>%
-            dplyr::left_join(rmap::mappings("mappingGCAMBasins"),by="subRegion") %>%
+            dplyr::left_join(rmap::mapping_gcambasins,by="subRegion") %>%
             dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
                                                      TRUE~subRegion)) %>%
             dplyr::select(-subRegionMap) %>%
@@ -2418,7 +2420,7 @@ server <- function(input, output, session) {
 
   output$table <- renderDT(
     # Point to reactive values
-    dataChartx(),
+    data() %>% dplyr::select(-aggregate),
     filter = "top"
   )
 
