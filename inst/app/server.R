@@ -21,6 +21,7 @@ library(grDevices)
 library(rmap)
 library(plotly)
 library(sp)
+library(sf)
 
 #...........................
 # Options
@@ -2030,15 +2031,14 @@ server <- function(input, output, session) {
         return(mapFocus)
       }
 
-    mapdf <- df_to_shape(rmap::map_find_df(dataMapFocus_raw));
+    mapdf <- rmap::map_find(dataMapFocus_raw);
 
     # Prepare for Polygons
     mapdf <- mapdf[mapdf$subRegion %in% dataMapFocus_raw$subRegion,]; mapdf
-    mapdf@data <- mapdf@data %>%
+    mapdf <- mapdf %>%
       left_join(dataMapFocus_raw %>%
                   dplyr::select(subRegion,value)) %>%
-      filter(subRegion %in% unique(dataMapFocus_raw$subRegion)) %>%
-      droplevels(); mapdf
+      filter(subRegion %in% unique(dataMapFocus_raw$subRegion)); mapdf
 
     # Create legends and color scales
     bins <- unique(argus::breaks(dataMapFocus_raw,breaks=7)[[1]]);
@@ -2048,17 +2048,17 @@ server <- function(input, output, session) {
     # Plot polygons on Leaflet
       labels <- sprintf(
         "<strong>%s</strong><br/>%g",
-        mapdf@data$subRegion, mapdf@data$value
+        mapdf$subRegion, mapdf$value
       ) %>% lapply(htmltools::HTML)
 
       if(length(bins)>1){
 
-        coords <- coordinates(mapdf)
+        bbox_shape <- sf::st_bbox(mapdf)
 
-        lat_min = min(coords[,2])
-        lat_max = max(coords[,2])
-        lng_min = min(coords[,1])
-        lng_max = max(coords[,1])
+        lat_min = bbox_shape[["xmin"]]
+        lat_max = bbox_shape[["xmax"]]
+        lng_min = bbox_shape[["ymin"]]
+        lng_max = bbox_shape[["ymax"]]
 
         initial_lat = (lat_max + lat_min )/2
         initial_lng = (lng_max + lng_min)/2
@@ -2068,7 +2068,7 @@ server <- function(input, output, session) {
         setView(lat = initial_lat, lng = initial_lng, zoom = initial_zoom) %>%
         addTiles() %>%
         addPolygons(data=mapdf,
-                    group=~unique(subRegionType),
+                    group=~unique(name),
                     fillColor = ~pal(value),
                     fillOpacity = 0.5,
                     opacity = 0.5,
@@ -2081,7 +2081,7 @@ server <- function(input, output, session) {
                       direction = "auto")
                     ) %>%
         addLegend(pal = pal,
-                values = mapdf@data$value,
+                values = mapdf$value,
                 opacity = 0.6,
                 title = NULL,
                 position = "bottomright")}
@@ -2090,7 +2090,7 @@ server <- function(input, output, session) {
         mapFocus <- leaflet() %>%
           addTiles() %>%
           addPolygons(data=mapdf,
-                      group=~unique(subRegionType),
+                      group=~unique(name),
                       fillColor = "red",
                       fillOpacity = 0.5,
                       opacity = 0.5,
