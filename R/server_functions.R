@@ -135,14 +135,14 @@ parse_local <- function(inputdatapath, urlfiledatadatapath){
   print(inputdatapath)
   if (tools::file_ext(inputdatapath) == ""){
     if (grepl("./$",urlfiledatadatapath)){
-      utils::read.csv(inputdatapath) %>%
-        as.data.frame()
+      data.table::fread(inputdatapath) %>%
+        tibble::as_tibble()
     }
   }else if (tools::file_ext(inputdatapath) == "zip"){
     return(parse_zip(inputdatapath))
   }else if (tools::file_ext(inputdatapath) == "csv"){
-    return(utils::read.csv(inputdatapath) %>%
-             as.data.frame())
+    return(data.table::fread(inputdatapath) %>%
+             tibble::as_tibble())
   }else{
     return(NULL)
   }

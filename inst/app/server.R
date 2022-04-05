@@ -21,6 +21,7 @@ library(grDevices)
 library(rmap)
 library(plotly)
 library(sp)
+library(sf)
 
 #...........................
 # Options
@@ -29,7 +30,7 @@ library(sp)
 options(shiny.sanitize.errors = FALSE)
 options(shiny.maxRequestSize=100*1024^2)
 #options(shiny.trace = TRUE)
-pal_all <- rmap::mappings()$pal_all
+pal_all <- jgcricolors::jgcricol()$pal_all
 
 #...........................
 # Server object
@@ -338,7 +339,15 @@ server <- function(input, output, session) {
         return()
       }
       temp <- tempfile()
-      utils::download.file(preloaded_df$link, temp)
+
+      download_link <- (preloaded_df %>%
+        dplyr::filter(name == input$examplesPreloaded))$link
+
+      print("...............")
+      print(download_link)
+      print(input$examplesPreloaded)
+
+      utils::download.file(download_link, temp)
       state <- readRDS(temp)
       rv$data <- state$data
       updateVals(state)
@@ -414,133 +423,13 @@ server <- function(input, output, session) {
     })
 
     #URL bookmark onRestore
-    onRestore(function(state) {
-      print(state)
-      rv$data <- state$values$data
-      session$sendCustomMessage("setsetting", c("inputz", ""))
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          label = "Story Board",
-          textInput(inputId="focusstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="focusstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
-        ))
-
+    onRestored(function(state) {
       removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          label = "Story Board",
-          textInput(inputId="linesallstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="linesallstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          label = "Story Board",
-          textInput(inputId="linescomparestoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="linescomparestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          label = "Story Board",
-          textInput(inputId="chartsabsstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="chartsabsstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="chartsdiffabsstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="chartsdiffabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="chartsdiffprcntstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="chartsdiffprcntstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="mapsabsstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="mapsabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="mapsdiffabsstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="mapsdiffabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="mapsdiffprcntstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="mapsdiffprcntstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="tablestoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="tablestoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-
     })
 
     #...........................
     # RDS Bookmark
     #...........................
-
-
 
     #rds bookmark download handler
     output$bookmark <- downloadHandler(
@@ -618,7 +507,7 @@ server <- function(input, output, session) {
 
         #legendType
         settingsmapLegend <- state$legendType
-        if((settingsmapLegend %in% c("kmean","pretty")) && !is.null(settingsmapLegend)){
+        if((settingsmapLegend %in% c("kmean","pretty","continuous")) && !is.null(settingsmapLegend)){
           updatePickerInput(
             inputId = "legendType",
             session=session,
@@ -1273,7 +1162,7 @@ server <- function(input, output, session) {
   #.........................................
 
   gcamParamsx <- reactive({
-    unique((rmap::mappings()$mapParamQuery)$param)
+    unique((rmap::mapping_param_query)$param)
   })
 
   output$gcamParams = renderUI({
@@ -1297,7 +1186,7 @@ server <- function(input, output, session) {
   #.........................................
 
   gcamRegionsx <- reactive({
-   unique((rmap::mappings()$countryToGCAMReg32)$region)
+   unique((rmap::mapping_country_gcam32)$region)
   })
 
   output$gcamRegions = renderUI({
@@ -1420,8 +1309,6 @@ server <- function(input, output, session) {
   # Read in Raw Data
   data_raw <- reactive({
 
-
-
     if (is.null(rv$filedatax) & is.null(rv$dataGCAM) & (is.null(rv$urlfiledatax))) {
 
       data_raw_result <- argus::addMissing(
@@ -1434,12 +1321,16 @@ server <- function(input, output, session) {
 
       data_raw_result <- NULL
 
+      print("Checking csv reading 1......")
+      print(paste0(input$filedata$datapath))
+
       for (i in 1:length(input$filedata$datapath)){
         argus::parse_local(input$filedata$datapath[i], inpu$urlfiledata$datapath) %>%
-            dplyr::select(scenario, subRegion, param, aggregate, class, x, value) -> data_raw_result_i
-        data_raw_result_i<-argus::addMissing(data_raw_result_i)
+            argus::addMissing() -> data_raw_result_i
         data_raw_result <- dplyr::bind_rows(data_raw_result, data_raw_result_i)
       }
+
+      print("Checking csv reading 2......")
 
       return(data_raw_result)
 
@@ -2004,7 +1895,7 @@ server <- function(input, output, session) {
           filter(param == focusMapParamSelectedx(),
                  scenario == input$focusMapScenarioSelected,
                  x == input$focusMapYearSelected) %>%
-            dplyr::left_join(rmap::mappings("mappingGCAMBasins"),by="subRegion") %>%
+            dplyr::left_join(rmap::mapping_gcambasins,by="subRegion") %>%
             dplyr::mutate(subRegion=dplyr::case_when(!is.na(subRegionMap)~subRegionMap,
                                                      TRUE~subRegion)) %>%
             dplyr::select(-subRegionMap) %>%
@@ -2020,15 +1911,14 @@ server <- function(input, output, session) {
         return(mapFocus)
       }
 
-    mapdf <- df_to_shape(rmap::map_find_df(dataMapFocus_raw));
+    mapdf <- rmap::map_find(dataMapFocus_raw);
 
     # Prepare for Polygons
     mapdf <- mapdf[mapdf$subRegion %in% dataMapFocus_raw$subRegion,]; mapdf
-    mapdf@data <- mapdf@data %>%
+    mapdf <- mapdf %>%
       left_join(dataMapFocus_raw %>%
                   dplyr::select(subRegion,value)) %>%
-      filter(subRegion %in% unique(dataMapFocus_raw$subRegion)) %>%
-      droplevels(); mapdf
+      filter(subRegion %in% unique(dataMapFocus_raw$subRegion)); mapdf
 
     # Create legends and color scales
     bins <- unique(argus::breaks(dataMapFocus_raw,breaks=7)[[1]]);
@@ -2038,17 +1928,17 @@ server <- function(input, output, session) {
     # Plot polygons on Leaflet
       labels <- sprintf(
         "<strong>%s</strong><br/>%g",
-        mapdf@data$subRegion, mapdf@data$value
+        mapdf$subRegion, mapdf$value
       ) %>% lapply(htmltools::HTML)
 
       if(length(bins)>1){
 
-        coords <- coordinates(mapdf)
+        bbox_shape <- sf::st_bbox(mapdf)
 
-        lat_min = min(coords[,2])
-        lat_max = max(coords[,2])
-        lng_min = min(coords[,1])
-        lng_max = max(coords[,1])
+        lat_min = bbox_shape[["xmin"]]
+        lat_max = bbox_shape[["xmax"]]
+        lng_min = bbox_shape[["ymin"]]
+        lng_max = bbox_shape[["ymax"]]
 
         initial_lat = (lat_max + lat_min )/2
         initial_lng = (lng_max + lng_min)/2
@@ -2058,7 +1948,7 @@ server <- function(input, output, session) {
         setView(lat = initial_lat, lng = initial_lng, zoom = initial_zoom) %>%
         addTiles() %>%
         addPolygons(data=mapdf,
-                    group=~unique(subRegionType),
+                    group=~unique(name),
                     fillColor = ~pal(value),
                     fillOpacity = 0.5,
                     opacity = 0.5,
@@ -2071,7 +1961,7 @@ server <- function(input, output, session) {
                       direction = "auto")
                     ) %>%
         addLegend(pal = pal,
-                values = mapdf@data$value,
+                values = mapdf$value,
                 opacity = 0.6,
                 title = NULL,
                 position = "bottomright")}
@@ -2080,7 +1970,7 @@ server <- function(input, output, session) {
         mapFocus <- leaflet() %>%
           addTiles() %>%
           addPolygons(data=mapdf,
-                      group=~unique(subRegionType),
+                      group=~unique(name),
                       fillColor = "red",
                       fillOpacity = 0.5,
                       opacity = 0.5,
@@ -2410,7 +2300,7 @@ server <- function(input, output, session) {
 
   output$table <- renderDT(
     # Point to reactive values
-    dataChartx(),
+    data() %>% dplyr::select(-aggregate),
     filter = "top"
   )
 

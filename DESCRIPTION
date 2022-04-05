@@ -30,6 +30,7 @@ Imports:
 	shinyWidgets,
 	shinyjs,
 	plotly,
+	sf,
 	shinyBS,
     knitr (>= 1.20),
     dplyr,
