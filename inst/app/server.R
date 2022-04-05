@@ -423,133 +423,13 @@ server <- function(input, output, session) {
     })
 
     #URL bookmark onRestore
-    onRestore(function(state) {
-      print(state)
-      rv$data <- state$values$data
-      session$sendCustomMessage("setsetting", c("inputz", ""))
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          label = "Story Board",
-          textInput(inputId="focusstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="focusstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
-        ))
-
+    onRestored(function(state) {
       removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          label = "Story Board",
-          textInput(inputId="linesallstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="linesallstoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          label = "Story Board",
-          textInput(inputId="linescomparestoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="linescomparestoryboard",label="Body", value = text, width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          label = "Story Board",
-          textInput(inputId="chartsabsstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="chartsabsstoryboard",value = text, label="Body", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="chartsdiffabsstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="chartsdiffabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="chartsdiffprcntstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="chartsdiffprcntstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="mapsabsstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="mapsabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="mapsdiffabsstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="mapsdiffabsstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="mapsdiffprcntstoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="mapsdiffprcntstoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-      showModal(
-        modalDialog(
-          size = "s",
-          easyClose = TRUE,
-          footer = NULL,
-          textInput(inputId="tablestoryboardtitle", label="Title", value = title, width = "100%"),
-          textAreaInput(inputId="tablestoryboard",value = text, label="Story Board", width = "100%", height="50vh", resize="vertical")
-        ))
-
-      removeModal()
-
-
     })
 
     #...........................
     # RDS Bookmark
     #...........................
-
-
 
     #rds bookmark download handler
     output$bookmark <- downloadHandler(
@@ -627,7 +507,7 @@ server <- function(input, output, session) {
 
         #legendType
         settingsmapLegend <- state$legendType
-        if((settingsmapLegend %in% c("kmean","pretty")) && !is.null(settingsmapLegend)){
+        if((settingsmapLegend %in% c("kmean","pretty","continuous")) && !is.null(settingsmapLegend)){
           updatePickerInput(
             inputId = "legendType",
             session=session,
