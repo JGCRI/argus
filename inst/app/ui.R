@@ -168,7 +168,7 @@ ui <- function(request) { fluidPage(
                   tabsetPanel(type="tabs",
                        tabPanel("All",
                                     div(downloadButton(
-                                            'downloadPlotSum',NULL,download = "summaryChart.png",
+                                            'downloadPlotSum',NULL,download = "charts_summary.png",
                                             class = "download_button_in"),style="float:right"),
                                 br(),
                                 div(align="center",
@@ -188,7 +188,7 @@ ui <- function(request) { fluidPage(
                                            ))),
                                     plotOutput(outputId = "summary")),
                        tabPanel("Compare Regions",
-                                div(downloadButton('downloadPlotSumReg',NULL,download = "summaryChartReg.png",
+                                div(downloadButton('downloadPlotSumReg',NULL,download = "charts_summary_region.png",
                                                class = "download_button_in"),style="float:right"),
                                 br(),
                                 div(align="center",
@@ -219,7 +219,7 @@ ui <- function(request) { fluidPage(
                            div(align="center",
                                 tabsetPanel(type = "tabs",
                                       tabPanel("Absolute Value",
-                                               div(downloadButton('downloadPlotChart',NULL,download = "barCharts.png",  class = "download_button_in"),
+                                               div(downloadButton('downloadPlotChart',NULL,download = "charts_bar.png",  class = "download_button_in"),
                                                    style = "float: right"),
                                                br(),
                                                div(align="center",
@@ -248,7 +248,7 @@ ui <- function(request) { fluidPage(
                                                div(class="charts",plotOutput(outputId = "plotAbs", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Absolute Difference",
-                                               div(downloadButton('downloadPlotChart1',NULL,download = "barCharts.png",  class = "download_button_in"),
+                                               div(downloadButton('downloadChartDiffAbs',NULL,download = "charts_bar_diff_absolute.png",  class = "download_button_in"),
                                                    style = "float: right"),
                                                br(),
                                                div(align="center",
@@ -269,7 +269,7 @@ ui <- function(request) { fluidPage(
                                                div(class="charts",plotOutput(outputId = "plotDiff", width = "100%", height="100%"), style = "margin-right: 20px;margin-left: 20px;")
                                       ),
                                       tabPanel("Percent Difference",
-                                               div(downloadButton('downloadPlotChart2',NULL,download = "barCharts.png",  class = "download_button_in"),
+                                               div(downloadButton('downloadChartDiffPrcnt',NULL,download = "charts_bar_diff_percent.png",  class = "download_button_in"),
                                                    style = "float: right"),
                                                br(),
                                                div(align="center",
@@ -312,7 +312,7 @@ ui <- function(request) { fluidPage(
                            div(align="center",
                                tabsetPanel(type="tabs",
                                            tabPanel("Absolute Value",
-                                                    div(downloadButton('downloadMap',NULL,download = "map.png",class = "download_button_in"),style="float:right"),
+                                                    div(downloadButton('downloadMap',NULL,download = "maps.png",class = "download_button_in"),style="float:right"),
                                                     br(),
                                                     div(align="center",
                                                         bsCollapse(id = "collapse_maps_abs", multiple = FALSE,
@@ -334,7 +334,7 @@ ui <- function(request) { fluidPage(
                                                         style = "margin-right: 20px;margin-left: 20px;")
                                                     ),
                                            tabPanel("Absolute Difference",
-                                                    div(downloadButton('downloadMapDiffAbs',NULL,download = "map.png", class = "download_button_in"),style="float:right"),
+                                                    div(downloadButton('downloadMapDiffAbs',NULL,download = "maps_diff_absolute.png", class = "download_button_in"),style="float:right"),
                                                     br(),
                                                     div(align="center",
                                                         bsCollapse(id = "collapse_maps_diffabs", multiple = FALSE,
@@ -356,7 +356,7 @@ ui <- function(request) { fluidPage(
                                                         style = "margin-right: 20px;margin-left: 20px;")
                                                     ),
                                           tabPanel("Percent Difference",
-                                                   div(downloadButton('downloadMapDiffPrcnt',NULL,download = "map.png",class = "download_button_in"),style="float:right"),
+                                                   div(downloadButton('downloadMapDiffPrcnt',NULL,download = "maps_diff_percent.png",class = "download_button_in"),style="float:right"),
                                                    br(),
                                                    div(align="center",
                                                        bsCollapse(id = "collapse_maps_diffprcnt", multiple = FALSE,
@@ -386,8 +386,8 @@ ui <- function(request) { fluidPage(
                   tabPanel(
                     "Table",
                     div(downloadButton('downloadTable', NULL, download = "table.csv", class="download_button"),
-                        style = "float: right"),
-                    br(),
+                        style = "float: right; margin-top: -6.5px"),
+                    # br(),
                     div(align="center",
                         bsCollapse(id = "collapse_table", multiple = FALSE,
                                    bsCollapsePanel("Notes", style = "info",
@@ -411,7 +411,7 @@ ui <- function(request) { fluidPage(
     #---------------------------
 
     div(actionButton(inputId="toggleSidebar", label="Inputs", icon = icon("caret-up","fa-1x"),class = "download_button_input")),
-    div(downloadButton('downloadAll', "All",  class = "download_button")),
+    div(downloadButton('downloadAll', "All", download = "all.zip", class = "download_button")),
     div(actionLink(inputId='github', label='',class = "icon", icon = icon("github","fa-1x"),onclick ="window.open('https://github.com/JGCRI/argus', '_blank')")),
     div(actionLink(inputId='help', label='', class = "icon",icon = icon("question","fa-1x"),onclick ="window.open('https://jgcri.github.io/argus/', '_blank')")),
     div(actionLink(inputId='loadbookmark', label='', class = "icon", icon = icon("bookmark","fa-1x"))),

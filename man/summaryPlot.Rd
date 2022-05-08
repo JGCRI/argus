@@ -4,20 +4,12 @@
 \alias{summaryPlot}
 \title{summaryPlot}
 \usage{
-summaryPlot(
-  aspectratio,
-  textsize,
-  titletext,
-  dataSumx,
-  ggplottheme = ggplot2::theme_bw()
-)
+summaryPlot(aspectratio, textsize, dataSumx, ggplottheme = ggplot2::theme_bw())
 }
 \arguments{
 \item{aspectratio}{aspect ratio}
 
 \item{textsize}{text size}
-
-\item{titletext}{title text}
 
 \item{dataSumx}{dataSumx()}
 

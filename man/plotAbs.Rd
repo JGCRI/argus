@@ -4,7 +4,12 @@
 \alias{plotAbs}
 \title{plotAbs}
 \usage{
-plotAbs(dataChartPlot, scenarioRefSelected, ggplottheme = ggplot2::theme_bw())
+plotAbs(
+  dataChartPlot,
+  scenarioRefSelected,
+  ggplottheme = ggplot2::theme_bw(),
+  textsize = 15
+)
 }
 \arguments{
 \item{dataChartPlot}{dataChartPlot: dataChartx()}
@@ -12,6 +17,8 @@ plotAbs(dataChartPlot, scenarioRefSelected, ggplottheme = ggplot2::theme_bw())
 \item{scenarioRefSelected}{scenarioRefSelected}
 
 \item{ggplottheme}{ggplot theme to use}
+
+\item{textsize}{Default = 15}
 }
 \description{
 generate chart plot for absolute value

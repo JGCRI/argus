@@ -9,7 +9,8 @@ plotMap(
   legendType = "kmeans",
   mapX = NULL,
   scenRef = NULL,
-  diff = NULL
+  diff = NULL,
+  textsize = 15
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ plotMap(
 \item{scenRef}{scenRef}
 
 \item{diff}{either "absolute", "percent" or NULL in the case of no diff}
+
+\item{textsize}{Default = 15}
 }
 \description{
 generate chart plot for absolute value

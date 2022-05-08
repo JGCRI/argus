@@ -185,17 +185,17 @@ exportWidth<-function(max_width_in, numelement, lenperchart){
 #' summaryPlotReg
 #'
 #' generate summary plot
-#' @param titletext plot title
 #' @param dataMapx Input map dataframe
 #' @param ggplottheme ggplot theme to use
 #' @param subsetRegionsx Subset of regions
+#' @param textsize Default =15
 #' @importFrom magrittr %>%
 #' @import ggplot2
 #' @export
 
-summaryPlotReg <- function(titletext,
-                           dataMapx,
+summaryPlotReg <- function(dataMapx,
                            ggplottheme = ggplot2::theme_bw(),
+                           textsize = 15,
                            subsetRegionsx){
 
   # Initialize
@@ -217,14 +217,15 @@ summaryPlotReg <- function(titletext,
                                        color=scenario)) +
       ggplottheme +
       ylab(NULL) + xlab(NULL) +
-      geom_line(size=2) +
+      geom_line(size=1) +
       scale_y_continuous(position = "right")+
       facet_grid(param~subRegion, scales="free",switch="y",
                  labeller = labeller(param = label_wrap_gen(15))
       )+
       theme(legend.position="top",
             legend.justification='left',
-            text = element_text(size = 15),
+            text = element_text(size = textsize),
+            strip.text = element_text(size = textsize*0.75),
             legend.title = element_blank(),
             plot.margin=margin(10,10,10,10,"pt"))
     }
@@ -280,14 +281,12 @@ breaks <- function(dataMap_raw_param = NULL,
 #' generate summary plot
 #' @param aspectratio aspect ratio
 #' @param textsize text size
-#' @param titletext title text
 #' @param dataSumx dataSumx()
 #' @param ggplottheme ggplot theme to use
 #' @importFrom magrittr %>%
 #' @export
 summaryPlot <- function(aspectratio,
                         textsize,
-                        titletext,
                         dataSumx,
                         ggplottheme = ggplot2::theme_bw()){
 
@@ -298,7 +297,7 @@ summaryPlot <- function(aspectratio,
                       group=scenario,
                       color=scenario))+
     ggplottheme +
-    geom_line(size=2) +
+    geom_line(size=1) +
     ylab(NULL) +  xlab(NULL) +
     facet_wrap(.~param, scales="free", ncol = 3,
                labeller = labeller(param = label_wrap_gen(15)))+
@@ -306,6 +305,7 @@ summaryPlot <- function(aspectratio,
           legend.title = element_blank(),
           plot.margin=margin(20,20,20,0,"pt"),
           text=element_text(size=textsize),
+          strip.text = element_text(size = textsize*0.75),
           aspect.ratio = aspectratio
     )
 }
@@ -317,10 +317,13 @@ summaryPlot <- function(aspectratio,
 #' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
 #' @param scenarioRefSelected scenarioRefSeleceted#'
 #' @param ggplottheme ggplot theme to use
+#' @param textsize Default = 15
 #' @importFrom magrittr %>%
 #' @export
-plotDiffAbs<- function(dataChartPlot, scenarioRefSelected,
-                       ggplottheme = ggplot2::theme_bw()){
+plotDiffAbs<- function(dataChartPlot,
+                       scenarioRefSelected,
+                       ggplottheme = ggplot2::theme_bw(),
+                       textsize = 15){
 
   NULL -> filter -> param -> scenario -> input -> value
 
@@ -376,7 +379,8 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected,
             strip.text.y = element_blank(),
             legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 15),
+            text = element_text(size = textsize),
+            strip.text = element_text(size = textsize*0.75),
             plot.margin=margin(20,20,20,0,"pt"),
             axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
     x = x+2
@@ -399,7 +403,8 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected,
             legend.title = element_blank(),
             legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 15),
+            text = element_text(size = textsize),
+            strip.text = element_text(size = textsize*0.75),
             plot.margin=margin(20,0,20,0,"pt"),
             axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
   }
@@ -412,10 +417,13 @@ plotDiffAbs<- function(dataChartPlot, scenarioRefSelected,
 #' @param dataChartPlot dataChartPlot: dataDiffAbsx() or dataPrcntDiffx()
 #' @param scenarioRefSelected scenarioRefSeleceted
 #' @param ggplottheme ggplot theme to use
+#' @param textsize Default = 15
 #' @importFrom magrittr %>%
 #' @export
-plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected,
-                         ggplottheme = ggplot2::theme_bw()){
+plotDiffPrcnt<- function(dataChartPlot,
+                         scenarioRefSelected,
+                         ggplottheme = ggplot2::theme_bw(),
+                         textsize = 15){
 
   NULL -> filter -> param -> scenario -> input -> value
 
@@ -465,14 +473,15 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected,
       ylab(NULL) +
       scale_color_manual(breaks=names(palCharts),values=palCharts) +
       scale_y_continuous(position = "left")+
-      geom_line(size=2)+
+      geom_line(size=1)+
       facet_grid(param~scenario, scales="free",switch="y") +
       theme(legend.position="bottom",
             legend.title = element_blank(),
             strip.text.y = element_blank(),
             legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 15),
+            text = element_text(size = textsize),
+            strip.text = element_text(size = textsize*0.75),
             plot.margin=margin(t = 20, r = 5, b = 0, l = 0, "pt"),
             axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
     x = x+2
@@ -495,7 +504,8 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected,
             legend.title = element_blank(),
             legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 15),
+            text = element_text(size = textsize),
+            strip.text = element_text(size = textsize*0.75),
             plot.margin=margin(t = 20, r = 5, b = 0, l = 0, "pt"),
             axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
   }
@@ -509,10 +519,13 @@ plotDiffPrcnt<- function(dataChartPlot, scenarioRefSelected,
 #' @param dataChartPlot dataChartPlot: dataChartx()
 #' @param scenarioRefSelected scenarioRefSelected
 #' @param ggplottheme ggplot theme to use
+#' @param textsize Default = 15
 #' @importFrom magrittr %>%
 #' @export
-plotAbs <- function(dataChartPlot, scenarioRefSelected,
-                    ggplottheme = ggplot2::theme_bw()){
+plotAbs <- function(dataChartPlot,
+                    scenarioRefSelected,
+                    ggplottheme = ggplot2::theme_bw(),
+                    textsize=15){
 
   NULL -> filter -> param -> scenario -> input -> value -> x
 
@@ -560,7 +573,8 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected,
             legend.title = element_blank(),
             legend.margin=margin(t =5, r = 0, b = 5, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 15),
+            text = element_text(size = textsize),
+            strip.text = element_text(size = textsize*0.75),
             plot.margin=margin(t = 20, r = 5, b = 0, l = 0, "pt"),
             axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
 
@@ -579,26 +593,36 @@ plotAbs <- function(dataChartPlot, scenarioRefSelected,
 #' @param mapX input$mapYear
 #' @param scenRef scenRef
 #' @param diff either "absolute", "percent" or NULL in the case of no diff
+#' @param textsize Default = 15
 #' @importFrom magrittr %>%
 #' @export
 plotMap <- function(mapData = NULL,
                     legendType = "kmeans",
                     mapX = NULL,
                     scenRef = NULL,
-                    diff = NULL){
+                    diff = NULL,
+                    textsize = 15){
+
+  # mapData = NULL
+  # legendType = "kmeans"
+  # mapX = NULL
+  # scenRef = NULL
+  # diff = NULL
 
   NULL -> filter -> param -> scenario -> input -> value -> x
 
   plist <- list()
   count_i = 1
 
-  mapData <- mapData %>%
-    dplyr::filter(x == mapX)
-
   if(nrow(mapData)>0){
 
     print("......................mapData")
     print(unique(mapData$param))
+
+    if(is.null(mapX)){mapX = max(mapData$x)}
+
+    mapData <- mapData %>%
+      dplyr::filter(x == mapX)
 
   for(i in 1:length(unique(mapData$param))){
 
@@ -662,8 +686,9 @@ plotMap <- function(mapData = NULL,
             legend.title = element_blank(),
             legend.margin=margin(t =0, r = 0, b = 0, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 20),
-            plot.margin=margin(t = 10, r = 5, b = 0, l = 0, "pt"),
+            text = element_text(size = textsize),
+            strip.text = element_text(size = textsize*0.75),
+            plot.margin=margin(t = 5, r = 5, b = 0, l = 0, "pt"),
             axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))+
       guides(fill=guide_legend(nrow=3,byrow=TRUE))
 
@@ -677,8 +702,9 @@ plotMap <- function(mapData = NULL,
             legend.title = element_blank(),
             legend.margin=margin(t =0, r = 0, b = 0, l =0, "pt"),
             legend.key.height=unit(0, "cm"),
-            text = element_text(size = 20),
-            plot.margin=margin(t = 10, r = 5, b = 0, l = 0, "pt"),
+            text = element_text(size = textsize),
+            strip.text = element_text(size = textsize*0.75),
+            plot.margin=margin(t = 5, r = 5, b = 0, l = 0, "pt"),
             axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))+
       guides(fill=guide_legend(nrow=3,byrow=TRUE))
     }

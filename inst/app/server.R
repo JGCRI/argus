@@ -2081,7 +2081,10 @@ server <- function(input, output, session) {
     if(T){ # Summary Plot
 
       output$summary <- renderPlot({
-        argus::summaryPlot(NULL, 17.5, 20, dataSumx(), ggplottheme=ggplottheme)
+        argus::summaryPlot(aspectratio = NULL,
+                           textsize = 17.5,
+                           dataSumx = dataSumx(),
+                           ggplottheme=ggplottheme)
       },
       height=function(){
         if (length(unique(dataChartx()$param))>3){
@@ -2098,15 +2101,27 @@ server <- function(input, output, session) {
       )
 
       output$downloadPlotSum <- downloadHandler(
-        filename = "summaryChart.png",
+        filename = "charts_summary.png",
         content = function(filename) {
-          ggsave(
-            filename,
-            plot=argus::summaryPlot(0.75, 10, 10, dataSumx(), ggplottheme=ggplottheme),
-            #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-            height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
-            width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
-            units="in"
+          shiny::withProgress(
+            message = paste0("Downloading charts_summary.png"),
+            value = 0,
+            {
+              shiny::incProgress(1/10)
+              Sys.sleep(1)
+              shiny::incProgress(5/10)
+              ggsave(
+                filename,
+                plot=argus::summaryPlot(aspectratio = 0.75,
+                                        textsize = 10,
+                                        dataSumx = dataSumx(),
+                                        ggplottheme=ggplottheme),
+                #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
+                height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
+                width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+                units="in"
+              )
+            }
           )
         })
 
@@ -2119,19 +2134,34 @@ server <- function(input, output, session) {
     if(T){# Summary Plot Compare Regions
 
   output$summaryReg <- renderPlot({
-    summaryPlotReg(15, dataMapx(),ggplottheme, subsetRegionsx())
+    argus::summaryPlotReg(dataMapx = dataMapx(),
+                           ggplottheme = ggplottheme,
+                           subsetRegionsx = subsetRegionsx(),
+                           textsize = 15)
   },
   height=function(){300*length(unique(dataMapx()$param))}#,
   #width=function(){max(400,300*length(subsetRegionsx())+100)}
   )
 
   output$downloadPlotSumReg <- downloadHandler(
-    filename = "summaryChartReg.png",
+    filename = "charts_summary_region.png",
     content = function(filename) {
-      ggsave(file,plot=summaryPlotReg(10,dataMapx(),ggplottheme, subsetRegionsx()),
-             height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
-             width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
-             units = "in")
+      shiny::withProgress(
+        message = paste0("Downloading charts_summary_region.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave(filename,plot=summaryPlotReg(dataMapx = dataMapx(),
+                                              ggplottheme = ggplottheme,
+                                              subsetRegionsx = subsetRegionsx(),
+                                              textsize = 10),
+                 height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
+                 width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
+                 units = "in")
+        }
+      )
     })
 
     } # Summary Plot Compare Regions
@@ -2170,23 +2200,32 @@ server <- function(input, output, session) {
   #...........................
 
   output$plotAbs <- renderPlot({
-    argus::plotAbs(dataChartx(), ggplottheme=ggplottheme,input$scenarioRefSelected)
+    argus::plotAbs(dataChartPlot = dataChartx(),
+                   ggplottheme=ggplottheme,
+                   scenarioRefSelected = input$scenarioRefSelected,
+                   textsize = 15)
   },
   height=function(){400*length(unique(dataChartx()$param))}#,
   #width=function(){500*length(unique(data()$scenario))}
   )
 
   output$downloadPlotChart <- downloadHandler(
-    file = "barChart.png",
+    file = "charts_bar.png",
     content = function(file) {
-      # foodweb(where=environment())
-      ggsave(file,plot=chartPlot(),
-             width=argus::exportWidth(49, length(unique(dataChartx()$param)), 6),
-             height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 3)+2,
-             unit = "in"
+      shiny::withProgress(
+        message = paste0("Downloading charts_bar.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave(file,plot=argus::plotAbs(dataChartx(), ggplottheme=ggplottheme,input$scenarioRefSelected),
+                 width=argus::exportWidth(49, length(unique(dataChartx()$param)), 4),
+                 height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 4)+2,
+                 unit = "in"
+          )
+        }
       )
-      # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
-      # max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
     })
 
   #...........................
@@ -2194,18 +2233,58 @@ server <- function(input, output, session) {
   #...........................
 
   output$plotDiff <- renderPlot({
-    argus::plotDiffAbs(dataDiffAbsx(), ggplottheme=ggplottheme, input$scenarioRefSelected)
+    argus::plotDiffAbs(dataChartPlot=dataDiffAbsx(),
+                       ggplottheme=ggplottheme,
+                       scenarioRefSelected = input$scenarioRefSelected,
+                       textsize = 15)
   },
  height=function(){400*length(unique(dataChartx()$param))}#,
  #width=function(){500*length(unique(data()$scenario))}
   )
 
+   output$downloadChartDiffAbs <- downloadHandler(
+    file = "charts_bar_diff_absolute.png",
+    content = function(file) {
+      # foodweb(where=environment())
+      ggsave(file,plot=argus::plotDiffAbs(dataDiffAbsx(), ggplottheme=ggplottheme, input$scenarioRefSelected),
+             width=argus::exportWidth(49, length(unique(dataChartx()$param)), 4),
+             height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 4)+2,
+             unit = "in"
+      )
+      # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
+      # max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
+    })
+
   output$plotPerc <- renderPlot({
-    argus::plotDiffPrcnt(dataPrcntAbsx(), ggplottheme=ggplottheme, input$scenarioRefSelected)
+    argus::plotDiffPrcnt(dataChartPlot = dataPrcntAbsx(),
+                         ggplottheme=ggplottheme,
+                         scenarioRefSelected = input$scenarioRefSelected,
+                         textsize = 15)
   },
   height=function(){400*length(unique(dataChartx()$param))}#,
   #width=function(){500*length(unique(data()$scenario))}
   )
+
+  output$downloadChartDiffPrcnt <- downloadHandler(
+    file = "charts_bar_diff_percent.png",
+    content = function(file) {
+      shiny::withProgress(
+        message = paste0("Downloading charts_bar_diff_percent.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave(file,plot=argus::plotDiffPrcnt(dataPrcntAbsx(), ggplottheme=ggplottheme, input$scenarioRefSelected),
+                 width=argus::exportWidth(49, length(unique(dataChartx()$param)), 4),
+                 height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 4)+2,
+                 unit = "in"
+          )
+        }
+      )
+      # exportHeight<-function(chartsperrow, max_height_in, numelement, lenperchart){
+      # max(10,min(45,5*length(unique(dataChartx()$param)))),units="in")
+    })
 
     } # Bar Charts
 
@@ -2236,6 +2315,32 @@ server <- function(input, output, session) {
       height=function(){400*length(unique((dataMapx() %>% dplyr::filter(x == input$mapYear))$param))}
       )
 
+      # Download
+      output$downloadMap <- downloadHandler(
+        file = "maps.png",
+        content = function(file) {
+          shiny::withProgress(
+            message = paste0("Downloading maps.png"),
+            value = 0,
+            {
+              shiny::incProgress(1/10)
+              Sys.sleep(1)
+              shiny::incProgress(5/10)
+              ggsave(
+                file,
+                plot=argus::plotMap(mapData = dataMapx(),
+                                    legendType = input$legendType,
+                                    mapX = input$mapYear,
+                                    textsize = 10),
+                height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 10),
+                width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
+                units="in"
+              )
+            }
+          )
+        })
+
+
       #...........................
       # Map Plot Diff Abs
       #...........................
@@ -2253,6 +2358,34 @@ server <- function(input, output, session) {
       },
       height=function(){400*length(unique((dataMapx() %>% dplyr::filter(x == input$mapYear))$param))}
       )
+
+      # Download
+      output$downloadMapDiffAbs <- downloadHandler(
+        file = "maps_diff_absolute.png",
+        content = function(file) {
+          shiny::withProgress(
+            message = paste0("Downloading maps_diff_absolute.png"),
+            value = 0,
+            {
+              shiny::incProgress(1/10)
+              Sys.sleep(1)
+              shiny::incProgress(5/10)
+              ggsave(
+                file,
+                plot=argus::plotMap(mapData = dataMapx(),
+                                    legendType = input$legendType,
+                                    mapX = input$mapYear,
+                                    scenRef = input$scenarioRefSelected ,
+                                    diff="absolute",
+                                    textsize = 10),
+                height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 10),
+                width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
+                units="in"
+              )
+            }
+          )
+        })
+
 
       #...........................
       # Map Plot Diff Percent
@@ -2276,15 +2409,29 @@ server <- function(input, output, session) {
 
 
   # Download
-  output$downloadMap <- downloadHandler(
-    file = "map.png",
+  output$downloadMapDiffPrcnt <- downloadHandler(
+    file = "maps_diff_percent.png",
     content = function(file) {
-      ggsave(
-        file,
-        plot=map(),
-        height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 7),
-        width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
-        units="in"
+      shiny::withProgress(
+        message = paste0("Downloading maps_diff_percent.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave(
+            file,
+            plot=argus::plotMap(mapData = dataMapx(),
+                                legendType = input$legendType,
+                                mapX = input$mapYear,
+                                scenRef = input$scenarioRefSelected ,
+                                diff="percent",
+                                textsize = 10),
+            height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 10),
+            width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
+            units="in"
+          )
+        }
       )
     })
 
@@ -2307,7 +2454,16 @@ server <- function(input, output, session) {
   output$downloadTable <- downloadHandler(
     file = "table.csv",
     content = function(file) {
-      write.csv(data() , file)
+      shiny::withProgress(
+        message = paste0("Downloading table.csv"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          write.csv(data() , file)
+        }
+      )
     })
 
   } # Data Table
@@ -2320,40 +2476,183 @@ server <- function(input, output, session) {
     content = function(file) {
       tmpdir <- tempdir()
       setwd(tempdir())
-      fs <- c("table.csv",
-              "summaryChart.png",
-              "barCharts.png",
-              "summaryChartReg.png",
-              "map.png",
-              "mapBase.png"
+      dataMapx <- dataMapx()
+      if(is.null(input$mapYear)){
+        max((((dataMapx$x %>% table() %>%
+           as.data.frame()) %>%
+          dplyr::filter(Freq==max(Freq)))$.) %>% as.vector) ->
+          mapX
+        } else {
+          mapX<-input$mapYear}
+      fs <- c("charts_summary.png",
+              "charts_summary_region.png",
+              "charts_bar.png",
+              "charts_bar_diff_absolute.png",
+              "charts_bar_diff_percent.png",
+              paste0("maps_",mapX,".png"),
+              paste0("maps_diff_absolute_",mapX,".png"),
+              paste0("maps_diff_percent_",mapX,".png"),
+              "table.csv"
               )
-      write.csv(data(), "table.csv")
-      ggsave("summaryChart.png", plot=argus::summaryPlot(0.75, 10, 10, dataSumx(), ggplottheme=ggplottheme),
-             #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
-             height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 4),
-             width=argus::exportWidth(10, length(unique(dataChartx()$param)), 2),
-             units="in"
+      shiny::withProgress(
+        message = paste0("Downloading charts_summary.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave(
+            "charts_summary.png",
+            plot=argus::summaryPlot(aspectratio = 0.75,
+                                    dataSumx = dataSumx(),
+                                    ggplottheme=ggplottheme,
+                                    textsize=10),
+            #max(13,min(13,1.25*length(unique(dataChartx()$param)))),
+            height = argus::exportHeight(3, 49, length(unique(dataChartx()$param)), 3),
+            width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
+            units="in"
+          )
+        }
       )
-      ggsave("barCharts.png",plot=chartPlot(),
-              width=argus::exportWidth(49, length(unique(dataChartx()$param)), 5),
-              height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 5)+2,
-              unit = "in"
-             )
-      ggsave("summaryChartReg.png", plot=summaryPlotReg(10, dataMapx(),ggplottheme, subsetRegionsx()),
-             height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
-             width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
-             units = "in"
-             )
-      ggsave("map.png",plot=map(),
-              height = argus::exportHeight(3, 49, rv$pcount, 3),
-              width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
-              units="in"
-              )
-      ggsave("mapBase.png", plot=mapBase(dataMapx()),
-              height = argus::exportHeight(3, 49, rv$pcount, 3),
-              width=argus::exportWidth(10, length(unique(dataChartx()$param)), 3),
-              units="in"
-            )
+      shiny::withProgress(
+        message = paste0("Downloading charts_summary_region.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave("charts_summary_region.png",plot=summaryPlotReg(dataMapx = dataMapx(),
+                                                                 ggplottheme = ggplottheme,
+                                                                 subsetRegionsx = subsetRegionsx(),
+                                                                 textsize=10),
+                   height = argus::exportHeight(1, 49, length(unique(dataMapx()$param)), 3),
+                   width = argus::exportWidth(49, length(unique(subsetRegionsx())), 2)+3,
+                   units = "in")
+        }
+      )
+      shiny::withProgress(
+        message = paste0("Downloading charts_bar.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave("charts_bar.png",plot=argus::plotAbs(dataChartPlot=dataChartx(),
+                                                      ggplottheme=ggplottheme,
+                                                      scenarioRefSelected=input$scenarioRefSelected,
+                                                      textsize=10),
+                 width=argus::exportWidth(49, length(unique(dataChartx()$param)), 4),
+                 height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 4)+2,
+                 unit = "in"
+          )
+        }
+      )
+      shiny::withProgress(
+        message = paste0("Downloading charts_bar_diff_absolute.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave("charts_bar_diff_absolute.png",plot=argus::plotDiffAbs(dataChartPlot=dataDiffAbsx(),
+                                                                        ggplottheme=ggplottheme,
+                                                                        scenarioRefSelected=input$scenarioRefSelected,
+                                                                        textsize=10),
+                 width=argus::exportWidth(49, length(unique(dataChartx()$param)), 4),
+                 height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 4)+2,
+                 unit = "in"
+          )
+        }
+      )
+      shiny::withProgress(
+        message = paste0("Downloading charts_bar_diff_percent.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave("charts_bar_diff_percent.png",plot=argus::plotDiffPrcnt(dataChartPlot=dataPrcntAbsx(),
+                                                                         ggplottheme=ggplottheme,
+                                                                         scenarioRefSelected=input$scenarioRefSelected,
+                                                                         textsize = 10),
+                 width=argus::exportWidth(49, length(unique(dataChartx()$param)), 4),
+                 height=argus::exportHeight(1, 49, length(unique(dataChartx()$param)), 4)+2,
+                 unit = "in"
+          )
+        }
+      )
+      shiny::withProgress(
+        message = paste0("Downloading maps.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          print(dataMapx$param%>%unique())
+          ggsave(
+            paste0("maps_",mapX,".png"),
+            plot=argus::plotMap(mapData = dataMapx,
+                                legendType = input$legendType,
+                                mapX = mapX,
+                                textsize = 10),
+            height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 10),
+            width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
+            units="in"
+          )
+        }
+      )
+      shiny::withProgress(
+        message = paste0("Downloading maps_diff_absolute.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave(
+            paste0("maps_diff_absolute_",mapX,".png"),
+            plot=argus::plotMap(mapData = dataMapx,
+                                legendType = input$legendType,
+                                mapX = mapX,
+                                scenRef = input$scenarioRefSelected ,
+                                diff="absolute",
+                                textsize=10),
+            height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 10),
+            width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
+            units="in"
+          )
+        }
+      )
+      shiny::withProgress(
+        message = paste0("Downloading maps_diff_percent.png"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          ggsave(
+            paste0("maps_diff_percent_",mapX,".png"),
+            plot=argus::plotMap(mapData = dataMapx,
+                                legendType = input$legendType,
+                                mapX = mapX,
+                                scenRef = input$scenarioRefSelected ,
+                                diff="percent",
+                                textsize = 10),
+            height = argus::exportHeight(3, 49, length(unique(dataMapx()$param)), 10),
+            width=argus::exportWidth(10, length(unique(data()$scenario)), 10),
+            units="in"
+          )
+        }
+      )
+      shiny::withProgress(
+        message = paste0("Downloading table.csv"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          write.csv(data(), "table.csv")
+        }
+      )
       zip::zip(zipfile=file, files=fs)
     }
   )

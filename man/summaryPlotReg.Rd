@@ -5,18 +5,18 @@
 \title{summaryPlotReg}
 \usage{
 summaryPlotReg(
-  titletext,
   dataMapx,
   ggplottheme = ggplot2::theme_bw(),
+  textsize = 15,
   subsetRegionsx
 )
 }
 \arguments{
-\item{titletext}{plot title}
-
 \item{dataMapx}{Input map dataframe}
 
 \item{ggplottheme}{ggplot theme to use}
+
+\item{textsize}{Default =15}
 
 \item{subsetRegionsx}{Subset of regions}
 }

@@ -7,7 +7,8 @@
 plotDiffAbs(
   dataChartPlot,
   scenarioRefSelected,
-  ggplottheme = ggplot2::theme_bw()
+  ggplottheme = ggplot2::theme_bw(),
+  textsize = 15
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ plotDiffAbs(
 \item{scenarioRefSelected}{scenarioRefSeleceted#'}
 
 \item{ggplottheme}{ggplot theme to use}
+
+\item{textsize}{Default = 15}
 }
 \description{
 generate chart plot for absolute difference and percent difference
