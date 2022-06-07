@@ -1162,7 +1162,7 @@ server <- function(input, output, session) {
   #.........................................
 
   gcamParamsx <- reactive({
-    unique((rmap::mapping_param_query)$param)
+    unique(gcamextractor::data_params)
   })
 
   output$gcamParams = renderUI({
@@ -1240,7 +1240,7 @@ server <- function(input, output, session) {
         }
       progress$inc(1/3, detail = paste("Connecting to Database", 1))
       dataGCAMraw <- gcamextractor::readgcam(reReadData = reReadData_i,
-                                        dirOutputs = tempdir,
+                                        folder = tempdir,
                                         gcamdatabase = gcamdatabasepath_i,
                                         scenOrigNames = scenOrigNames_i,
                                         #scenNewNames = scenNewNames_i,
@@ -1251,7 +1251,7 @@ server <- function(input, output, session) {
       progress$inc(1/3, detail = paste("Unlinking", 2))
       unlink(tempdir, recursive = T)
 
-      dataGCAMraw$data %>% as_tibble() %>%
+      dataGCAMraw$dataAll %>% as_tibble() %>%
         dplyr::select(scenario, region, subRegion, param,
                       class1, class2, x, vintage, aggregate, units,
                       value) %>%
