@@ -83,44 +83,57 @@
 
 
 <p><br></p>
-<!-- ------------------------><!-- ------------------------><div class="section level1">
+<!-- ------------------------>
+<!-- ------------------------>
+<div class="section level1">
 <div class="page-header"><h1 id="introduction">
 <a name="Introduction"></a>Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h1></div>
-<!-- ------------------------><!-- ------------------------><p><code>argus</code> is an R Shiny App to interactively visualize data across scenarios, parameters, and regions. It can accomodate data inputs of the user’s choice, including the options to read a URL, upload a .csv file, or use GCAM data. Features of the application include selecting which scenarios will run, choosing the relevant parameters for individual cases, and selecting the geographic regions of interest. The designated parameters can be viewed as line graphs plotted over time, weighted bar graphs showing makeup breakdown within each bar, maps showing values by country, or as output tables. All results can be downloaded onto a local machine, or the user can obtain a bookmark to save their work.</p>
+<!-- ------------------------>
+<!-- ------------------------>
+<p><code>argus</code> is an R Shiny App to interactively visualize data across scenarios, parameters, and regions. It can accomodate data inputs of the user’s choice, including the options to read a URL, upload a .csv file, or use GCAM data. Features of the application include selecting which scenarios will run, choosing the relevant parameters for individual cases, and selecting the geographic regions of interest. The designated parameters can be viewed as line graphs plotted over time, weighted bar graphs showing makeup breakdown within each bar, maps showing values by country, or as output tables. All results can be downloaded onto a local machine, or the user can obtain a bookmark to save their work.</p>
 <p>For more detailed information on using argus, click the green <strong>User Guide</strong> button below. To launch argus in your browser, click the blue <strong>Launch App</strong> button.</p>
 <p><br></p>
-<p align="center"><a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank" class="external-link"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_user_guide.PNG?raw=true" alt="https://jgcri.github.io/argus/articles/vignette_argus.html" height="60"></a> <img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_divider.PNG?raw=true" height="40"><a href="http://ec2-3-21-37-120.us-east-2.compute.amazonaws.com/argus/inst/app/" target="_blank" class="external-link"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_launch_app.PNG?raw=true" alt="https://jgcri.shinyapps.io/argus/" height="60"></a></p>
-<!-- ------------------------><!-- ------------------------>
+<p align="center">
+<a href="https://jgcri.github.io/argus/articles/vignette_argus.html" target="_blank" class="external-link"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_user_guide.PNG?raw=true" alt="https://jgcri.github.io/argus/articles/vignette_argus.html" height="60"></a> <img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_divider.PNG?raw=true" height="40"><a href="https://jgcri.shinyapps.io/argus/" target="_blank" class="external-link"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_launch_app.PNG?raw=true" alt="https://jgcri.shinyapps.io/argus/" height="60"></a>
+</p>
+<!-- ------------------------>
+<!-- ------------------------>
 </div>
 <div class="section level1">
 <h1 id="citation">
 <a name="Citation"></a>Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h1>
-<!-- ------------------------><!-- ------------------------><p>Khan, Z., Tang, S., Warmka, A., Zhao, M., Wild, T., Vernon, C., 2021. Argus - An interactive platform to effectively communicate and share spatio-temporal scientific data. (In progress) Journal of Open Source Software, DOI: XXXX</p>
-<!-- ------------------------><!-- ------------------------>
+<!-- ------------------------>
+<!-- ------------------------>
+<p>Khan, Z., Tang, S., Warmka, A., Zhao, M., Wild, T., Vernon, C., 2021. Argus - An interactive platform to effectively communicate and share spatio-temporal scientific data. (In progress) Journal of Open Source Software, DOI: XXXX</p>
+<!-- ------------------------>
+<!-- ------------------------>
 </div>
 <div class="section level1">
 <h1 id="argus-offline">
 <a name="Argus%20Offline"></a>Argus Offline<a class="anchor" aria-label="anchor" href="#argus-offline"></a>
 </h1>
-<!-- ------------------------><!-- ------------------------><p>If users want to use argus locally on their machines they can install the software as follows:</p>
+<!-- ------------------------>
+<!-- ------------------------>
+<p>If users want to use argus locally on their machines they can install the software as follows:</p>
 <ol style="list-style-type: decimal">
-<li>Download and install:<ul>
+<li>Download and install:
+<ul>
 <li>R (<a href="https://www.r-project.org/" class="external-link uri">https://www.r-project.org/</a>)</li>
 <li>R studio (<a href="https://www.rstudio.com/" class="external-link uri">https://www.rstudio.com/</a>)</li>
 </ul>
 </li>
 <li>Open R studio:</li>
 </ol>
-<pre><code><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/rgcam"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/rmap"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/jgcricolors"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/gcamextractor"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/argus"</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/argus" class="external-link">argus</a></span><span class="op">)</span>
-<span class="fu">argus</span><span class="fu">::</span><span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/rgcam"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/rmap"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/jgcricolors"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/gcamextractor"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/argus"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/argus" class="external-link">argus</a></span><span class="op">)</span></span>
+<span><span class="fu">argus</span><span class="fu">::</span><span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="op">)</span></span></code></pre>
 <p>Additional steps for UBUNTU from a terminal</p>
 <pre><code>sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt-get update
@@ -137,6 +150,7 @@ brew install imagemagick@6</code></pre>
     <div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=argus" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/JGCRI/argus/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/JGCRI/argus/issues" class="external-link">Report a bug</a></li>
 </ul>
@@ -191,7 +205,7 @@ brew install imagemagick@6</code></pre>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
